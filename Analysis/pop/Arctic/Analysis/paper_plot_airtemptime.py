@@ -31,14 +31,17 @@ lyear = '250'; # last year
 dn = 5; # 5 year filter
 time = np.linspace(1, 250, 250)
 
-root_folder='/mnt/fimm/Analysis/pop/Arctic/Analysis/matfiles/'
+#root_folder='/mnt/fimm/Analysis/pop/Arctic/Analysis/matfiles/'
+root_folder='/export/grunchfs/unibjerknes/milicak/bckup/Analysis/pop/Arctic/Analysis/matfiles/'
 
-projects=['B1850CN_f19_tn11_kdsens','B1850CN_f19_tn11_kdsens01','B1850CN_f19_tn11_kdsens02','B1850CN_f19_tn11_kdsens03',
-          'B1850CN_f19_tn11_kdsens05','B1850CN_f19_tn11_kdsens04','B1850CN_f19_tn11_kdsens06']
+projects=['B1850CN_f19_tn11_kdsens','B1850CN_f19_tn11_kdsens01','B1850CN_f19_tn11_kdsens02',
+          'B1850CN_f19_tn11_kdsens03','B1850CN_f19_tn11_kdsens05','B1850CN_f19_tn11_kdsens04',
+          'B1850CN_f19_tn11_kdsens06','B1850CN_f19_tn11_kdsens07']
 
-legendnames=['Cold-ctrl','Exp1','Exp2','Exp3','Warm-ctrl','Exp4','Exp5']
-plotcolors=['cyan','blue','magenta','brown','green','red','black']
-    
+legendnames=['Cold-ctrl','Exp1','Exp2','Exp3','Warm-ctrl','Exp4','Exp5','Exp6']
+plotcolors=['cyan','blue','magenta','brown','green','red','black','orange']
+
+
 fig = plt.figure()
 for i in xrange(0,4):
     filename=root_folder+projects[i]+'_airtemp_mean_'+fyear+'_'+lyear+'.mat'
@@ -58,7 +61,7 @@ plt.savefig('paperfigs/cold_exps_airtempwinternorth_time.eps', format='eps', dpi
 plt.close(fig)
 
 fig = plt.figure()
-for i in xrange(4,7):
+for i in xrange(4,8):
     filename=root_folder+projects[i]+'_airtemp_mean_'+fyear+'_'+lyear+'.mat'
     mat = scipy.io.loadmat(filename)
     AIRTEMPTrefwinter=np.array(mat['AIRTEMPTrefwinter'])
