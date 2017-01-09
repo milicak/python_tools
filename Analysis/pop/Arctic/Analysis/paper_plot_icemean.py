@@ -15,7 +15,9 @@ from netcdf_functions import nc_read
 from netcdf_functions import ncgetdim
 
 plt.ion()
-grid_file='/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/DATA/ncar-pop/areacello_fx_CCSM4_piControl_r0i0p0.nc';
+grid_file="/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/DATA/ncar-pop/ \
+areacello_fx_CCSM4_piControl_r0i0p0.nc";
+sys.exit()
 
 lon=nc_read(grid_file,'lon');
 lat=nc_read(grid_file,'lat');
