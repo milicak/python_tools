@@ -21,6 +21,13 @@ reload(my_nanfilter)
 # %matplotlib inline
 # np.shape !!!!!
 
+aradius = 6.373E6      # Radius of Earth (m)
+Lv = 2.5e6  # Joule/kg
+rhow = 1000  # kg/m3
+Lhvap = 2.5E6    # Latent heat of vaporization (J / kg)
+Lhsub = 2.834E6   # Latent heat of sublimation (J / kg)
+Lhfus = Lhsub - Lhvap  # Latent heat of fusion (J / kg)
+
 # IMPORTANT 
 plt.ion()
 
@@ -32,7 +39,6 @@ def inferred_heat_transport(energy_in, lat_deg):
     '''Returns the inferred heat transport (in PW) by integrating the net energy imbalance from pole to pole.'''
     from scipy import integrate
     lat_rad = np.deg2rad(lat_deg)
-    aradius = 6.373E6      # Radius of Earth (m)
     return (1E-15 * 2 * np.math.pi * aradius**2 *
             integrate.cumtrapz( np.cos(lat_rad)*energy_in, \
             x=lat_rad, initial=0.))
@@ -66,11 +72,6 @@ def enable_global(tlon,tlat,data):
 
 def compute_heat_transport(root_folder,project_name,cam_ext):
     ''' computes heat transport '''
-    Lv = 2.5e6  # Joule/kg
-    rhow = 1000  # kg/m3
-    Lhvap = 2.5E6    # Latent heat of vaporization (J / kg)
-    Lhsub = 2.834E6   # Latent heat of sublimation (J / kg)
-    Lhfus = Lhsub - Lhvap  # Latent heat of fusion (J / kg)
 
     mw = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], dtype=np.float)
     mw = mw/sum(mw)
