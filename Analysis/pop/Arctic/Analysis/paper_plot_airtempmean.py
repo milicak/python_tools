@@ -28,8 +28,8 @@ projects=['B1850CN_f19_tn11_kdsens','B1850CN_f19_tn11_kdsens01','B1850CN_f19_tn1
 
 #05 ctrl for warm; 04 Barents,Kara + Eurasia; 06 Barents,Kara for warm exps
 
-av1=240; #240; %75;
-av2=250; #250; %85;
+av1=75; #240; %75;
+av2=85; #250; %85;
 
 fyear = '1'; # first year
 lyear = '250'; # last year
@@ -75,7 +75,8 @@ for i in ctrls:
     # vmax=100, vmin=20,latlon=True)
     #cmap = plt.get_cmap('Blues', 10)
     cb = m.colorbar(im1,"right", size="5%", pad="2%")
-    cb.set_label( r'$^\circ$' 'C')
+    #cb.set_label( r'$^\circ$' 'C')
+    cb.set_label('K')
     #plt.clim(20,110)
     plt.show()
     plt.savefig('paperfigs/'+projects[i]+'_airtemp_winter_'
@@ -107,7 +108,8 @@ for i in xrange(0,len(projects)):
          im1 = m.pcolormesh(lon,lat,np.transpose(np.ma.masked_invalid(dnm)),
                             shading='flat',cmap=cmap_needjet2,latlon=True)
          cb = m.colorbar(im1,"right", size="5%", pad="2%")
-         cb.set_label( r'$^\circ$' 'C')
+         #cb.set_label( r'$^\circ$' 'C')
+         cb.set_label('K')
          plt.show()
          plt.savefig('paperfigs/'+projects[i]+'_airtemp_winter_diff_'
                      +str(av1)+'_'+str(av2)+'_years.eps', 
@@ -131,7 +133,8 @@ for i in xrange(0,len(projects)):
         im1 = m.pcolormesh(lon,lat,np.transpose(np.ma.masked_invalid(dnm)),
                            shading='flat',cmap=cmap_needjet2,latlon=True)
         cb = m.colorbar(im1,"right", size="5%", pad="2%")
-        cb.set_label( r'$^\circ$' 'C')
+        #cb.set_label( r'$^\circ$' 'C')
+        cb.set_label('K')
         plt.show()
         plt.savefig('paperfigs/'+projects[i]+'_airtemp_winter_diff_'
                     +str(av1)+'_'+str(av2)+'_years.eps', 
