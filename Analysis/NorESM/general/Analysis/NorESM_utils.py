@@ -5,9 +5,9 @@ import scipy.io.netcdf as nio
 import scipy.io as io
 from scipy.interpolate import griddata
 from scipy import interpolate
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
-from shapely.geometry.polygon import LinearRing
+#from shapely.geometry import Point
+#from shapely.geometry.polygon import Polygon
+#from shapely.geometry.polygon import LinearRing
 import os
 from mpl_toolkits.basemap import Basemap
 import sys
@@ -15,11 +15,12 @@ import dist
 from scipy import stats
 # Some locally installed stuff
 #sys.path.append('/usr/lib/python2.7/site-packages')
-sys.path.append('/Home/siv22/anu074/PyFerret/gsw-3.0.2/')
-sys.path.append('/Home/siv22/anu074/PyFerret/seawater-3.3.1/')
+#sys.path.append('/Home/siv22/anu074/PyFerret/gsw-3.0.2/')
+sys.path.append('/fimm/home/bjerknes/milicak/python-gsw')
+#sys.path.append('/Home/siv22/anu074/PyFerret/seawater-3.3.1/')
 #import h5py
 import gsw
-import seawater as sw
+#import seawater as sw
 from netCDF4 import Dataset
 
 def read_sections(filename):
@@ -666,13 +667,13 @@ def noresm2WOA(datain,shift=False, grid='gx1v6',dest='1deg'):
       #S=mapping_data['S'].copy()
     #these two don't work, maybe something wrong with the way data is written in mat file
     elif grid in ['tnx1v1']:
-      mapping_data=io.loadmat('/Data/skd/users/anu074/norstore/map_noresm_tnx1v1_to_woa09_1deg_aave_v2.mat')
+      mapping_data=io.loadmat('/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/map_noresm_tnx1v1_to_woa09_1deg_aave_v2.mat')
       #S=mapping_data["S"].values()[0][:]
     elif grid in ['tnx0.25v1']:
       if dest in ['1deg']:
-        mapping_data=io.loadmat('/Data/skd/users/anu074/norstore/map_noresm_tnx0.25v1_to_woa09_1deg_aave_v2.mat')
+        mapping_data=io.loadmat('/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/map_noresm_tnx0.25v1_to_woa09_1deg_aave_v2.mat')
       elif dest in ['0.25deg']:
-        mapping_data=io.loadmat('/Data/skd/users/anu074/norstore/map_noresm_tnx0.25v1_to_woa09_0_25deg_aave_v2.mat')
+        mapping_data=io.loadmat('/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/map_noresm_tnx0.25v1_to_woa09_0_25deg_aave_v2.mat')
     S=mapping_data['S'][:]
     lon_b=mapping_data['lon_b'][:].squeeze()
     lat_b=mapping_data['lat_b'][:].squeeze()

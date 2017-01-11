@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 from netcdf_functions import nc_read
 from netcdf_functions import ncgetdim
+import NorESM_utils as noresmutils
 
 plt.ion()
 
@@ -357,3 +358,7 @@ prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext)
 #amocmean=amocmean(root_folder, cmpnt, mdl, ext)
 #HT,lat_cesm=compute_heat_transport(root_folder, expid, cmpnt, mdl, ext)
 temp=var3Dmean(root_folder, cmpnt, mdl, ext, 'templvl')
+lon_w,lat_w,t1_w=noresmutils.noresm2WOA(temp[0,:-1,:],shift=True, grid='tnx1v1')
+
+
+
