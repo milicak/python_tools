@@ -8,12 +8,6 @@ from netcdf_functions import nc_read
 from netcdf_functions import ncgetdim
 
 plt.ion()
-root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-
-#expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
-expid = 'N1850_f19_tn11_01_default'
-fyear = 100; # first year
-lyear = 110; # last year
 
 datesep = '-'
 
@@ -71,14 +65,17 @@ def timemean(prefix, var, varname, fyear, lyear):
     ''' timemean averages '''
     months2days=[31,  28,  31,  30,  31,   30,   31,  31,   30, 31,   30, 31];
     yeardays=sum(months2days);
+    mw = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], dtype=np.float)
+    mw = mw/sum(mw)
     n=0.0;
     for year in xrange(fyear,lyear+1):
         if m2y==1:
             for month in xrange(0,12):
-                n=n+months2days[month]
+                n=n+mw[month]
                 sdate="%4.4d%c%2.2d" % (year,datesep,month+1)
                 dnm=nc_read(prefix+sdate+'.nc',varname);
-                var=var+np.squeeze(dnm.data)*months2days[month]
+                var=var+np.squeeze(dnm.data)*mw[month]
+            print sdate,n
         
             
         else:
@@ -218,11 +215,9 @@ def amocmean(root_folder,cmpnt,mdl,ext):
 
 
 def var3Dmean(root_folder, cmpnt, mdl, ext, varname):
-    ''' compute mean amoc'''
-    #prefix,sdate = get_sdate_ini(root_folder) 
+    ''' compute any 3D variable mean'''
     var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
                                         dim3='depth')
-    print 'mehmet',var.shape
     var = timemean(prefix, var, varname, fyear, lyear)
     return var
 
@@ -342,10 +337,16 @@ def set_ini_val_zero(prefix,sdate,*args, **kwargs):
 # 2 for indian_pacific_ocean region
 # 3 for global_ocean
 region = 1
-m2y = 0
+root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+
+expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
+#expid = 'N1850_f19_tn11_01_default'
+fyear = 100; # first year
+lyear = 110; # last year
+m2y = 1
 cmpnt = 'ocn' # ocn, atm 
 mdl = 'micom' # micom, cam2, cam
-ext = 'hy' # hm, hy, h0
+ext = 'hm' # hm, hy, h0
 #cmpnt = 'atm' # ocn, atm 
 #mdl = 'cam2' # micom, cam2, cam
 #ext = 'h0' # hm, hy, h0
