@@ -223,6 +223,26 @@ def var3Dmean(root_folder, cmpnt, mdl, ext, varname):
     return var
 
 
+def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2):
+    ''' compute any 3D variable mean'''
+    var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
+                                        dim3='depth')
+    var = timemean(prefix, var, varname, fyear, lyear)
+    lon_w,lat_w,t1_w=noresmutils.noresm2WOA(var[z1,:-1,:],shift=True, grid='tnx1v1')
+    # adjust lon_w
+    lon_w[lon_w > 180] = lon_w[lon_w > 180]-360
+    varsurface = np.copy(t1_w)
+    dnm = np.copy(varsurface[:,180:])
+    varsurface[:,180:] = varsurface[:,:180]
+    varsurface[:,:180] = dnm
+    varwoa = nc_read(woafname, woavname)
+    varwoa = np.copy(varwoa[z2,:,:])
+    lonwoa = nc_read(woafname, 'lon')
+    latwoa = nc_read(woafname, 'lat')    
+    varwoa[varwoa < -10] =0
+    return varsurface, varwoa, lonwoa, latwoa
+
+
 def compute_heat_transport(root_folder, project_name, cmpnt, mdl, ext):
     ''' computes ocean and atmosphere heat transport '''
 
@@ -338,27 +358,64 @@ def set_ini_val_zero(prefix,sdate,*args, **kwargs):
 # 2 for indian_pacific_ocean region
 # 3 for global_ocean
 region = 1
-root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+#root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+root_folder = '/work/milicak/mnt/viljework/archive/'
 
-expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
+#expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
+expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
 #expid = 'N1850_f19_tn11_01_default'
-fyear = 100; # first year
-lyear = 110; # last year
-m2y = 1
+fyear = 10; # first year
+lyear = 20; # last year
+m2y = 0
 cmpnt = 'ocn' # ocn, atm 
 mdl = 'micom' # micom, cam2, cam
-ext = 'hm' # hm, hy, h0
+ext = 'hy' # hm, hy, h0
+varname = 'templvl'
 #cmpnt = 'atm' # ocn, atm 
 #mdl = 'cam2' # micom, cam2, cam
 #ext = 'h0' # hm, hy, h0
 prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext) 
+woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
+woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
 
-#vol=passagevolumetransporttime(root_folder,5) # 5 for Drake
-#amoctime=amoctime(root_folder, cmpnt, mdl, ext)
-#amocmean=amocmean(root_folder, cmpnt, mdl, ext)
-#HT,lat_cesm=compute_heat_transport(root_folder, expid, cmpnt, mdl, ext)
-temp=var3Dmean(root_folder, cmpnt, mdl, ext, 'templvl')
-lon_w,lat_w,t1_w=noresmutils.noresm2WOA(temp[0,:-1,:],shift=True, grid='tnx1v1')
+
+def call_generic_diags(argument):
+    switcher = {
+        'amoctime': 1,
+        'amocmean': 2,
+        'heattransport': 3,
+        'voltr': 4,
+        '3Dmean': 5,
+        'sstbias': 6,
+        'sssbias': 7,
+    }
+    return switcher.get(argument, "non-valid option. Please select another option")
+   
+
+diagno = call_generic_diags('sstbias')
+print 'You select', diagno
+if diagno == 1:
+    amoctime = amoctime(root_folder, cmpnt, mdl, ext)
+elif diagno == 2:
+    amocmean = amocmean(root_folder, cmpnt, mdl, ext)
+elif diagno == 3:
+    HT,lat_cesm = compute_heat_transport(root_folder, expid, cmpnt, mdl, ext)
+elif diagno == 4:
+    vol = passagevolumetransporttime(root_folder,5) # 5 for Drake
+elif diagno == 5:
+    temp = var3Dmean(root_folder, cmpnt, mdl, ext, varname)
+elif diagno == 6:
+    sst,sstwoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'templvl',
+                                  woafnamet,'t',0,0)
+    plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
+elif diagno == 7:
+    sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
+                                  woafnames,'s',0,0)
+    plt.pcolor(lon,lat,np.ma.masked_invalid(sss-ssswoa),vmin=-3,vmax=3);plt.colorbar()
+
+
+
+
 
 
 
