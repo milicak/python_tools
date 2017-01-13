@@ -40,6 +40,13 @@ def ncread_time_surface(fname, variable, timestr, timeend, x, y):
     return tmp
 
 
+def ncread_lev(fname, variable, zlev):
+    ncfile = Dataset(fname, 'r', format='NETCDF4')
+    tmp = np.squeeze(ncfile.variables[variable][:,zlev,:,:].copy())
+
+    return tmp
+
+
 def get_sdate_ini(root_folder,cmpnt,mdl,ext):
     # Get dimensions and time attributes for ocn or atm or others ...
     prefix=root_folder+expid+'/'+cmpnt+'/hist/'+expid+ '.'+ mdl + \
@@ -62,7 +69,8 @@ def inferred_heat_transport(energy_in, lat_deg):
             x=lat_rad, initial=0.))
 
 
-def timemean(prefix, var, varname, fyear, lyear):
+def timemean(prefix, var, varname, fyear, lyear, **kwargs):
+    zlev = kwargs.get('zlev', None)
     ''' timemean averages '''
     months2days=[31,  28,  31,  30,  31,   30,   31,  31,   30, 31,   30, 31];
     yeardays=sum(months2days);
@@ -74,7 +82,12 @@ def timemean(prefix, var, varname, fyear, lyear):
             for month in xrange(0,12):
                 n=n+mw[month]
                 sdate="%4.4d%c%2.2d" % (year,datesep,month+1)
-                dnm=nc_read(prefix+sdate+'.nc',varname);
+                if not zlev == None:
+                    dnm=ncread_lev(prefix+sdate+'.nc', varname, zlev);
+                else:
+                    dnm=nc_read(prefix+sdate+'.nc', varname);
+
+
                 var=var+np.squeeze(dnm.data)*mw[month]
             print sdate,n
         
@@ -82,51 +95,18 @@ def timemean(prefix, var, varname, fyear, lyear):
         else:
             sdate = "%4.4d" % (year)
             n += 1.0
-            dnm=nc_read(prefix+sdate+'.nc',varname);
+            if not zlev == None:
+                dnm=ncread_lev(prefix+sdate+'.nc', varname, zlev);
+            else:
+                dnm=nc_read(prefix+sdate+'.nc', varname);
+
+
             var=var+np.squeeze(dnm.data)
-            print sdate,n
+            print sdate,n, var.shape
+
 
     var = var/n
     return var
-
-
-
-def timemean_old(args):
-    ''' timemean averages '''
-    mask=nc_read(grid_file,'pmask');
-
-    prefix,sdate = get_sdate_ini(root_folder) 
-    months2days=[31,  28,  31,  30,  31,   30,   31,  31,   30, 31,   30, 31];
-    yeardays=sum(months2days);
-
-    nx=ncgetdim(prefix+sdate+'.nc','x');
-    ny=ncgetdim(prefix+sdate+'.nc','y');
-    nz=ncgetdim(prefix+sdate+'.nc','depth');
-    depth=nc_read(prefix+sdate+'.nc','depth');
-
-    templvl=np.zeros((nz,ny,nx));
-    salnlvl=np.zeros((nz,ny,nx));
-    difisolvl=np.zeros((nz,ny,nx));
-    difdialvl=np.zeros((nz,ny,nx));
-    mask=np.tile(mask,(nz,1,1));
-    #mask=np.transpose(mask, (2, 1, 0));
-
-    n=0;
-    if m2y==1:
-         for year in xrange(fyear,lyear+1):
-              for month in xrange(0,12):
-                   n=n+months2days[month]
-                   sdate="%4.4d%c%2.2d" % (year,datesep,month+1)
-                   dnm=nc_read(prefix+sdate+'.nc','templvl');
-                   templvl=templvl+np.squeeze(dnm.data)*mask*months2days[month]
-                   dnm=nc_read(prefix+sdate+'.nc','salnlvl');
-                   salnlvl=salnlvl+np.squeeze(dnm.data)*mask*months2days[month]
-                   dnm=nc_read(prefix+sdate+'.nc','difisolvl');
-                   difisolvl=difisolvl+10**(np.squeeze(dnm.data))*mask*months2days[month]
-                   dnm=nc_read(prefix+sdate+'.nc','difdialvl');
-                   difdialvl=difdialvl+10**(np.squeeze(dnm.data))*mask*months2days[month]
-                   print sdate
-
 
 
 def passagevolumetransporttime(root_folder,sectionno):
@@ -225,10 +205,11 @@ def var3Dmean(root_folder, cmpnt, mdl, ext, varname):
 
 def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2):
     ''' compute any 3D variable mean'''
-    var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
-                                        dim3='depth')
-    var = timemean(prefix, var, varname, fyear, lyear)
-    lon_w,lat_w,t1_w=noresmutils.noresm2WOA(var[z1,:-1,:],shift=True, grid='tnx1v1')
+    var, nx, ny, _, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',)
+    #var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
+    #                                    dim3='depth')
+    var = timemean(prefix, var, varname, fyear, lyear, zlev=z1)
+    lon_w,lat_w,t1_w=noresmutils.noresm2WOA(var[:-1,:],shift=True, grid='tnx1v1')
     # adjust lon_w
     lon_w[lon_w > 180] = lon_w[lon_w > 180]-360
     varsurface = np.copy(t1_w)
