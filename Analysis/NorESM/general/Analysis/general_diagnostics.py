@@ -1,6 +1,7 @@
 #!/usr/bin/env python 
 import numpy as np
 import numpy.ma as ma
+import pdb
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import sys
@@ -89,7 +90,7 @@ def timemean(prefix, var, varname, fyear, lyear, **kwargs):
 
 
                 var=var+np.squeeze(dnm.data)*mw[month]
-            print sdate,n
+            print sdate, n
         
             
         else:
@@ -102,7 +103,7 @@ def timemean(prefix, var, varname, fyear, lyear, **kwargs):
 
 
             var=var+np.squeeze(dnm.data)
-            print sdate,n, var.shape
+            print sdate, n
 
 
     var = var/n
@@ -202,6 +203,39 @@ def var3Dmean(root_folder, cmpnt, mdl, ext, varname):
     var = timemean(prefix, var, varname, fyear, lyear)
     return var
 
+
+def zonalmean_bias(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
+                  , maskwoafname, maskindex):
+    ''' compute any 3D variable mean'''
+    var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
+                                        dim3='depth')
+    var = timemean(prefix, var, varname, fyear, lyear)
+    mask1 = nc_read(prefix+sdate+'.nc','templvl');
+    mask = np.squeeze(mask1.mask)
+    print 'mehhmet', mask.shape, mask[0,200,200]
+    var_w=ma.zeros((nz,180,360))
+    m_w=ma.zeros((nz,180,360))
+    #LOOP OVER THE DEPTH LEVELS
+    for z in range(var.shape[0]):
+        print 'level = ',z
+        lon_w,lat_w,t1_w=noresmutils.noresm2WOA(var[z,:-1,:],shift=True,
+                                               grid='tnx1v1')
+        lon_w,lat_w,m1_w=noresmutils.noresm2WOA(ma.masked_array(1-mask[z,:-1,:],
+                            mask=mask[z,:-1,:]),shift=True, grid='tnx1v1')
+    # NOTE THAT HERE WE INTERPOLATE THE MASK AS WELL - THIS WILL GIVE US THE
+    # LAND FRACTION OF EACH CELL IN THE NEW GRID
+    # DIVIDING BY THIS FRACTION GIVES THE TEMPERATURE/SALINITY
+    # VALUE OF THE CELL (I.E. NOT THE MEAN OF THE WHOLE CELL,
+    # BUT THE MEAN OF THE OCEAN PART)
+        var_w[z,:,:]=t1_w
+        var_w[z,:,:]=t1_w/m1_w
+        m_w[z,:,:]=m1_w
+    
+
+    dnm = np.copy(var_w[:,:,180:])
+    var_w[:,:,180:] = var_w[:,:,:180]
+    var_w[:,:,:180] = dnm
+    return var_w, t1_w, m1_w, mask
 
 def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2):
     ''' compute any 3D variable mean'''
@@ -358,6 +392,14 @@ varname = 'templvl'
 prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext) 
 woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
 woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
+mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
+
+#mask_index = 0; # 0 for Global                                               
+#mask_index = 1; # 1 for Pacific Ocean                                        
+#mask_index = 2; # 2 for Atlantic Ocean                                       
+mask_index = 4; # 4 for Southern Ocean                                        
+#mask_index = 6; # 6 for Arctic Ocean                                         
+#mask_index = 7; # 7 for Indian Ocea
 
 
 def call_generic_diags(argument):
@@ -369,11 +411,12 @@ def call_generic_diags(argument):
         '3Dmean': 5,
         'sstbias': 6,
         'sssbias': 7,
+        'zonalmean': 8,
     }
     return switcher.get(argument, "non-valid option. Please select another option")
    
 
-diagno = call_generic_diags('sstbias')
+diagno = call_generic_diags('zonalmean')
 print 'You select', diagno
 if diagno == 1:
     amoctime = amoctime(root_folder, cmpnt, mdl, ext)
@@ -393,6 +436,12 @@ elif diagno == 7:
     sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
                                   woafnames,'s',0,0)
     plt.pcolor(lon,lat,np.ma.masked_invalid(sss-ssswoa),vmin=-3,vmax=3);plt.colorbar()
+elif diagno == 8:
+    #var,varwoa,lat,depth = zonalmean_bias(root_folder, cmpnt, mdl, ext, 'templvl',
+    #                              woafnamet,'t')
+    var, vart, varm, mask11 = zonalmean_bias(root_folder, cmpnt, mdl, ext, 'templvl',
+                                  woafnamet, 't', mask_woa09_file, mask_index)
+    #plt.pcolor(lat,depth,np.ma.masked_invalid(var-varwoa),vmin=-5,vmax=5);plt.colorbar()
 
 
 

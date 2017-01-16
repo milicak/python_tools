@@ -4,7 +4,7 @@ import math as math
 import scipy.io.netcdf as nio
 import scipy.io as io
 from scipy.interpolate import griddata
-from scipy import interpolate
+#from scipy import interpolate
 #from shapely.geometry import Point
 #from shapely.geometry.polygon import Polygon
 #from shapely.geometry.polygon import LinearRing

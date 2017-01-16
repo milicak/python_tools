@@ -3,17 +3,17 @@ This routine computes the ocean and atm heat transport annually. Inspired from:
 http://www.atmos.albany.edu/facstaff/brose/classes/ATM623_Spring2015/Notes
 /Lectures/Lecture13%20--%20Heat%20transport.html#section6
 '''
-import my_nanfilter
+import sys
 import numpy as np
 import numpy.ma as ma
 # import scipy.io
 # from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+import matplotlib as mpllib
+import my_nanfilter
 from cpttoseg import cpt2seg
 from netCDF4 import Dataset
 from netcdf_functions import nc_read
-import matplotlib.pyplot as plt
-import matplotlib as mpllib
-import sys
 reload(my_nanfilter)
 
 # from my_nanfilter import my_nanfilterbox
@@ -28,22 +28,26 @@ Lhvap = 2.5E6    # Latent heat of vaporization (J / kg)
 Lhsub = 2.834E6   # Latent heat of sublimation (J / kg)
 Lhfus = Lhsub - Lhvap  # Latent heat of fusion (J / kg)
 
-# IMPORTANT 
+# IMPORTANT
 plt.ion()
+# pylint: disable=C0103
 
 _palette_data = cpt2seg('/fimm/home/bjerknes/milicak/python_tools/Analysis/cpt_files/sst.cpt')
 palette = mpllib.colors.LinearSegmentedColormap('palette', _palette_data, 256)
 
 
 def inferred_heat_transport(energy_in, lat_deg):
-    '''Returns the inferred heat transport (in PW) by integrating the net energy imbalance from pole to pole.'''
+    '''Returns the inferred heat transport (in PW) by
+    integrating the net energy imbalance from pole to pole.'''
     from scipy import integrate
     lat_rad = np.deg2rad(lat_deg)
     return (1E-15 * 2 * np.math.pi * aradius**2 *
-            integrate.cumtrapz( np.cos(lat_rad)*energy_in, \
+            integrate.cumtrapz(np.cos(lat_rad) * energy_in, \
             x=lat_rad, initial=0.))
 
+
 def ncread_time_surface(fname, variable, timestr, timeend, x, y):
+    ''' netcdf file read surface in time '''
     # how to use this subroutine is from netcdf_functions import nc_read
     ncfile = Dataset(fname, 'r', format='NETCDF4')
     tmp = np.zeros([y, x])
@@ -55,8 +59,9 @@ def ncread_time_surface(fname, variable, timestr, timeend, x, y):
     return tmp
 
 
-def enable_global(tlon,tlat,data):
-    """Fix the data in such a way that it can to be plotted on a global projection on its native grid"""
+def enable_global(tlon, tlat, data):
+    """Fix the data in such a way that it can to be plotted
+    on a global projection on its native grid"""
     tlon = np.where(np.greater_equal(tlon, min(tlon[:, 0])), tlon-360, tlon)
     tlon = tlon+abs(ma.max(tlon))
     tlon = tlon+360
@@ -70,7 +75,7 @@ def enable_global(tlon,tlat,data):
 
 
 
-def compute_heat_transport(root_folder,project_name,cam_ext):
+def compute_heat_transport(root_folder, project_name, cam_ext):
     ''' computes heat transport '''
 
     mw = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], dtype=np.float)
@@ -144,20 +149,20 @@ def compute_heat_transport(root_folder,project_name,cam_ext):
     lat = nc_read(filename, 'lat')
     # mean averaged on x-axis
     Rtoa = np.mean(Rtoa, axis=1)
-    SurfaceHeatFlux = np.mean(SurfaceHeatFlux, axis=1) 
+    SurfaceHeatFlux = np.mean(SurfaceHeatFlux, axis=1)
     Fatmin = np.mean(Fatmin, axis=1)
-    # heat transport terms 
+    # heat transport terms
     HTmonthly = {}
     HTmonthly['total'] = inferred_heat_transport(Rtoa, lat)
     HTmonthly['atm'] = inferred_heat_transport(Fatmin, lat)
     HTmonthly['ocn'] = inferred_heat_transport(-SurfaceHeatFlux, lat)
-    return HTmonthly,lat
+    return HTmonthly, lat
 
 
 root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
 project = ['N1850_f19_tn11_01_default']
 project_rf = ['N1850_f19_tn11_reverseCoriolis']
-titles = ['ctrl','reverse f']
+titles = ['ctrl', 'reverse f']
 
 fyear = '650'  # first year
 lyear = '750'  # last year
@@ -166,19 +171,19 @@ ny = 96
 ticks = [-90, -60, -30, 0, 30, 60, 90]
 
 
-fig = plt.figure(figsize=(10,4))
+fig = plt.figure(figsize=(10, 4))
 runs = [project, project_rf]
-cams = ['cam2','cam']
+cams = ['cam2', 'cam']
 N = len(runs)
 
 for n, HTname in enumerate([project, project_rf]):
-    HT,lat_cesm=compute_heat_transport(root_folder,HTname,cams[n])
+    HT, lat_cesm = compute_heat_transport(root_folder, HTname, cams[n])
     ax = fig.add_subplot(1, N, n+1)
     ax.plot(lat_cesm, HT['total'], 'k-', label='total', linewidth=2)
     ax.plot(lat_cesm, HT['atm'], 'r-', label='atm', linewidth=2)
     ax.plot(lat_cesm, HT['ocn'], 'b-', label='ocean', linewidth=2)
     ax.set_title(titles[n])
-    ax.set_xlim(-90,90)
+    ax.set_xlim(-90, 90)
     ax.set_xticks(ticks)
     ax.legend(loc='upper left')
     ax.grid()
