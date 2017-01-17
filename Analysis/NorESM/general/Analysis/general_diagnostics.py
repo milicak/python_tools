@@ -13,12 +13,6 @@ plt.ion()
 
 datesep = '-'
 
-# tripolar 1degree grid
-grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
-# tripolar 0.25degree grid
-#grid_file = '/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
-# bi-polar grid
-#grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
 # global constants
 aradius = 6.373E6      # Radius of Earth (m)
@@ -205,7 +199,22 @@ def var3Dmean(root_folder, cmpnt, mdl, ext, varname):
 
 
 def zonalmean_bias(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
-                  , maskwoafname, maskindex):
+                  ,maskfile, maskfilevar):
+    ''' compute any 3D variable mean'''
+    import scipy.io
+    var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
+                                        dim3='depth')
+    var = timemean(prefix, var, varname, fyear, lyear)
+    varwoa = nc_read(woafname, woavname)
+    depth = nc_read(woafname, 'depth')
+    lat = nc_read(woafname, 'TLAT')
+    mat = scipy.io.loadmat(maskfile)
+    mask = np.transpose(np.array(mat[maskfilevar]))
+    return var, varwoa, mask, lat, depth
+
+
+def zonalmean_bias_old(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
+                  , maskfile, maskindex):
     ''' compute any 3D variable mean'''
     var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
                                         dim3='depth')
@@ -368,19 +377,25 @@ def set_ini_val_zero(prefix,sdate,*args, **kwargs):
 
     return var , nx, ny, nz
 
+# tripolar 1degree grid
+grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+# tripolar 0.25degree grid
+#grid_file = '/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+# bi-polar grid
+#grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
 # 1 for atlantic_arctic_ocean region
 # 2 for indian_pacific_ocean region
 # 3 for global_ocean
 region = 1
-#root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-root_folder = '/work/milicak/mnt/viljework/archive/'
+root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+#root_folder = '/work/milicak/mnt/viljework/archive/'
 
 #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
-expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
-#expid = 'N1850_f19_tn11_01_default'
-fyear = 10; # first year
-lyear = 20; # last year
+#expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
+expid = 'N1850_f19_tn11_01_default'
+fyear = 100; # first year
+lyear = 120; # last year
 m2y = 0
 cmpnt = 'ocn' # ocn, atm 
 mdl = 'micom' # micom, cam2, cam
@@ -390,14 +405,16 @@ varname = 'templvl'
 #mdl = 'cam2' # micom, cam2, cam
 #ext = 'h0' # hm, hy, h0
 prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext) 
-woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
-woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
-mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
+#woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
+#woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
+woafnamet = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
+#mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
+mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
 
 #mask_index = 0; # 0 for Global                                               
+mask_index = 10; # 10 for Atlantic Ocean                                       
 #mask_index = 1; # 1 for Pacific Ocean                                        
-#mask_index = 2; # 2 for Atlantic Ocean                                       
-mask_index = 4; # 4 for Southern Ocean                                        
+#mask_index = 4; # 4 for Southern Ocean                                        
 #mask_index = 6; # 6 for Arctic Ocean                                         
 #mask_index = 7; # 7 for Indian Ocea
 
@@ -418,6 +435,7 @@ def call_generic_diags(argument):
 
 diagno = call_generic_diags('zonalmean')
 print 'You select', diagno
+
 if diagno == 1:
     amoctime = amoctime(root_folder, cmpnt, mdl, ext)
 elif diagno == 2:
@@ -437,10 +455,30 @@ elif diagno == 7:
                                   woafnames,'s',0,0)
     plt.pcolor(lon,lat,np.ma.masked_invalid(sss-ssswoa),vmin=-3,vmax=3);plt.colorbar()
 elif diagno == 8:
-    #var,varwoa,lat,depth = zonalmean_bias(root_folder, cmpnt, mdl, ext, 'templvl',
-    #                              woafnamet,'t')
-    var, vart, varm, mask11 = zonalmean_bias(root_folder, cmpnt, mdl, ext, 'templvl',
-                                  woafnamet, 't', mask_woa09_file, mask_index)
+    var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext, 
+                                                   'templvl',
+                                  woafnamet, 'twoa_noresm', mask_woa09_file, 
+                                             'mask_tnxv1')
+    tmask = np.copy(var)
+    tmask[tmask>-50.0]=1.0
+    tmask[tmask<=-50.0]=0.0
+    var[var<=-50]=0.
+    mask = np.double(mask)
+    mask[mask != mask_index] = np.nan 
+    mask[mask == mask_index] = 1.0
+    area = nc_read(grid_file, 'parea')
+    zonalbias = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
+    zonalbiaswght = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
+    for z in xrange(0,varwoa.shape[0]):
+        zonalbias[z,:,:] = np.squeeze(var[z,:,:]-varwoa[z,:,:])*mask*area
+        zonalbiaswght[z,:,:] = np.squeeze(tmask[z,:,:])*mask*area
+
+
+    zonalbias = np.nansum(zonalbias, axis=2)
+    zonalbiaswght = np.nansum(zonalbiaswght, axis=2)
+    zonalbias = zonalbias/zonalbiaswght
+    plt.figure()
+    plt.pcolor(lat[:,0],-depth,np.ma.masked_invalid(zonalbias),vmin=-5,vmax=5);plt.colorbar()
     #plt.pcolor(lat,depth,np.ma.masked_invalid(var-varwoa),vmin=-5,vmax=5);plt.colorbar()
 
 
