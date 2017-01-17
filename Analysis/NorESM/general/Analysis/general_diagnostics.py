@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 import numpy as np
 import numpy.ma as ma
 import pdb
@@ -85,8 +85,8 @@ def timemean(prefix, var, varname, fyear, lyear, **kwargs):
 
                 var=var+np.squeeze(dnm.data)*mw[month]
             print sdate, n
-        
-            
+
+
         else:
             sdate = "%4.4d" % (year)
             n += 1.0
@@ -137,8 +137,8 @@ def passagevolumetransporttime(root_folder,sectionno):
 
 def amoctime(root_folder,cmpnt,mdl,ext):
     ''' compute max amoc, amoc26 in time'''
-    
-    prefix,sdate = get_sdate_ini(root_folder,cmpnt,mdl,ext) 
+
+    prefix,sdate = get_sdate_ini(root_folder,cmpnt,mdl,ext)
     # Latitude interval for maximum AMOC search
     lat=nc_read(prefix+sdate+'.nc','lat');
     lat1=20;
@@ -181,10 +181,10 @@ def amoctime(root_folder,cmpnt,mdl,ext):
 
 def amocmean(root_folder,cmpnt,mdl,ext):
     ''' compute mean amoc'''
-    prefix,sdate = get_sdate_ini(root_folder,cmpnt,mdl,ext) 
+    prefix,sdate = get_sdate_ini(root_folder,cmpnt,mdl,ext)
     # set initial values to zero
     amoc, nx , _ ,_ = set_ini_val_zero(prefix, sdate, dim1='region', dim2='depth',
-                            dim3='lat') 
+                            dim3='lat')
     amoc = np.transpose(amoc, (2, 1, 0));
     amoc = timemean(prefix, amoc,'mmflxd',fyear,lyear)
     return amoc
@@ -239,7 +239,7 @@ def zonalmean_bias_old(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
         var_w[z,:,:]=t1_w
         var_w[z,:,:]=t1_w/m1_w
         m_w[z,:,:]=m1_w
-    
+
 
     dnm = np.copy(var_w[:,:,180:])
     var_w[:,:,180:] = var_w[:,:,:180]
@@ -262,7 +262,7 @@ def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2)
     varwoa = nc_read(woafname, woavname)
     varwoa = np.copy(varwoa[z2,:,:])
     lonwoa = nc_read(woafname, 'lon')
-    latwoa = nc_read(woafname, 'lat')    
+    latwoa = nc_read(woafname, 'lat')
     varwoa[varwoa < -10] =0
     return varsurface, varwoa, lonwoa, latwoa
 
@@ -317,7 +317,7 @@ def compute_heat_transport(root_folder, project_name, cmpnt, mdl, ext):
             SnowFlux = SnowFlux + (precsc+precsl)*rhow*Lhfus
 
 
-        print year 
+        print year
 
     prect = prect/(np.float(lyear)-np.float(fyear)+1)
     OLR = OLR/(np.float(lyear)-np.float(fyear)+1)
@@ -337,9 +337,9 @@ def compute_heat_transport(root_folder, project_name, cmpnt, mdl, ext):
     lat = nc_read(filename, 'lat')
     # mean averaged on x-axis
     Rtoa = np.mean(Rtoa, axis=1)
-    SurfaceHeatFlux = np.mean(SurfaceHeatFlux, axis=1) 
+    SurfaceHeatFlux = np.mean(SurfaceHeatFlux, axis=1)
     Fatmin = np.mean(Fatmin, axis=1)
-    # heat transport terms 
+    # heat transport terms
     HTmonthly = {}
     HTmonthly['total'] = inferred_heat_transport(Rtoa, lat)
     HTmonthly['atm'] = inferred_heat_transport(Fatmin, lat)
@@ -397,26 +397,30 @@ expid = 'N1850_f19_tn11_01_default'
 fyear = 100; # first year
 lyear = 120; # last year
 m2y = 0
-cmpnt = 'ocn' # ocn, atm 
+cmpnt = 'ocn' # ocn, atm
 mdl = 'micom' # micom, cam2, cam
 ext = 'hy' # hm, hy, h0
 varname = 'templvl'
-#cmpnt = 'atm' # ocn, atm 
+#cmpnt = 'atm' # ocn, atm
 #mdl = 'cam2' # micom, cam2, cam
 #ext = 'h0' # hm, hy, h0
-prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext) 
+prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext)
 #woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
 #woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
 woafnamet = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
 #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
 mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
 
-#mask_index = 0; # 0 for Global                                               
-mask_index = 10; # 10 for Atlantic Ocean                                       
-#mask_index = 1; # 1 for Pacific Ocean                                        
-#mask_index = 4; # 4 for Southern Ocean                                        
-#mask_index = 6; # 6 for Arctic Ocean                                         
-#mask_index = 7; # 7 for Indian Ocea
+mask_index = 0; # 0 for Global
+#mask_index = 10; # 10 for Atlantic Ocean
+#mask_index = 1; # 1 for Arctic Ocean
+#mask_index = 2; # 2 for Mediterranean
+#mask_index = 3; # 3 for Pacific Ocean
+#mask_index = 4; # 4 for Southern Ocean
+#mask_index = 6; # 6 for Baltic Sea
+#mask_index = 7; # 7 for Red Sea
+#mask_index = 8; # 8 for Indian Ocean
+#mask_index = 9; # 9 for Black Sea and Caspian Sea
 
 
 def call_generic_diags(argument):
@@ -431,7 +435,7 @@ def call_generic_diags(argument):
         'zonalmean': 8,
     }
     return switcher.get(argument, "non-valid option. Please select another option")
-   
+
 
 diagno = call_generic_diags('zonalmean')
 print 'You select', diagno
@@ -455,17 +459,23 @@ elif diagno == 7:
                                   woafnames,'s',0,0)
     plt.pcolor(lon,lat,np.ma.masked_invalid(sss-ssswoa),vmin=-3,vmax=3);plt.colorbar()
 elif diagno == 8:
-    var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext, 
+    var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext,
                                                    'templvl',
-                                  woafnamet, 'twoa_noresm', mask_woa09_file, 
+                                  woafnamet, 'twoa_noresm', mask_woa09_file,
                                              'mask_tnxv1')
     tmask = np.copy(var)
     tmask[tmask>-50.0]=1.0
     tmask[tmask<=-50.0]=0.0
     var[var<=-50]=0.
     mask = np.double(mask)
-    mask[mask != mask_index] = np.nan 
-    mask[mask == mask_index] = 1.0
+    if mask_index == 0:
+        mask[mask != mask_index] = 1.0
+        mask[mask == mask_index] = np.nan
+    else:
+        mask[mask != mask_index] = np.nan
+        mask[mask == mask_index] = 1.0
+
+
     area = nc_read(grid_file, 'parea')
     zonalbias = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
     zonalbiaswght = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
