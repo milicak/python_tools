@@ -411,8 +411,8 @@ woafnamet = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v
 #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
 mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
 
-mask_index = 0; # 0 for Global
-#mask_index = 10; # 10 for Atlantic Ocean
+#mask_index = 0; # 0 for Global
+mask_index = 10; # 10 for Atlantic Ocean
 #mask_index = 1; # 1 for Arctic Ocean
 #mask_index = 2; # 2 for Mediterranean
 #mask_index = 3; # 3 for Pacific Ocean
