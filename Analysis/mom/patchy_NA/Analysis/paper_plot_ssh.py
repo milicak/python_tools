@@ -74,6 +74,12 @@ ny_b = 200
 sshclim_src = sshclim.flatten()
 mapping_data=io.loadmat('/fimm/home/bjerknes/milicak/Analysis/mom/patchy_NA/Analysis/map_woa09_1deg_to_mom_1deg_patch.mat')
 Sspr = mapping_data['Sspr'][:]
+#sshclim_mom = ma.reshape(Sspr*sshclim_src,(int(ny_b), int(nx_b)))
+row = ncgetdim(map_file,'row');
+col = ncgetdim(map_file,'col');
+S1 = ncgetdim(map_file,'S');
+scipy.sparse.csr_matrix((S1,(row-1,col-1)),shape=(nx_b*ny_b,
+                                                  nx_b*180),dtype=np.float64)
 sshclim_mom = ma.reshape(Sspr*sshclim_src,(int(ny_b), int(nx_b)))
 
 
