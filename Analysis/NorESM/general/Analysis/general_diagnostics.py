@@ -2,6 +2,7 @@
 import numpy as np
 import numpy.ma as ma
 import pdb
+from mpl_toolkits.basemap import Basemap
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import sys
@@ -246,13 +247,15 @@ def zonalmean_bias_old(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
     var_w[:,:,:180] = dnm
     return var_w, t1_w, m1_w, mask
 
-def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2):
+def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2
+                 , gridtype):
     ''' compute any 3D variable mean'''
     var, nx, ny, _, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',)
     #var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
     #                                    dim3='depth')
     var = timemean(prefix, var, varname, fyear, lyear, zlev=z1)
-    lon_w,lat_w,t1_w=noresmutils.noresm2WOA(var[:-1,:],shift=True, grid='tnx1v1')
+    lon_w,lat_w,t1_w=noresmutils.noresm2WOA(var[:-1,:],shift=True,
+                                            grid=gridtype)
     # adjust lon_w
     lon_w[lon_w > 180] = lon_w[lon_w > 180]-360
     varsurface = np.copy(t1_w)
@@ -393,21 +396,24 @@ root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
 
 #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
 #expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
-expid = 'N1850_f19_tn11_01_default'
-fyear = 100; # first year
-lyear = 120; # last year
-m2y = 0
+#expid = 'N1850_f19_tn11_01_default'
+expid = 'NOIIA_T62_tn025_default_visc01'
+fyear = 20; # first year
+lyear = 30; # last year
+m2y = 1
 cmpnt = 'ocn' # ocn, atm
 mdl = 'micom' # micom, cam2, cam
-ext = 'hy' # hm, hy, h0
+ext = 'hm' # hm, hy, h0
 varname = 'templvl'
 #cmpnt = 'atm' # ocn, atm
 #mdl = 'cam2' # micom, cam2, cam
 #ext = 'h0' # hm, hy, h0
+
+gridtype = 'tnx0.25v1' # tnx1v1 , tnx0.25v1, gx1v6
 prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext)
-#woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
-#woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
-woafnamet = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
+woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
+woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
+woafname = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
 #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
 mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
 
@@ -437,7 +443,7 @@ def call_generic_diags(argument):
     return switcher.get(argument, "non-valid option. Please select another option")
 
 
-diagno = call_generic_diags('zonalmean')
+diagno = call_generic_diags('sstbias')
 print 'You select', diagno
 
 if diagno == 1:
@@ -452,16 +458,33 @@ elif diagno == 5:
     temp = var3Dmean(root_folder, cmpnt, mdl, ext, varname)
 elif diagno == 6:
     sst,sstwoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'templvl',
-                                  woafnamet,'t',0,0)
-    plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
+                                  woafnamet,'t',0,0,gridtype)
+    plt.figure()
+    m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+    m.drawcoastlines()
+    m.fillcontinents()
+    m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+    m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+    im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sst-sstwoa),
+                       shading='flat',vmin=-5,vmax=5,cmap='RdBu_r');
+    cb = m.colorbar(im1,"right", size="5%", pad="10%")
+    #plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
 elif diagno == 7:
     sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
-                                  woafnames,'s',0,0)
-    plt.pcolor(lon,lat,np.ma.masked_invalid(sss-ssswoa),vmin=-3,vmax=3);plt.colorbar()
+                                  woafnames,'s',0,0,gridtype)
+    plt.figure()
+    m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+    m.drawcoastlines()
+    m.fillcontinents()
+    m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+    m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+    im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sss-ssswoa),
+                       shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
+    cb = m.colorbar(im1,"right", size="5%", pad="10%")
 elif diagno == 8:
     var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext,
                                                    'templvl',
-                                  woafnamet, 'twoa_noresm', mask_woa09_file,
+                                  woafname, 'twoa_noresm', mask_woa09_file,
                                              'mask_tnxv1')
     tmask = np.copy(var)
     tmask[tmask>-50.0]=1.0
