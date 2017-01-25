@@ -44,12 +44,12 @@ lyear = '750'; # last year
 
 root_folder='/fimm/home/bjerknes/milicak/Analysis/NorESM/reverse_coriolis/Analysis/matfiles/'
 
-#projects=['N1850_f19_tn11_reverseCoriolis']
-projects=['N1850_f19_tn11_01_default']
+projects=['N1850_f19_tn11_reverseCoriolis']
+#projects=['N1850_f19_tn11_01_default']
 
 legendnames=['Cold-ctrl','Exp1','Exp2','Exp3','Warm-ctrl','Exp4','Exp5']
 plotcolors=['cyan','blue','magenta','brown','green','red','black']
-    
+
 for i in xrange(0,1):
     filename=root_folder+projects[i]+'_timemean_'+fyear+'_'+lyear+'.mat'
     mat = scipy.io.loadmat(filename)
@@ -65,7 +65,8 @@ for i in xrange(0,1):
     im1 = m.pcolormesh(np.transpose(lon-110),np.transpose(lat),np.transpose(np.ma.masked_invalid(sss))
                       ,shading='flat',cmap=cmap_needjet2,vmin=31,vmax=38,latlon=True)
     cb = m.colorbar(im1,"right", size="5%", pad="15%") #,ticks=[-4, -3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
-    cb.set_label('[' r'$^\circ$' 'C]')
+    cb.set_label('[psu]')
+    #cb.set_label('[' r'$^\circ$' 'C]')
 
 
 #plt.show()
