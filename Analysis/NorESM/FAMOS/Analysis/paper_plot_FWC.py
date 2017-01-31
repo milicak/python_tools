@@ -45,48 +45,46 @@ def my_nanfilterbox(y, dn):
     return yfilter
 
 
+Sref = 34.8 # Sref psu
 fyear = 33; # first year 1980
 lyear = 60; # last year 2007
 mw = np.array([31,28,31,30,31,30,31,31,30,31,30,31],dtype=np.float)
 mw = mw/sum(mw)
 nx = 360
-ny = 384
+ny = 385
 grid_file = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc'
 area = nc_read(grid_file,'parea')
-area = area[:-1,:]
+#area = area[:-1,:]
+mask = nc_read('NorESM_tnx1v2_arctic_mask.nc','mask')
 root_folder='/work/milicak/mnt/viljework/archive/'
 #root_folder='/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG']
+projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR']
+#projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG']
 
-ice_area = {}
-ice_volume = {}
-
+FWC = {}
 
 for project in projects:
-    ice_area[project] = []
-    ice_volume[project] = []
+    FWC[project] = []
     for year in xrange(np.int(fyear),np.int(lyear)+1):
-        aice = np.zeros([ny,nx])
-        vice = np.zeros([ny,nx])
+        fwcy = np.zeros([ny,nx])
         for month in xrange(1,13):
-            filename = root_folder+project+'/ice/hist/'+project+'.cice.h.'+str(year).zfill(4)+'-'+str(month).zfill(2)+'.nc'
-            dnm = np.squeeze(nc_read(filename,'aice'))/100.0 # ratio
-            # if there is area criteria
-            #  dnm[dnm<0.15] = np.nan
-            aice = aice+dnm*mw[month-1]*area
-            #  ice thickness
-            dnm = np.squeeze(nc_read(filename,'hi'))
-            #  if there is height criteria
-            #  dnm[dnm<0.15] = np.nan
-            vice = vice+dnm*mw[month-1]*area
-            # get rid off southern hemisphere
-            aice[:200,:] = 0.0
-            vice[:200,:] = 0.0
+            filename = root_folder+project+'/ocn/hist/'+project+'.micom.hm.'+str(year).zfill(4)+'-'+str(month).zfill(2)+'.nc'
+            dnm1 = np.squeeze(nc_read(filename,'saln'))
+            dnm2 = np.squeeze(nc_read(filename,'dz'))
+            s1 = np.copy(dnm1)
+            s1[s1<0.0] = np.nan
+            smask = s1-Sref
+            smask[smask >= 0.0] = 0.0
+            smask[smask < 0.0] = 1.0
+            smask[np.isnan(smask)] = 0.0
+            fwcytmp = (Sref-s1)*dnm2*smask/Sref
+            fwcy = fwcy+np.sum(fwcytmp, axis=0)*mask*area*mw[month-1]
+
 
 
         print year
-        ice_area[project] = np.append(ice_area[project],aice.sum())
-        ice_volume[project] = np.append(ice_volume[project],vice.sum())
+        FWC[project] = np.append(FWC[project],fwcy.sum())
+        #FWC[project] = np.append(FWC[project],fwcy)
 
 
 
