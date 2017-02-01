@@ -46,8 +46,8 @@ def my_nanfilterbox(y, dn):
 
 
 Sref = 34.8 # Sref psu
-fyear = 33; # first year 1980
-lyear = 60; # last year 2007
+fyear = 33; # 33 first year 1980
+lyear = 62; # 62 last year 2009
 mw = np.array([31,28,31,30,31,30,31,31,30,31,30,31],dtype=np.float)
 mw = mw/sum(mw)
 nx = 360
@@ -58,8 +58,8 @@ area = nc_read(grid_file,'parea')
 mask = nc_read('NorESM_tnx1v2_arctic_mask.nc','mask')
 root_folder='/work/milicak/mnt/viljework/archive/'
 #root_folder='/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR']
-#projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG']
+#projects = ['NOIIA_T62_tn11_FAMOS_BG_NEG']
+projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG']
 
 FWC = {}
 
@@ -68,7 +68,12 @@ for project in projects:
     for year in xrange(np.int(fyear),np.int(lyear)+1):
         fwcy = np.zeros([ny,nx])
         for month in xrange(1,13):
-            filename = root_folder+project+'/ocn/hist/'+project+'.micom.hm.'+str(year).zfill(4)+'-'+str(month).zfill(2)+'.nc'
+            if project == 'NOIIA_T62_tn11_FAMOS_BG_NEG' and year == 42 and month == 8:
+                filename = root_folder+project+'/ocn/hist/'+project+'.micom.hm.'+str(year).zfill(4)+'-'+str(month-1).zfill(2)+'.nc'
+            else:
+                filename = root_folder+project+'/ocn/hist/'+project+'.micom.hm.'+str(year).zfill(4)+'-'+str(month).zfill(2)+'.nc'
+
+
             dnm1 = np.squeeze(nc_read(filename,'saln'))
             dnm2 = np.squeeze(nc_read(filename,'dz'))
             s1 = np.copy(dnm1)
@@ -79,7 +84,6 @@ for project in projects:
             smask[np.isnan(smask)] = 0.0
             fwcytmp = (Sref-s1)*dnm2*smask/Sref
             fwcy = fwcy+np.sum(fwcytmp, axis=0)*mask*area*mw[month-1]
-
 
 
         print year

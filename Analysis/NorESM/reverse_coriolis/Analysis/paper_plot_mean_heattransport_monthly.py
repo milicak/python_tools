@@ -6,7 +6,7 @@ http://www.atmos.albany.edu/facstaff/brose/classes/ATM623_Spring2015/Notes
 import sys
 import numpy as np
 import numpy.ma as ma
-# import scipy.io
+import scipy.io
 # from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import matplotlib as mpllib
@@ -178,12 +178,17 @@ N = len(runs)
 
 for n, HTname in enumerate([project, project_rf]):
     HT, lat_cesm = compute_heat_transport(root_folder, HTname, cams[n])
+    if n==0:
+        HT1 = HT.copy()
+
+
     ax = fig.add_subplot(1, N, n+1)
     ax.plot(lat_cesm, HT['total'], 'k-', label='total', linewidth=2)
     ax.plot(lat_cesm, HT['atm'], 'r-', label='atm', linewidth=2)
     ax.plot(lat_cesm, HT['ocn'], 'b-', label='ocean', linewidth=2)
     ax.set_title(titles[n])
     ax.set_xlim(-90, 90)
+    ax.set_xlabel('Lat')
     ax.set_xticks(ticks)
     ax.legend(loc='upper left')
     ax.grid()
@@ -193,28 +198,30 @@ plt.savefig('paperfigs/total_heat_transport.eps',
             bbox_inches='tight', format='eps', dpi=200)
 plt.clf()
 plt.close(fig)
-sys.exit()
 
-fig = plt.figure()
-# ax = plt.gca()
-# ax.set_axis_bgcolor('grey')
-# lon_0 is central longitude of projection.
-# resolution = 'c' means use crude resolution coastlines.
-# m = Basemap(projection='kav7',lon_0=0,resolution='c')
-# m = Basemap(llcrnrlon=-180, llcrnrlat=-88, urcrnrlon=180, urcrnrlat=88,
-#             projection='cyl')
-# m.drawcoastlines()
-# m.drawparallels(np.arange(-80, 81, 20), labels=[1, 1, 0, 0])
-# m.drawmeridians(np.arange(0, 360, 60), labels=[0, 0, 0, 1])
-# im1 = m.pcolormesh(lon, lat, np.ma.masked_invalid(EminusP), shading='flat',
-#                    cmap='jet', vmin=-13, vmax=5, latlon=True)
-# cb = m.colorbar(im1, "right", size="5%", pad="10%")
-# cb.set_label('[mm/day]')
-# plt.ylabel('Depth [m]')
-# plt.xlabel('Lat')
-# plt.ylim(-7000,0)
-# cb.set_label('[' r'$^\circ$' 'C]')
-plt.savefig('paperfigs/'+project[0]+'_heat_transport.eps',
+filename = '../../general/Analysis/global_ocean_heat_transport.mat'
+mat = scipy.io.loadmat(filename)
+lat_fas08 = np.array(mat['lat_fas08'])
+hf_atl_ocn_fas08 = np.array(mat['hf_atl_ocn_fas08'])
+hf_ind_ocn_fas08 = np.array(mat['hf_ind_ocn_fas08'])
+hf_pac_ocn_fas08 = np.array(mat['hf_pac_ocn_fas08'])
+hf_tot_ocn_fas08 = np.array(mat['hf_tot_ocn_fas08'])
+
+#sys.exit()
+
+fig = plt.figure(figsize=(10, 4))
+ax = fig.add_subplot(1, 1, 1)
+ax.plot(lat_cesm, HT1['ocn'], 'b-', label='ctrl', linewidth=2)
+ax.plot(lat_cesm, HT['ocn'], 'r-', label='reverse f', linewidth=2)
+ax.plot(lat_fas08, hf_tot_ocn_fas08, 'k-', label='obs', linewidth=2)
+ax.set_title('Total ocean heat transport [Pw]')
+ax.set_xlim(-90, 90)
+ax.set_xlabel('Lat')
+ax.set_xticks(ticks)
+ax.legend(loc='upper left')
+ax.grid()
+
+plt.savefig('paperfigs/total_ocean_heat_transport.eps',
             bbox_inches='tight', format='eps', dpi=200)
 plt.clf()
 plt.close(fig)
