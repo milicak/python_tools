@@ -55,18 +55,25 @@ ny = 385
 grid_file = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc'
 area = nc_read(grid_file,'parea')
 #area = area[:-1,:]
-mask = nc_read('NorESM_tnx1v2_arctic_mask.nc','mask')
+#mask = nc_read('NorESM_tnx1v2_arctic_mask.nc','mask')
+maskfilename = 'BG_GS_masks.mat'
+mat = scipy.io.loadmat(maskfilename)
+maskGS =np.transpose(np.array(mat['GS_mask']))
+maskBG =np.transpose(np.array(mat['BG_mask']))
 root_folder='/work/milicak/mnt/viljework/archive/'
 #root_folder='/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
 #projects = ['NOIIA_T62_tn11_FAMOS_BG_NEG']
 projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG']
 
-FWC = {}
+FWC_BG = {}
+FWC_GS = {}
 
 for project in projects:
-    FWC[project] = []
+    FWC_BG[project] = []
+    FWC_GS[project] = []
     for year in xrange(np.int(fyear),np.int(lyear)+1):
-        fwcy = np.zeros([ny,nx])
+        fwcyBG = np.zeros([ny,nx])
+        fwcyGS = np.zeros([ny,nx])
         for month in xrange(1,13):
             if project == 'NOIIA_T62_tn11_FAMOS_BG_NEG' and year == 42 and month == 8:
                 filename = root_folder+project+'/ocn/hist/'+project+'.micom.hm.'+str(year).zfill(4)+'-'+str(month-1).zfill(2)+'.nc'
@@ -83,11 +90,13 @@ for project in projects:
             smask[smask < 0.0] = 1.0
             smask[np.isnan(smask)] = 0.0
             fwcytmp = (Sref-s1)*dnm2*smask/Sref
-            fwcy = fwcy+np.sum(fwcytmp, axis=0)*mask*area*mw[month-1]
+            fwcyBG = fwcyBG+np.sum(fwcytmp, axis=0)*maskBG*area*mw[month-1]
+            fwcyGS = fwcyGS+np.sum(fwcytmp, axis=0)*maskGS*area*mw[month-1]
 
 
         print year
-        FWC[project] = np.append(FWC[project],fwcy.sum())
+        FWC_BG[project] = np.append(FWC_BG[project],fwcyBG.sum())
+        FWC_GS[project] = np.append(FWC_GS[project],fwcyGS.sum())
         #FWC[project] = np.append(FWC[project],fwcy)
 
 
