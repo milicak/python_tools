@@ -46,7 +46,7 @@ def my_nanfilterbox(y, dn):
 
 
 fyear = 33; # first year 1980
-lyear = 60; # last year 2007
+lyear = 62; # last year 2009
 mw = np.array([31,28,31,30,31,30,31,31,30,31,30,31],dtype=np.float)
 mw = mw/sum(mw)
 nx = 360

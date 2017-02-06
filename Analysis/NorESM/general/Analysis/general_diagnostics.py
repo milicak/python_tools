@@ -43,14 +43,16 @@ def ncread_lev(fname, variable, zlev):
     return tmp
 
 
-def get_sdate_ini(root_folder,cmpnt,mdl,ext):
+def get_sdate_ini(root_folder,cmpnt,mdl,ext, **kwargs):
+    expid = kwargs.get('expid', None)
+    m2y = kwargs.get('m2y', None)
     # Get dimensions and time attributes for ocn or atm or others ...
     prefix=root_folder+expid+'/'+cmpnt+'/hist/'+expid+ '.'+ mdl + \
             '.'+ext+'.'
     if m2y==1:
-        sdate="%4.4d%c%2.2d" % (fyear,datesep,1)
+        sdate="%4.4d%c%2.2d" % (1,'-',1)    # assuming fyear 1 exists
     else:
-        sdate="%4.4d" % (fyear)
+        sdate="%4.4d" % (1)
 
 
     return prefix, sdate
@@ -67,17 +69,21 @@ def inferred_heat_transport(energy_in, lat_deg):
 
 def timemean(prefix, var, varname, fyear, lyear, **kwargs):
     zlev = kwargs.get('zlev', None)
+    expid = kwargs.get('expid', None)
+    m2y = kwargs.get('m2y', None)
     ''' timemean averages '''
     months2days=[31,  28,  31,  30,  31,   30,   31,  31,   30, 31,   30, 31];
     yeardays=sum(months2days);
     mw = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], dtype=np.float)
     mw = mw/sum(mw)
     n=0.0;
+    fyear
+    lyear
     for year in xrange(fyear,lyear+1):
         if m2y==1:
             for month in xrange(0,12):
                 n=n+mw[month]
-                sdate="%4.4d%c%2.2d" % (year,datesep,month+1)
+                sdate="%4.4d%c%2.2d" % (year,'-',month+1)
                 if not zlev == None:
                     dnm=ncread_lev(prefix+sdate+'.nc', varname, zlev);
                 else:
@@ -380,143 +386,146 @@ def set_ini_val_zero(prefix,sdate,*args, **kwargs):
 
     return var , nx, ny, nz
 
-# tripolar 1degree grid
-grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
-# tripolar 0.25degree grid
-#grid_file = '/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
-# bi-polar grid
-#grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
-# 1 for atlantic_arctic_ocean region
-# 2 for indian_pacific_ocean region
-# 3 for global_ocean
-region = 1
-root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-#root_folder = '/work/milicak/mnt/viljework/archive/'
+def main():
+    # tripolar 1degree grid
+    grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+    # tripolar 0.25degree grid
+    #grid_file = '/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+    # bi-polar grid
+    #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
-#expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
-#expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
-#expid = 'N1850_f19_tn11_01_default'
-expid = 'NOIIA_T62_tn025_default_visc01'
-fyear = 20; # first year
-lyear = 30; # last year
-m2y = 1
-cmpnt = 'ocn' # ocn, atm
-mdl = 'micom' # micom, cam2, cam
-ext = 'hm' # hm, hy, h0
-varname = 'templvl'
-#cmpnt = 'atm' # ocn, atm
-#mdl = 'cam2' # micom, cam2, cam
-#ext = 'h0' # hm, hy, h0
+    # 1 for atlantic_arctic_ocean region
+    # 2 for indian_pacific_ocean region
+    # 3 for global_ocean
+    region = 1
+    root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+    #root_folder = '/work/milicak/mnt/viljework/archive/'
 
-gridtype = 'tnx0.25v1' # tnx1v1 , tnx0.25v1, gx1v6
-prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext)
-woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
-woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
-woafname = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
-#mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
-mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
+    #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
+    #expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
+    #expid = 'N1850_f19_tn11_01_default'
+    expid = 'NOIIA_T62_tn025_default_visc01'
+    fyear = 20; # first year
+    lyear = 30; # last year
+    m2y = 1
+    cmpnt = 'ocn' # ocn, atm
+    mdl = 'micom' # micom, cam2, cam
+    ext = 'hm' # hm, hy, h0
+    varname = 'templvl'
+    #cmpnt = 'atm' # ocn, atm
+    #mdl = 'cam2' # micom, cam2, cam
+    #ext = 'h0' # hm, hy, h0
 
-#mask_index = 0; # 0 for Global
-mask_index = 10; # 10 for Atlantic Ocean
-#mask_index = 1; # 1 for Arctic Ocean
-#mask_index = 2; # 2 for Mediterranean
-#mask_index = 3; # 3 for Pacific Ocean
-#mask_index = 4; # 4 for Southern Ocean
-#mask_index = 6; # 6 for Baltic Sea
-#mask_index = 7; # 7 for Red Sea
-#mask_index = 8; # 8 for Indian Ocean
-#mask_index = 9; # 9 for Black Sea and Caspian Sea
+    gridtype = 'tnx0.25v1' # tnx1v1 , tnx0.25v1, gx1v6
+    prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext)
+    woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
+    woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
+    woafname = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
+    #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
+    mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
 
-
-def call_generic_diags(argument):
-    switcher = {
-        'amoctime': 1,
-        'amocmean': 2,
-        'heattransport': 3,
-        'voltr': 4,
-        '3Dmean': 5,
-        'sstbias': 6,
-        'sssbias': 7,
-        'zonalmean': 8,
-    }
-    return switcher.get(argument, "non-valid option. Please select another option")
+    #mask_index = 0; # 0 for Global
+    mask_index = 10; # 10 for Atlantic Ocean
+    #mask_index = 1; # 1 for Arctic Ocean
+    #mask_index = 2; # 2 for Mediterranean
+    #mask_index = 3; # 3 for Pacific Ocean
+    #mask_index = 4; # 4 for Southern Ocean
+    #mask_index = 6; # 6 for Baltic Sea
+    #mask_index = 7; # 7 for Red Sea
+    #mask_index = 8; # 8 for Indian Ocean
+    #mask_index = 9; # 9 for Black Sea and Caspian Sea
 
 
-diagno = call_generic_diags('sstbias')
-print 'You select', diagno
-
-if diagno == 1:
-    amoctime = amoctime(root_folder, cmpnt, mdl, ext)
-elif diagno == 2:
-    amocmean = amocmean(root_folder, cmpnt, mdl, ext)
-elif diagno == 3:
-    HT,lat_cesm = compute_heat_transport(root_folder, expid, cmpnt, mdl, ext)
-elif diagno == 4:
-    vol = passagevolumetransporttime(root_folder,5) # 5 for Drake
-elif diagno == 5:
-    temp = var3Dmean(root_folder, cmpnt, mdl, ext, varname)
-elif diagno == 6:
-    sst,sstwoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'templvl',
-                                  woafnamet,'t',0,0,gridtype)
-    plt.figure()
-    m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
-    m.drawcoastlines()
-    m.fillcontinents()
-    m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
-    m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
-    im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sst-sstwoa),
-                       shading='flat',vmin=-5,vmax=5,cmap='RdBu_r');
-    cb = m.colorbar(im1,"right", size="5%", pad="10%")
-    #plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
-elif diagno == 7:
-    sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
-                                  woafnames,'s',0,0,gridtype)
-    plt.figure()
-    m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
-    m.drawcoastlines()
-    m.fillcontinents()
-    m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
-    m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
-    im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sss-ssswoa),
-                       shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
-    cb = m.colorbar(im1,"right", size="5%", pad="10%")
-elif diagno == 8:
-    var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext,
-                                                   'templvl',
-                                  woafname, 'twoa_noresm', mask_woa09_file,
-                                             'mask_tnxv1')
-    tmask = np.copy(var)
-    tmask[tmask>-50.0]=1.0
-    tmask[tmask<=-50.0]=0.0
-    var[var<=-50]=0.
-    mask = np.double(mask)
-    if mask_index == 0:
-        mask[mask != mask_index] = 1.0
-        mask[mask == mask_index] = np.nan
-    else:
-        mask[mask != mask_index] = np.nan
-        mask[mask == mask_index] = 1.0
+    def call_generic_diags(argument):
+        switcher = {
+            'amoctime': 1,
+            'amocmean': 2,
+            'heattransport': 3,
+            'voltr': 4,
+            '3Dmean': 5,
+            'sstbias': 6,
+            'sssbias': 7,
+            'zonalmean': 8,
+        }
+        return switcher.get(argument, "non-valid option. Please select another option")
 
 
-    area = nc_read(grid_file, 'parea')
-    zonalbias = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
-    zonalbiaswght = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
-    for z in xrange(0,varwoa.shape[0]):
-        zonalbias[z,:,:] = np.squeeze(var[z,:,:]-varwoa[z,:,:])*mask*area
-        zonalbiaswght[z,:,:] = np.squeeze(tmask[z,:,:])*mask*area
+    diagno = call_generic_diags('sstbias')
+    print 'You select', diagno
+
+    if diagno == 1:
+        amoctime = amoctime(root_folder, cmpnt, mdl, ext)
+    elif diagno == 2:
+        amocmean = amocmean(root_folder, cmpnt, mdl, ext)
+    elif diagno == 3:
+        HT,lat_cesm = compute_heat_transport(root_folder, expid, cmpnt, mdl, ext)
+    elif diagno == 4:
+        vol = passagevolumetransporttime(root_folder,5) # 5 for Drake
+    elif diagno == 5:
+        temp = var3Dmean(root_folder, cmpnt, mdl, ext, varname)
+    elif diagno == 6:
+        sst,sstwoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'templvl',
+                                      woafnamet,'t',0,0,gridtype)
+        plt.figure()
+        m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+        m.drawcoastlines()
+        m.fillcontinents()
+        m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+        m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+        im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sst-sstwoa),
+                           shading='flat',vmin=-5,vmax=5,cmap='RdBu_r');
+        cb = m.colorbar(im1,"right", size="5%", pad="10%")
+        #plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
+    elif diagno == 7:
+        sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
+                                      woafnames,'s',0,0,gridtype)
+        plt.figure()
+        m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+        m.drawcoastlines()
+        m.fillcontinents()
+        m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+        m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+        im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sss-ssswoa),
+                           shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
+        cb = m.colorbar(im1,"right", size="5%", pad="10%")
+    elif diagno == 8:
+        var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext,
+                                                       'templvl',
+                                      woafname, 'twoa_noresm', mask_woa09_file,
+                                                 'mask_tnxv1')
+        tmask = np.copy(var)
+        tmask[tmask>-50.0]=1.0
+        tmask[tmask<=-50.0]=0.0
+        var[var<=-50]=0.
+        mask = np.double(mask)
+        if mask_index == 0:
+            mask[mask != mask_index] = 1.0
+            mask[mask == mask_index] = np.nan
+        else:
+            mask[mask != mask_index] = np.nan
+            mask[mask == mask_index] = 1.0
 
 
-    zonalbias = np.nansum(zonalbias, axis=2)
-    zonalbiaswght = np.nansum(zonalbiaswght, axis=2)
-    zonalbias = zonalbias/zonalbiaswght
-    plt.figure()
-    plt.pcolor(lat[:,0],-depth,np.ma.masked_invalid(zonalbias),vmin=-5,vmax=5);plt.colorbar()
-    #plt.pcolor(lat,depth,np.ma.masked_invalid(var-varwoa),vmin=-5,vmax=5);plt.colorbar()
+        area = nc_read(grid_file, 'parea')
+        zonalbias = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
+        zonalbiaswght = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
+        for z in xrange(0,varwoa.shape[0]):
+            zonalbias[z,:,:] = np.squeeze(var[z,:,:]-varwoa[z,:,:])*mask*area
+            zonalbiaswght[z,:,:] = np.squeeze(tmask[z,:,:])*mask*area
+
+
+        zonalbias = np.nansum(zonalbias, axis=2)
+        zonalbiaswght = np.nansum(zonalbiaswght, axis=2)
+        zonalbias = zonalbias/zonalbiaswght
+        plt.figure()
+        plt.pcolor(lat[:,0],-depth,np.ma.masked_invalid(zonalbias),vmin=-5,vmax=5);plt.colorbar()
+        #plt.pcolor(lat,depth,np.ma.masked_invalid(var-varwoa),vmin=-5,vmax=5);plt.colorbar()
 
 
 
 
-
-
+if __name__ == "__main__":
+    # this won't be run when imported
+    main()
 
