@@ -1,5 +1,4 @@
 ''' computes sea ice area'''
-import my_nanfilter
 import numpy as np
 import numpy.ma as ma
 import scipy.io
@@ -7,12 +6,14 @@ import sys
 #%matplotlib inline
 #np.shape !!!!!
 from mpl_toolkits.basemap import Basemap
-from cpttoseg import cpt2seg
 from netCDF4 import Dataset
+from cpttoseg import cpt2seg
 from netcdf_functions import nc_read
-from netcdf_functions import ncgetdim
+#import my_nanfilter
+#from netcdf_functions import ncgetdim
 import matplotlib.pyplot as plt
 import matplotlib as mpllib
+import pickle
 
 # IMPORTANT
 plt.ion()
@@ -63,7 +64,8 @@ maskBG =np.transpose(np.array(mat['BG_mask']))
 root_folder='/work/milicak/mnt/viljework/archive/'
 #root_folder='/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
 #projects = ['NOIIA_T62_tn11_FAMOS_BG_NEG']
-projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG']
+projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG',
+           'NOIIA_T62_tn11_FAMOS_BG_POS_90s', 'NOIIA_T62_tn11_FAMOS_BG_NEG_90s']
 
 FWC_BG = {}
 FWC_GS = {}
@@ -102,5 +104,5 @@ for project in projects:
 
 
 
-
+pickle.dump( FWC_BG, open( "FWC_BG.p", "wb" ) )
 
