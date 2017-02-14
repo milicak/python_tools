@@ -142,10 +142,11 @@ def passagevolumetransporttime(root_folder,sectionno):
     return vol
 
 
-def amoctime(root_folder,cmpnt,mdl,ext):
+def amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y):
     ''' compute max amoc, amoc26 in time'''
 
-    prefix,sdate = get_sdate_ini(root_folder,cmpnt,mdl,ext)
+    prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext, expid = expid,
+                                 m2y=m2y)
     # Latitude interval for maximum AMOC search
     lat=nc_read(prefix+sdate+'.nc','lat');
     lat1=20;
@@ -180,15 +181,17 @@ def amoctime(root_folder,cmpnt,mdl,ext):
 
 
     time = np.linspace(fyear,lyear,lyear-fyear+1)
-    plt.plot(time,amoc['max'],'b',label='max')
-    plt.plot(time,amoc['26N'],'r',label='26N')
+    plt.figure()
+    plt.plot(amoc['max'],'k',label='max')
+    plt.plot(amoc['26N'],'g',label='26N')
     plt.legend(loc='lower right')
     return amoc
 
 
-def amocmean(root_folder,cmpnt,mdl,ext):
+def amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y):
     ''' compute mean amoc'''
-    prefix,sdate = get_sdate_ini(root_folder,cmpnt,mdl,ext)
+    prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext, expid = expid,
+                                 m2y=m2y)
     # set initial values to zero
     amoc, nx , _ ,_ = set_ini_val_zero(prefix, sdate, dim1='region', dim2='depth',
                             dim3='lat')
@@ -254,12 +257,15 @@ def zonalmean_bias_old(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
     return var_w, t1_w, m1_w, mask
 
 def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2
-                 , gridtype):
+                 , gridtype, **kwargs):
     ''' compute any 3D variable mean'''
+    prefix = kwargs.get('prefix', None)
+    sdate = kwargs.get('sdate', None)
+    m2y = kwargs.get('m2y', None)
     var, nx, ny, _, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',)
     #var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
     #                                    dim3='depth')
-    var = timemean(prefix, var, varname, fyear, lyear, zlev=z1)
+    var = timemean(prefix, var, varname, fyear, lyear, zlev=z1, m2y=m2y)
     lon_w,lat_w,t1_w=noresmutils.noresm2WOA(var[:-1,:],shift=True,
                                             grid=gridtype)
     # adjust lon_w
@@ -388,6 +394,7 @@ def set_ini_val_zero(prefix,sdate,*args, **kwargs):
 
 
 def main():
+    global fyear, lyear
     # tripolar 1degree grid
     grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
     # tripolar 0.25degree grid
@@ -399,15 +406,15 @@ def main():
     # 2 for indian_pacific_ocean region
     # 3 for global_ocean
     region = 1
-    root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-    #root_folder = '/work/milicak/mnt/viljework/archive/'
+    #root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+    root_folder = '/work/milicak/mnt/viljework/archive/'
 
     #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
     #expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
     #expid = 'N1850_f19_tn11_01_default'
-    expid = 'NOIIA_T62_tn025_default_visc01'
+    expid = 'NOIIA_T62_tn025_default_visc09'
     fyear = 20; # first year
-    lyear = 30; # last year
+    lyear = 40; # last year
     m2y = 1
     cmpnt = 'ocn' # ocn, atm
     mdl = 'micom' # micom, cam2, cam
@@ -416,9 +423,11 @@ def main():
     #cmpnt = 'atm' # ocn, atm
     #mdl = 'cam2' # micom, cam2, cam
     #ext = 'h0' # hm, hy, h0
+    print 'expid = ', expid
 
     gridtype = 'tnx0.25v1' # tnx1v1 , tnx0.25v1, gx1v6
-    prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext)
+    prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext, expid = expid,
+                                 m2y=m2y)
     woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
     woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
     woafname = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
@@ -450,14 +459,14 @@ def main():
         }
         return switcher.get(argument, "non-valid option. Please select another option")
 
-
-    diagno = call_generic_diags('sstbias')
-    print 'You select', diagno
+    diagname = 'sstbias'
+    print 'You select', diagname
+    diagno = call_generic_diags(diagname)
 
     if diagno == 1:
-        amoctime = amoctime(root_folder, cmpnt, mdl, ext)
+        amoc_time = amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y)
     elif diagno == 2:
-        amocmean = amocmean(root_folder, cmpnt, mdl, ext)
+        amocmean = amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y)
     elif diagno == 3:
         HT,lat_cesm = compute_heat_transport(root_folder, expid, cmpnt, mdl, ext)
     elif diagno == 4:
@@ -466,7 +475,8 @@ def main():
         temp = var3Dmean(root_folder, cmpnt, mdl, ext, varname)
     elif diagno == 6:
         sst,sstwoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'templvl',
-                                      woafnamet,'t',0,0,gridtype)
+                                      woafnamet,'t',0,0,gridtype,
+                                           prefix=prefix, sdate=sdate, m2y=m2y)
         plt.figure()
         m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
         m.drawcoastlines()
@@ -479,7 +489,8 @@ def main():
         #plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
     elif diagno == 7:
         sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
-                                      woafnames,'s',0,0,gridtype)
+                                      woafnames,'s',0,0,gridtype,
+                                          prefix=prefix, sdate=sdate, m2y=m2y)
         plt.figure()
         m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
         m.drawcoastlines()
