@@ -209,12 +209,15 @@ def var3Dmean(root_folder, cmpnt, mdl, ext, varname):
 
 
 def zonalmean_bias(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
-                  ,maskfile, maskfilevar):
+                  ,maskfile, maskfilevar, **kwargs):
     ''' compute any 3D variable mean'''
+    prefix = kwargs.get('prefix', None)
+    sdate = kwargs.get('sdate', None)
+    m2y = kwargs.get('m2y', None)
     import scipy.io
     var, nx, ny, nz, = set_ini_val_zero(prefix, sdate, dim1='x', dim2='y',
                                         dim3='depth')
-    var = timemean(prefix, var, varname, fyear, lyear)
+    var = timemean(prefix, var, varname, fyear, lyear, m2y=m2y)
     varwoa = nc_read(woafname, woavname)
     depth = nc_read(woafname, 'depth')
     lat = nc_read(woafname, 'TLAT')
@@ -394,11 +397,25 @@ def set_ini_val_zero(prefix,sdate,*args, **kwargs):
 
 
 def main():
+    def call_generic_diags(argument):
+        switcher = {
+            'amoctime': 1,
+            'amocmean': 2,
+            'heattransport': 3,
+            'voltr': 4,
+            '3Dmean': 5,
+            'sstbias': 6,
+            'sssbias': 7,
+            'zonalmean': 8,
+        }
+        return switcher.get(argument, "non-valid option. Please select another option")
+
+
     global fyear, lyear
     # tripolar 1degree grid
-    grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+    #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
     # tripolar 0.25degree grid
-    #grid_file = '/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+    grid_file = '/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
     # bi-polar grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
@@ -406,14 +423,14 @@ def main():
     # 2 for indian_pacific_ocean region
     # 3 for global_ocean
     region = 1
-    #root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-    root_folder = '/work/milicak/mnt/viljework/archive/'
+    root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+    #root_folder = '/work/milicak/mnt/viljework/archive/'
 
     #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
     #expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
     #expid = 'N1850_f19_tn11_01_default'
-    expid = 'NOIIA_T62_tn025_default_visc09'
-    fyear = 20; # first year
+    expid = 'NOIIA_T62_tn025_default_visc01'
+    fyear = 30; # first year
     lyear = 40; # last year
     m2y = 1
     cmpnt = 'ocn' # ocn, atm
@@ -430,9 +447,14 @@ def main():
                                  m2y=m2y)
     woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
     woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
-    woafname = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_tnx1v1_65layers.nc'
+    woafname = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_' \
+               + gridtype +'_65layers.nc'
     #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
-    mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
+
+    #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
+    #maskvariable = 'mask_tnxv1'
+    mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';
+    maskvariable = 'mask'
 
     #mask_index = 0; # 0 for Global
     mask_index = 10; # 10 for Atlantic Ocean
@@ -445,21 +467,7 @@ def main():
     #mask_index = 8; # 8 for Indian Ocean
     #mask_index = 9; # 9 for Black Sea and Caspian Sea
 
-
-    def call_generic_diags(argument):
-        switcher = {
-            'amoctime': 1,
-            'amocmean': 2,
-            'heattransport': 3,
-            'voltr': 4,
-            '3Dmean': 5,
-            'sstbias': 6,
-            'sssbias': 7,
-            'zonalmean': 8,
-        }
-        return switcher.get(argument, "non-valid option. Please select another option")
-
-    diagname = 'sstbias'
+    diagname = 'zonalmean' #ssstbias, sssbias, zonalmean
     print 'You select', diagname
     diagno = call_generic_diags(diagname)
 
@@ -478,7 +486,7 @@ def main():
                                       woafnamet,'t',0,0,gridtype,
                                            prefix=prefix, sdate=sdate, m2y=m2y)
         plt.figure()
-        m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+        m = Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
         m.drawcoastlines()
         m.fillcontinents()
         m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
@@ -492,11 +500,13 @@ def main():
                                       woafnames,'s',0,0,gridtype,
                                           prefix=prefix, sdate=sdate, m2y=m2y)
         plt.figure()
-        m=Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+        m = Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+        #m = Basemap(projection='ortho',lon_0=0,lat_0=90,resolution='l')
         m.drawcoastlines()
         m.fillcontinents()
         m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
         m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+        print 'mehmet', sss.max(), ssswoa.max()
         im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sss-ssswoa),
                            shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
         cb = m.colorbar(im1,"right", size="5%", pad="10%")
@@ -504,7 +514,8 @@ def main():
         var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext,
                                                        'templvl',
                                       woafname, 'twoa_noresm', mask_woa09_file,
-                                                 'mask_tnxv1')
+                                                 maskvariable,
+                                          prefix=prefix, sdate=sdate, m2y=m2y)
         tmask = np.copy(var)
         tmask[tmask>-50.0]=1.0
         tmask[tmask<=-50.0]=0.0
@@ -522,18 +533,16 @@ def main():
         zonalbias = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
         zonalbiaswght = np.zeros((varwoa.shape[0],area.shape[0],area.shape[1]))
         for z in xrange(0,varwoa.shape[0]):
-            zonalbias[z,:,:] = np.squeeze(var[z,:,:]-varwoa[z,:,:])*mask*area
-            zonalbiaswght[z,:,:] = np.squeeze(tmask[z,:,:])*mask*area
+            zonalbias[z,:,:] = np.squeeze(var[z,:,:]-varwoa[z,:,:])*area*mask
+            zonalbiaswght[z,:,:] = np.squeeze(tmask[z,:,:])*area*mask
 
 
         zonalbias = np.nansum(zonalbias, axis=2)
         zonalbiaswght = np.nansum(zonalbiaswght, axis=2)
         zonalbias = zonalbias/zonalbiaswght
         plt.figure()
-        plt.pcolor(lat[:,0],-depth,np.ma.masked_invalid(zonalbias),vmin=-5,vmax=5);plt.colorbar()
+        plt.pcolor(lat[:,0],-depth,np.ma.masked_invalid(zonalbias),vmin=-3,vmax=3);plt.colorbar()
         #plt.pcolor(lat,depth,np.ma.masked_invalid(var-varwoa),vmin=-5,vmax=5);plt.colorbar()
-
-
 
 
 if __name__ == "__main__":
