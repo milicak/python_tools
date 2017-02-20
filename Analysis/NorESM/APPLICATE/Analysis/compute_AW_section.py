@@ -2,7 +2,11 @@
 salinity) along the pathway of Atlantic Water in the Nordic Seas. The section
 location can be found in Ilicak et al. (2016) paper '''
 import numpy as np
+import sys
 from netcdf_functions import nc_read
+
+sys.path.insert(0,'/home/mil021/anaconda2/envs/esmpy/lib/python2.7/site-packages/')
+
 
 # lon and lat values of the AW section
 lon_AW = [17.6, 16.5, 16.05, 15.6, 15.1, 14.1, 13.0, 12.0, 10.0, 8.0, 4.0, 4.0,
