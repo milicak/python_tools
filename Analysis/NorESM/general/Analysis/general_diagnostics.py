@@ -423,26 +423,27 @@ def main():
     # 2 for indian_pacific_ocean region
     # 3 for global_ocean
     region = 1
-    root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+    #root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
     #root_folder = '/work/milicak/mnt/viljework/archive/'
+    root_folder = '/hexagon/work/milicak/archive/'
 
     #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
-    #expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
+    expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
     #expid = 'N1850_f19_tn11_01_default'
-    expid = 'NOIIA_T62_tn025_default_visc01'
-    fyear = 30; # first year
-    lyear = 40; # last year
-    m2y = 1
+    #expid = 'NOIIA_T62_tn025_default_visc01'
+    fyear = 200; # first year
+    lyear = 220; # last year
+    m2y = 0
     cmpnt = 'ocn' # ocn, atm
     mdl = 'micom' # micom, cam2, cam
-    ext = 'hm' # hm, hy, h0
+    ext = 'hy' # hm, hy, h0
     varname = 'templvl'
     #cmpnt = 'atm' # ocn, atm
     #mdl = 'cam2' # micom, cam2, cam
     #ext = 'h0' # hm, hy, h0
     print 'expid = ', expid
 
-    gridtype = 'tnx0.25v1' # tnx1v1 , tnx0.25v1, gx1v6
+    gridtype = 'tnx1v1' # tnx1v1 , tnx0.25v1, gx1v6
     prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext, expid = expid,
                                  m2y=m2y)
     woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
@@ -467,7 +468,7 @@ def main():
     #mask_index = 8; # 8 for Indian Ocean
     #mask_index = 9; # 9 for Black Sea and Caspian Sea
 
-    diagname = 'zonalmean' #ssstbias, sssbias, zonalmean
+    diagname = 'sstbias' #ssstbias, sssbias, zonalmean
     print 'You select', diagname
     diagno = call_generic_diags(diagname)
 
@@ -506,7 +507,6 @@ def main():
         m.fillcontinents()
         m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
         m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
-        print 'mehmet', sss.max(), ssswoa.max()
         im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sss-ssswoa),
                            shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
         cb = m.colorbar(im1,"right", size="5%", pad="10%")
