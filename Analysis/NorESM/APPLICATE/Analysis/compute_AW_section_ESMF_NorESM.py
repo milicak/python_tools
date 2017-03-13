@@ -49,12 +49,14 @@ xpt,ypt = m(lon_s4new,lat_s4new)
 m.plot(xpt,ypt,'-o',color='b')
 
 # The data file should be in global latlon grid from a GRIDSPEC formatted file source grid
-datafname = "/mnt/fimmhome/Analysis/NorESM/climatology/Analysis/t00an1.nc"
-gridfile = "/mnt/fimmhome/Analysis/NorESM/climatology/Analysis/t00an1.nc"
-tempwoa = nc_read(datafname,'t')
+datafname = "/mnt/fimmexport/bckup/noresm/CORE2/Arctic/DATA/NorESM/NOIIA_T62_tn11_sr10m60d_01_temperature_pendatal_1-300.nc"
+gridfile = "/mnt/fimmhome/python_tools/Analysis/NorESM/APPLICATE/Analysis/noresm_ESMF_grid_tnx1v1_nohalo.nc"
+tempwoa = nc_read(datafname,'temp')
 zt = nc_read(datafname,'depth')
-lon=nc_read(datafname,'lon')
-lat=nc_read(datafname,'lat')
+lon=nc_read(datafname,'tlon')
+lat=nc_read(datafname,'tlat')
+
+sys.exit()
 
 secfield = np.zeros((lon_s4new.shape[0],tempwoa.shape[0]))
 
