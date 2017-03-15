@@ -49,9 +49,13 @@ xpt,ypt = m(lon_s4new,lat_s4new)
 m.plot(xpt,ypt,'-o',color='b')
 
 # The data file should be in global latlon grid from a GRIDSPEC formatted file source grid
-datafname = "/mnt/fimmhome/Analysis/NorESM/climatology/Analysis/t00an1.nc"
-gridfile = "/mnt/fimmhome/Analysis/NorESM/climatology/Analysis/t00an1.nc"
-tempwoa = nc_read(datafname,'t')
+#datafname = "/mnt/fimmhome/Analysis/NorESM/climatology/Analysis/t00an1.nc"
+#gridfile = "/mnt/fimmhome/Analysis/NorESM/climatology/Analysis/t00an1.nc"
+datafname = "/mnt/fimmexport/bckup/OISST/woa13_decav_t00_04v2.nc"
+gridfile = "/mnt/fimmexport/bckup/OISST/woa13_decav_t00_04v2.nc"
+tempwoa = nc_read(datafname,'t_an')
+tempwoa = np.squeeze(tempwoa[0,:,:,:])
+#tempwoa = nc_read(datafname,'t')
 zt = nc_read(datafname,'depth')
 lon=nc_read(datafname,'lon')
 lat=nc_read(datafname,'lat')
@@ -88,8 +92,10 @@ for kind in range(0,tempwoa.shape[0]):
     secfield[:,kind] = dstfield.data
 
 
+secfield[secfield<-5]=np.nan;
 plt.figure()
-plt.pcolor(xnew,-zt,np.transpose(secfield),vmin=-1.5,vmax=7);plt.colorbar()
+plt.pcolor(xnew,-zt,np.transpose(np.ma.masked_invalid(secfield)),vmin=-1.25,vmax=7,cmap='gist_ncar');plt.colorbar()
+plt.ylim((-4500,0));
 
 
 

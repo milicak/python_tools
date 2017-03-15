@@ -667,13 +667,13 @@ def noresm2WOA(datain,shift=False, grid='gx1v6',dest='1deg'):
       #S=mapping_data['S'].copy()
     #these two don't work, maybe something wrong with the way data is written in mat file
     elif grid in ['tnx1v1']:
-      mapping_data=io.loadmat('/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/map_noresm_tnx1v1_to_woa09_1deg_aave_v2.mat')
+      mapping_data=io.loadmat('/export/grunchfs/unibjerknes/milicak/bckup//noresm/CORE2/Arctic/maps/map_noresm_tnx1v1_to_woa09_1deg_aave_v2.mat')
       #S=mapping_data["S"].values()[0][:]
     elif grid in ['tnx0.25v1']:
       if dest in ['1deg']:
-        mapping_data=io.loadmat('/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/map_noresm_tnx0.25v1_to_woa09_1deg_aave_v2.mat')
+        mapping_data=io.loadmat('/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/map_noresm_tnx0.25v1_to_woa09_1deg_aave_v2.mat')
       elif dest in ['0.25deg']:
-        mapping_data=io.loadmat('/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/map_noresm_tnx0.25v1_to_woa09_0_25deg_aave_v2.mat')
+        mapping_data=io.loadmat('/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/map_noresm_tnx0.25v1_to_woa09_0_25deg_aave_v2.mat')
     S=mapping_data['S'][:]
     lon_b=mapping_data['lon_b'][:].squeeze()
     lat_b=mapping_data['lat_b'][:].squeeze()

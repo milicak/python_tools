@@ -415,7 +415,7 @@ def main():
     # tripolar 1degree grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
     # tripolar 0.25degree grid
-    grid_file = '/bcmhsm/milicak/RUNS/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+    grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
     # bi-polar grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
@@ -424,26 +424,26 @@ def main():
     # 3 for global_ocean
     region = 1
     #root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-    #root_folder = '/work/milicak/mnt/viljework/archive/'
-    root_folder = '/hexagon/work/milicak/archive/'
+    root_folder = '/work/milicak/mnt/viljework/archive/'
+    #root_folder = '/hexagon/work/milicak/archive/'
 
     #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
-    expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
+    #expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
     #expid = 'N1850_f19_tn11_01_default'
-    #expid = 'NOIIA_T62_tn025_default_visc01'
-    fyear = 200; # first year
-    lyear = 220; # last year
-    m2y = 0
+    expid = 'NOIIA_T62_tn025_default_visc10'
+    fyear = 20; # first year
+    lyear = 25; # last year
+    m2y = 1
     cmpnt = 'ocn' # ocn, atm
     mdl = 'micom' # micom, cam2, cam
-    ext = 'hy' # hm, hy, h0
+    ext = 'hm' # hm, hy, h0
     varname = 'templvl'
     #cmpnt = 'atm' # ocn, atm
     #mdl = 'cam2' # micom, cam2, cam
     #ext = 'h0' # hm, hy, h0
     print 'expid = ', expid
 
-    gridtype = 'tnx1v1' # tnx1v1 , tnx0.25v1, gx1v6
+    gridtype = 'tnx0.25v1' # tnx1v1 , tnx0.25v1, gx1v6
     prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext, expid = expid,
                                  m2y=m2y)
     woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
