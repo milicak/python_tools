@@ -9,6 +9,7 @@ import sys
 from netcdf_functions import nc_read
 from netcdf_functions import ncgetdim
 import NorESM_utils as noresmutils
+import argparse
 
 plt.ion()
 
@@ -412,6 +413,9 @@ def main():
 
 
     global fyear, lyear
+    print 'input order = root_folder expid fyear lyear m2y cmpnt mdl ext varname diagname'
+    # general_diagnostics.py /work/milicak/mnt/norstore/NS2345K/noresm/cases/
+    # NOIIA_T62_tn11_FAMOS_BG_CTR 1 5 1 ocn micom hm templvl tnx1v1 sstbias
     # tripolar 1degree grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
     # tripolar 0.25degree grid
@@ -424,26 +428,39 @@ def main():
     # 3 for global_ocean
     region = 1
     #root_folder = '/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
-    root_folder = '/work/milicak/mnt/viljework/archive/'
+    #root_folder = '/work/milicak/mnt/viljework/archive/'
     #root_folder = '/hexagon/work/milicak/archive/'
 
+    root_folder = str(sys.argv[1])
+    expid = str(sys.argv[2])
+    fyear = int(sys.argv[3]) #15; # first year
+    lyear = int(sys.argv[4]) #15; # first year
+    m2y = int(sys.argv[5]) #15; # first year
+    cmpnt = str(sys.argv[6]) #15; # first year
+    mdl = str(sys.argv[7]) #15; # first year
+    ext = str(sys.argv[8]) #15; # first year
+    varname = str(sys.argv[9]) #15; # first year
+    gridtype = str(sys.argv[10]) #15; # first year
+    diagname = str(sys.argv[11]) #15; # first year
     #expid = 'NOIIA_T62_tn11_norems2_ctrl_tke'
     #expid = 'NBF1850_f19_tn11_sst_sss_rlx_01'
     #expid = 'N1850_f19_tn11_01_default'
-    expid = 'NOIIA_T62_tn025_default_visc10'
-    fyear = 20; # first year
-    lyear = 25; # last year
-    m2y = 1
-    cmpnt = 'ocn' # ocn, atm
-    mdl = 'micom' # micom, cam2, cam
-    ext = 'hm' # hm, hy, h0
-    varname = 'templvl'
+    #expid = 'NOIIA_T62_tn11_ctrl_default_02' # CORE2+TKE+Aleksi's default
+    #expid = 'NOIIA_T62_tn11_drho01'
+    #expid = 'NOIIA_T62_tn025_default_visc01'
+    #fyear = 15; # last year
+    #lyear = 20; # last year
+    #m2y = 1
+    #cmpnt = 'ocn' # ocn, atm
+    #mdl = 'micom' # micom, cam2, cam
+    #ext = 'hm' # hm, hy, h0
+    #varname = 'templvl'
     #cmpnt = 'atm' # ocn, atm
     #mdl = 'cam2' # micom, cam2, cam
     #ext = 'h0' # hm, hy, h0
     print 'expid = ', expid
 
-    gridtype = 'tnx0.25v1' # tnx1v1 , tnx0.25v1, gx1v6
+    #gridtype = 'tnx1v1' # tnx1v1 , tnx0.25v1, gx1v6
     prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext, expid = expid,
                                  m2y=m2y)
     woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
@@ -468,7 +485,7 @@ def main():
     #mask_index = 8; # 8 for Indian Ocean
     #mask_index = 9; # 9 for Black Sea and Caspian Sea
 
-    diagname = 'sstbias' #ssstbias, sssbias, zonalmean
+    #diagname = 'sstbias' #ssstbias, sssbias, zonalmean
     print 'You select', diagname
     diagno = call_generic_diags(diagname)
 
