@@ -35,16 +35,18 @@ def ncread_time_surface(fname,variable,timestr,timeend,x,y):
 #mask=nc_read(mask_file,'tmask');
 # Atlantic mask==2
 
-root_folder='/hexagon/work/milicak/RUNS/mom/om3_core3_2/'
+#root_folder='/hexagon/work/milicak/RUNS/mom/om3_core3_2/'
 #root_folder='/mnt/fimm/mom/'
+root_folder='/export/grunchfs/unibjerknes/milicak/bckup/mom/'
 
-#projects=['om3_core3_ctrl','om3_core3_patchy_full_01','om3_core3_patchy_full_02']
+projects=['om3_core3_ctrl','om3_core3_patchy_full_01','om3_core3_patchy_full_02','om3_core3_patchy_full_03']
+hist_folder = ['history_63-124years'];
+#projects=['om3_core3_patchy_full_03']
 #hist_folder = ['history_63-124years'];
-projects=['om3_core3']
-hist_folder = ['history'];
+#hist_folder = ['history'];
 
-fname1 = '/fimm/home/bjerknes/milicak/Analysis/mom/patchy_NA/Analysis/WOA09_ann_theta_cm2m_extrap.nc'
-fname2 = "/fimm/home/bjerknes/milicak/Analysis/mom/patchy_NA/Analysis/levitus_ewg_temp_salt_cm2m.nc"
+fname1 = '/export/grunchfs/unibjerknes/milicak/bckup/Analysis/mom/patchy_NA/Analysis/WOA09_ann_theta_cm2m_extrap.nc'
+fname2 = "/export/grunchfs/unibjerknes/milicak/bckup/Analysis/mom/patchy_NA/Analysis/levitus_ewg_temp_salt_cm2m.nc"
 #fname1 = ['/mnt/fimmhome/Analysis/mom/patchy_NA/Analysis/WOA09_ann_theta_cm2m_extrap.nc']
 #fname2 = ['/mnt/fimmhome/Analysis/mom/patchy_NA/Analysis/levitus_ewg_temp_salt_cm2m.nc']
 tempwoa = nc_read(fname1,'POTENTIAL_TEMP');
@@ -52,11 +54,10 @@ lon = nc_read(fname2,'x_T');
 lat = nc_read(fname2,'y_T');
 sstwoa=np.squeeze(tempwoa[:,0,:,:])
 
-# compute amoc
-for i in range(0,1):
-#for i in range(0,3):
-    filename=root_folder+projects[i]+'/'+hist_folder[0]+'/'+'00010101.ocean_month.nc'
-    #filename=root_folder+projects[i]+'/'+hist_folder[0]+'/'+'00630101.ocean_month.nc'
+#for i in range(0,1):
+for i in range(0,4):
+    #filename=root_folder+projects[i]+'/'+hist_folder[0]+'/'+'00010101.ocean_month.nc'
+    filename=root_folder+projects[i]+'/'+hist_folder[0]+'/'+'00630101.ocean_month.nc'
     print filename
     #sst=ncread_time_surface(filename,'temp',700,744,nx,ny)
     sst=ncread_time_surface(filename,'temp',348,744,nx,ny)
@@ -64,6 +65,8 @@ for i in range(0,1):
         sst_ctrl=np.copy(sst)
     if i==2:
         sst2=np.copy(sst)
+    if i==3:
+        sst3=np.copy(sst)
 
 
     # bias from WOA
@@ -78,11 +81,12 @@ for i in range(0,1):
     cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[-4, -3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
     cb.set_label('[' r'$^\circ$' 'C]')
     plt.show()
-    #plt.savefig('paperfigs/'+projects[i]+'_sst_bias.eps', bbox_inches='tight',format='eps', dpi=300)
-    #plt.clf()
-    #plt.close(fig)
+    plt.savefig('paperfigs/'+projects[i]+'_sst_bias.eps', bbox_inches='tight',format='eps', dpi=300)
+    plt.clf()
+    plt.close(fig)
 
-sys.exit()
+#sys.exit()
+i=2
 # difference from sst_ctrl
 fig = plt.figure()
 m=Basemap(llcrnrlon=-280,llcrnrlat=-88,urcrnrlon=80,urcrnrlat=88,projection='cyl')
@@ -96,5 +100,21 @@ cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[-4,-3, -2, -1, 0, 1, 2,
 cb.set_label('[' r'$^\circ$' 'C]')
 plt.show()
 plt.savefig('paperfigs/'+projects[i]+'_sst_diff_patchy2_ctrl.eps', bbox_inches='tight',format='eps', dpi=300)
+plt.clf()
+plt.close(fig)
+
+fig = plt.figure()
+i=3
+m=Basemap(llcrnrlon=-280,llcrnrlat=-88,urcrnrlon=80,urcrnrlat=88,projection='cyl')
+m.drawcoastlines()
+m.fillcontinents()
+m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sst3-sst_ctrl),shading='flat',cmap='RdBu_r'
+                    ,vmin=-4,vmax=4,latlon=True)
+cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[-4,-3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
+cb.set_label('[' r'$^\circ$' 'C]')
+plt.show()
+plt.savefig('paperfigs/'+projects[i]+'_sst_diff_patchy3_ctrl.eps', bbox_inches='tight',format='eps', dpi=300)
 plt.clf()
 plt.close(fig)

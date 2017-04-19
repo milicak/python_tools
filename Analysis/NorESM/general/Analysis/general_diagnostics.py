@@ -413,13 +413,14 @@ def main():
 
 
     global fyear, lyear
+    global lon, lat
     print 'input order = root_folder expid fyear lyear m2y cmpnt mdl ext varname diagname'
     # general_diagnostics.py /work/milicak/mnt/norstore/NS2345K/noresm/cases/
     # NOIIA_T62_tn11_FAMOS_BG_CTR 1 5 1 ocn micom hm templvl tnx1v1 sstbias
     # tripolar 1degree grid
-    #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+    grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
     # tripolar 0.25degree grid
-    grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+    #grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
     # bi-polar grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
@@ -465,14 +466,14 @@ def main():
                                  m2y=m2y)
     woafnamet = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/t00an1.nc'
     woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
-    woafname = '/fimm/home/bjerknes/milicak/Analysis/obs/WOA13/Analysis/WOA13_' \
+    woafname = '/export/grunchfs/unibjerknes/milicak/bckup//Analysis/obs/WOA13/Analysis/WOA13_' \
                + gridtype +'_65layers.nc'
     #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
 
-    #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
-    #maskvariable = 'mask_tnxv1'
-    mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';
-    maskvariable = 'mask'
+    mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
+    maskvariable = 'mask_tnxv1'
+    #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';
+    #maskvariable = 'mask'
 
     #mask_index = 0; # 0 for Global
     mask_index = 10; # 10 for Atlantic Ocean
@@ -500,6 +501,7 @@ def main():
     elif diagno == 5:
         temp = var3Dmean(root_folder, cmpnt, mdl, ext, varname)
     elif diagno == 6:
+        global sst, sstwoa
         sst,sstwoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'templvl',
                                       woafnamet,'t',0,0,gridtype,
                                            prefix=prefix, sdate=sdate, m2y=m2y)
@@ -514,6 +516,7 @@ def main():
         cb = m.colorbar(im1,"right", size="5%", pad="10%")
         #plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
     elif diagno == 7:
+        global sss, ssswoa
         sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
                                       woafnames,'s',0,0,gridtype,
                                           prefix=prefix, sdate=sdate, m2y=m2y)
@@ -528,6 +531,7 @@ def main():
                            shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
         cb = m.colorbar(im1,"right", size="5%", pad="10%")
     elif diagno == 8:
+        global zonalbias, depth
         var, varwoa, mask, lat, depth = zonalmean_bias(root_folder, cmpnt, mdl, ext,
                                                        'templvl',
                                       woafname, 'twoa_noresm', mask_woa09_file,
