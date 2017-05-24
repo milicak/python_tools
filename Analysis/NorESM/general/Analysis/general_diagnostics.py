@@ -506,13 +506,16 @@ def main():
                                       woafnamet,'t',0,0,gridtype,
                                            prefix=prefix, sdate=sdate, m2y=m2y)
         plt.figure()
-        m = Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+        m = Basemap(llcrnrlon=280,llcrnrlat=20,urcrnrlon=360,urcrnrlat=80,projection='cyl')
+        #m = Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
         m.drawcoastlines()
         m.fillcontinents()
-        m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
-        m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+        #m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+        #m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+        m.drawparallels(np.arange(20,80,10),labels=[1,1,0,0])
+        m.drawmeridians(np.arange(280,360,10),labels=[0,0,0,1])
         im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sst-sstwoa),
-                           shading='flat',vmin=-5,vmax=5,cmap='RdBu_r');
+                           shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
         cb = m.colorbar(im1,"right", size="5%", pad="10%")
         #plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
     elif diagno == 7:
