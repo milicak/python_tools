@@ -183,8 +183,17 @@ def amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y):
 
     time = np.linspace(fyear,lyear,lyear-fyear+1)
     plt.figure()
-    plt.plot(amoc['max'],'k',label='max')
-    plt.plot(amoc['26N'],'g',label='26N')
+    if m2y==1:
+        plt.plot(np.mean(np.reshape(amoc['max'],(np.size(amoc['max'])/12,12)),1),'k',label='max')
+        plt.plot(np.mean(np.reshape(amoc['26N'],(np.size(amoc['26N'])/12,12)),1),'r',label='26N')
+
+
+    else:
+        plt.plot(amoc['max'],'k',label='max')
+        plt.plot(amoc['26N'],'r',label='26N')
+
+
+
     plt.legend(loc='lower right')
     return amoc
 
@@ -491,6 +500,7 @@ def main():
     diagno = call_generic_diags(diagname)
 
     if diagno == 1:
+        global amoc_time
         amoc_time = amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y)
     elif diagno == 2:
         amocmean = amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y)
