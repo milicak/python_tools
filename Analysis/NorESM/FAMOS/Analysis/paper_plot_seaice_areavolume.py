@@ -1,12 +1,12 @@
 ''' computes sea ice area'''
-import my_nanfilter
+#import my_nanfilter
 import numpy as np
 import numpy.ma as ma
 import scipy.io
 import sys
 #%matplotlib inline
 #np.shape !!!!!
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
 from cpttoseg import cpt2seg
 from netCDF4 import Dataset
 from netcdf_functions import nc_read
@@ -45,6 +45,8 @@ def my_nanfilterbox(y, dn):
     return yfilter
 
 
+#fyear = 109; # first year 1980
+#lyear = 141; # last year 2009
 fyear = 33; # first year 1980
 lyear = 62; # last year 2009
 mw = np.array([31,28,31,30,31,30,31,31,30,31,30,31],dtype=np.float)
@@ -54,8 +56,10 @@ ny = 384
 grid_file = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc'
 area = nc_read(grid_file,'parea')
 area = area[:-1,:]
-root_folder='/work/milicak/mnt/viljework/archive/'
-#root_folder='/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+#root_folder='/work/milicak/mnt/viljework/archive/'
+#root_folder='/hexagon/work/mmu072/archive/'
+root_folder='/work/milicak/mnt/norstore/NS2345K/noresm/cases/'
+#projects = ['NOI20C_T62_tn11_CRF_CTRL','NOI20C_T62_tn11_CRF_BG_Pos_01','NOI20C_T62_tn11_CRF_BG_Neg_01']
 projects = ['NOIIA_T62_tn11_FAMOS_BG_CTR','NOIIA_T62_tn11_FAMOS_BG_POS','NOIIA_T62_tn11_FAMOS_BG_NEG']
 
 ice_area = {}
@@ -73,12 +77,13 @@ for project in projects:
             dnm = np.squeeze(nc_read(filename,'aice'))/100.0 # ratio
             # if there is area criteria
             #  dnm[dnm<0.15] = np.nan
+            dnm[dnm<0.15] = 0.0
             aice = aice+dnm*mw[month-1]*area
             #  ice thickness
-            dnm = np.squeeze(nc_read(filename,'hi'))
+            dnm2 = np.squeeze(nc_read(filename,'hi'))
             #  if there is height criteria
             #  dnm[dnm<0.15] = np.nan
-            vice = vice+dnm*mw[month-1]*area
+            vice = vice+dnm*dnm2*mw[month-1]*area
             # get rid off southern hemisphere
             aice[:200,:] = 0.0
             vice[:200,:] = 0.0
