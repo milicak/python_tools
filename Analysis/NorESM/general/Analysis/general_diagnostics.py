@@ -203,11 +203,19 @@ def amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y):
     prefix,sdate = get_sdate_ini(root_folder, cmpnt, mdl, ext, expid = expid,
                                  m2y=m2y)
     # set initial values to zero
-    amoc, nx , _ ,_ = set_ini_val_zero(prefix, sdate, dim1='region', dim2='depth',
+    amoc_mean, nx , _ ,_ = set_ini_val_zero(prefix, sdate, dim1='region', dim2='depth',
                             dim3='lat')
-    amoc = np.transpose(amoc, (2, 1, 0));
-    amoc = timemean(prefix, amoc,'mmflxd',fyear,lyear)
-    return amoc
+
+    sdate="%4.4d%c%2.2d" % (fyear,'-',1)
+    depth = nc_read(prefix+sdate+'.nc', 'depth');
+    lat = nc_read(prefix+sdate+'.nc', 'lat');
+
+    amoc_mean = np.transpose(amoc_mean, (2, 1, 0));
+    amoc_mean = timemean(prefix, amoc_mean,'mmflxd',fyear,lyear,m2y=m2y)
+    plt.figure()
+    plt.pcolor(lat,-depth,np.ma.masked_invalid(np.squeeze(amoc_mean[0,:,:]))*1e-9,
+               vmin=-10,vmax=30);plt.colorbar()
+    return amoc_mean
 
 
 def var3Dmean(root_folder, cmpnt, mdl, ext, varname):
@@ -427,9 +435,9 @@ def main():
     # general_diagnostics.py /work/milicak/mnt/norstore/NS2345K/noresm/cases/
     # NOIIA_T62_tn11_FAMOS_BG_CTR 1 5 1 ocn micom hm templvl tnx1v1 sstbias
     # tripolar 1degree grid
-    grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+    #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
     # tripolar 0.25degree grid
-    #grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+    grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
     # bi-polar grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
@@ -479,10 +487,21 @@ def main():
                + gridtype +'_65layers.nc'
     #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
 
-    mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
-    maskvariable = 'mask_tnxv1'
-    #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';
-    #maskvariable = 'mask'
+    print gridtype
+    if gridtype=='tnx1v1':
+        # tripolar 1degree grid
+        mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
+        maskvariable = 'mask_tnxv1'
+        grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+    elif gridtype=='tnx0.25v1':
+        # tripolar 0.25degree grid
+        mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';
+        maskvariable = 'mask'
+        grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+    # bi-polar grid
+    #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
+
+
 
     #mask_index = 0; # 0 for Global
     mask_index = 10; # 10 for Atlantic Ocean
@@ -503,7 +522,8 @@ def main():
         global amoc_time
         amoc_time = amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y)
     elif diagno == 2:
-        amocmean = amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y)
+        global amoc_mean
+        amoc_mean = amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y)
     elif diagno == 3:
         HT,lat_cesm = compute_heat_transport(root_folder, expid, cmpnt, mdl, ext)
     elif diagno == 4:
@@ -576,6 +596,8 @@ def main():
         zonalbias = zonalbias/zonalbiaswght
         plt.figure()
         plt.pcolor(lat[:,0],-depth,np.ma.masked_invalid(zonalbias),vmin=-3,vmax=3);plt.colorbar()
+        plt.set_cmap('RdBu_r')
+        plt.xlim(-40,60)
         #plt.pcolor(lat,depth,np.ma.masked_invalid(var-varwoa),vmin=-5,vmax=5);plt.colorbar()
 
 
