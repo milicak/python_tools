@@ -26,9 +26,9 @@ palette = mpllib.colors.LinearSegmentedColormap('palette', _palette_data, 256)
 _palette_data = cpt2seg('coldblue.cpt')
 palette = mpllib.colors.LinearSegmentedColormap('palette', _palette_data, 11)
 
-lon = nc_read('/work/milicak/etopo5.nc','topo_lon')
-lat = nc_read('/work/milicak/etopo5.nc','topo_lat')
-topo = nc_read('/work/milicak/etopo5.nc','topo')
+lon = nc_read('/export/grunchfs/unibjerknes/milicak/bckup/world_grid/etopo5.nc','topo_lon')
+lat = nc_read('/export/grunchfs/unibjerknes/milicak/bckup/world_grid/etopo5.nc','topo_lat')
+topo = nc_read('/export/grunchfs/unibjerknes/milicak/bckup/world_grid/etopo5.nc','topo')
 lon1 = nc_read('/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc','plon');
 lat1 = nc_read('/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc','plat');
 lon1 = np.transpose(lon1)

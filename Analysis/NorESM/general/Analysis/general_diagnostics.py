@@ -48,6 +48,8 @@ def get_sdate_ini(root_folder,cmpnt,mdl,ext, **kwargs):
     expid = kwargs.get('expid', None)
     m2y = kwargs.get('m2y', None)
     # Get dimensions and time attributes for ocn or atm or others ...
+    #prefix=root_folder+expid+'/'+'/run/'+expid+ '.'+ mdl + \
+    #        '.'+ext+'.'
     prefix=root_folder+expid+'/'+cmpnt+'/hist/'+expid+ '.'+ mdl + \
             '.'+ext+'.'
     if m2y==1:
@@ -184,18 +186,18 @@ def amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y):
     time = np.linspace(fyear,lyear,lyear-fyear+1)
     plt.figure()
     if m2y==1:
-        plt.plot(np.mean(np.reshape(amoc['max'],(np.size(amoc['max'])/12,12)),1),'k',label='max')
-        plt.plot(np.mean(np.reshape(amoc['26N'],(np.size(amoc['26N'])/12,12)),1),'r',label='26N')
+        line1, = plt.plot(np.mean(np.reshape(amoc['max'],(np.size(amoc['max'])/12,12)),1),'k',label='max')
+        line2, = plt.plot(np.mean(np.reshape(amoc['26N'],(np.size(amoc['26N'])/12,12)),1),'r',label='26N')
 
 
     else:
-        plt.plot(amoc['max'],'k',label='max')
-        plt.plot(amoc['26N'],'r',label='26N')
+        line1, = plt.plot(amoc['max'],'k',label='max')
+        line2, = plt.plot(amoc['26N'],'r',label='26N')
 
 
 
     plt.legend(loc='lower right')
-    return amoc
+    return amoc, line1, line2
 
 
 def amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y):
@@ -519,8 +521,10 @@ def main():
     diagno = call_generic_diags(diagname)
 
     if diagno == 1:
-        global amoc_time
-        amoc_time = amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y)
+        global amoc_time,line1, line2
+        amoc_time,line1,line2 = amoctime(root_folder, expid, cmpnt, mdl, ext, region, m2y)
+        # to change label names later
+        # plt.legend([line1, line2], ['Line Up', 'Line Down'])
     elif diagno == 2:
         global amoc_mean
         amoc_mean = amocmean(root_folder, expid, cmpnt, mdl, ext, region, m2y)

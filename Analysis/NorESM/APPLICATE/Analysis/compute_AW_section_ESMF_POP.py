@@ -49,8 +49,10 @@ xpt,ypt = m(lon_s4new,lat_s4new)
 m.plot(xpt,ypt,'-o',color='b')
 
 # The data file should be in global latlon grid from a GRIDSPEC formatted file source grid
-datafname = "/mnt/fimmexport/bckup/noresm/CORE2/Arctic/DATA/ncar-pop/TSUV/g40.000.pop.h.0296-0300.nc"
-gridfile = "/mnt/fimmhome/python_tools/Analysis/NorESM/APPLICATE/Analysis/ncar_pop_ESMF_grid_gx1v6_nohalo.nc"
+datafname = "/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/DATA/ncar-pop/TSUV/g40.000.pop.h.0296-0300.nc"
+gridfile = "ncar_pop_ESMF_grid_gx1v6_nohalo.nc"
+#datafname = "/mnt/fimmexport/bckup/noresm/CORE2/Arctic/DATA/ncar-pop/TSUV/g40.000.pop.h.0296-0300.nc"
+#gridfile = "/mnt/fimmhome/python_tools/Analysis/NorESM/APPLICATE/Analysis/ncar_pop_ESMF_grid_gx1v6_nohalo.nc"
 tempwoa = nc_read(datafname,'TEMP')
 tempwoa = tempwoa[0,:,:,:]
 zt = nc_read(datafname,'z_t')
