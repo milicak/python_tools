@@ -439,7 +439,7 @@ def main():
     # tripolar 1degree grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
     # tripolar 0.25degree grid
-    grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+    #grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
     # bi-polar grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
@@ -494,7 +494,8 @@ def main():
         # tripolar 1degree grid
         mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnxv1_mask.mat';
         maskvariable = 'mask_tnxv1'
-        grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+        #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid.nc';
+        grid_file='/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx1v1/20120120/grid.nc';
     elif gridtype=='tnx0.25v1':
         # tripolar 0.25degree grid
         mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';

@@ -16,7 +16,7 @@ from scipy import stats
 # Some locally installed stuff
 #sys.path.append('/usr/lib/python2.7/site-packages')
 #sys.path.append('/Home/siv22/anu074/PyFerret/gsw-3.0.2/')
-sys.path.append('/fimm/home/bjerknes/milicak/python-gsw')
+#sys.path.append('/fimm/home/bjerknes/milicak/python-gsw')
 #sys.path.append('/Home/siv22/anu074/PyFerret/seawater-3.3.1/')
 #import h5py
 import gsw
