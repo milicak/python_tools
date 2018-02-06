@@ -501,6 +501,7 @@ def main():
         mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';
         maskvariable = 'mask'
         grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
+        grid_file = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx0.25v3/20170623/grid.nc'
     # bi-polar grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 

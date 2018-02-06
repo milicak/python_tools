@@ -52,20 +52,22 @@ def get_dpm(time, calendar='standard'):
         return month_length
 
 fyear = 1701
-lyear = 1950
+lyear = 1850
 root_folder = '/cluster/work/users/milicak/archive/'
-expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
+#root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
+#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
+expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI2'
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
 freq = '*hy*'
-list=(glob.glob(foldername+freq+sdate))
+list=sorted(glob.glob(foldername+freq+sdate))
 for year in xrange(fyear+1,lyear+1):
     sdate="%c%4.4d%c" % ('*',year,'*')
-    list.extend(glob.glob(foldername+freq+sdate))
+    list.extend(sortef(glob.glob(foldername+freq+sdate)))
 
 
-chunks = (360,385)
+chunks = (385,360)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
 data = xr.open_mfdataset(list,chunks=xr_chunks)['templvl']
 data1 = xr.open_mfdataset(list,chunks=xr_chunks)['salnlvl']
@@ -74,6 +76,7 @@ temp = np.copy(data.data[:,:,315,107])
 salt = np.copy(data1.data[:,:,315,107])
 
 time = np.linspace(fyear,lyear,lyear-fyear+1)
+plt.figure()
 plt.clf()
 plt.pcolormesh(time,-zr,np.transpose(temp),cmap='gist_ncar');plt.colorbar()
 plt.ylim((-1400,0))
