@@ -1,4 +1,6 @@
 import numpy as np
+import numpy.ma as ma
+from mpl_toolkits.basemap import Basemap
 import pandas as pd
 import xarray as xr
 from netCDF4 import num2date
@@ -35,6 +37,19 @@ def leap_year(year, calendar='standard'):
     return leap
 
 
+def enable_global(tlon,tlat,data):
+  """Fix the data in such a way that it can to be plotted on a global projection on its native grid"""
+  tlon = np.where(np.greater_equal(tlon,min(tlon[:,0])),tlon-360,tlon)
+  tlon=tlon+abs(ma.max(tlon)); tlon=tlon+360
+  # stack grids side-by-side (in longitiudinal direction), so
+  # any range of longitudes may be plotted on a world map.
+  tlon = np.concatenate((tlon,tlon+360),1)
+  tlat = np.concatenate((tlat,tlat),1)
+  data = ma.concatenate((data,data),1)
+  tlon = tlon-360.
+  return tlon, tlat, data
+
+
 def get_dpm(time, calendar='standard'):
         """
             return a array of days per month corresponding to the months
@@ -51,22 +66,25 @@ def get_dpm(time, calendar='standard'):
                 month_length[i] += 1
         return month_length
 
+
+gridfile = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx1v1/20120120/grid.nc'
 #fyear = 1701
 #lyear = 1922
 fyear = 3301
 lyear = 3600
-root_folder = '/cluster/work/users/milicak/archive/'
+root_folder = '/tos-project1/NS4659K/milicak/'
+#root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
 root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
 expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SPG'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SO'
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
 foldernameref = root_folderref + expidref + '/ocn/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
-freq = '*hy*'
+freq = '*hm*'
 list=sorted(glob.glob(foldername+freq+sdate))
 listref=sorted(glob.glob(foldernameref+freq+sdate))
 for year in xrange(fyear+1,lyear+1):
@@ -75,37 +93,43 @@ for year in xrange(fyear+1,lyear+1):
     listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
 
 
-# 1 for atlantic_arctic_ocean region
-# 2 for indian_pacific_ocean region
-# 3 for global_ocean
-region = 1;
-chunks = (385,360)
+fig = plt.figure()
+chunks = (190,180)
+#chunks = (385,360)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
-data = xr.open_mfdataset(list,chunks=xr_chunks)['mmflxd']
-dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['mmflxd']
-lat = xr.open_mfdataset(list,chunks=xr_chunks)['lat']
-lat1 = 20.0;
-lat2 = 60.0;
-lat3 = 26.5;
-ind1 = np.int(np.min(np.where(lat>=lat1)));
-ind2 = np.int(np.max(np.where(lat<=lat2)));
-ind3 = np.int(np.max(np.where(lat<=lat3)));
+area = xr.open_mfdataset(gridfile,chunks=xr_chunks)['parea']
+area = np.copy(area.data)
+area = np.copy(area[:-1,:])
+data = xr.open_mfdataset(list,chunks=xr_chunks)['fice']
+dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['fice']
+fice = np.copy(data.data)
+ficeref = np.copy(dataref.data)
+#fice = np.copy(data.mean('time'))
+#ficeref = np.copy(dataref.mean('time'))
+fice = np.copy(fice[:,:-1,:])
+ficeref = np.copy(ficeref[:,:-1,:])
+ice_cr = 0.15;
+fice = fice/100
+ficeref = ficeref/100
+# apply critical value
+fice[np.where(fice<ice_cr)] = 0.0
+fice[np.where(fice>=ice_cr)] = 1.0
+ficeref[np.where(ficeref<ice_cr)] = 0.0
+ficeref[np.where(ficeref>=ice_cr)] = 1.0
 
-amoc= {}
-amocref= {}
-amoc['max'] = np.nanmax(data[:,region-1,:,ind1-1:ind2-1],axis=(1,2))*1e-9
-amoc['26N'] = np.nanmax(data[:,region-1,:,ind3],axis=1)*1e-9
-amocref['max'] = np.nanmax(dataref[:,region-1,:,ind1-1:ind2-1],axis=(1,2))*1e-9
-amocref['26N'] = np.nanmax(dataref[:,region-1,:,ind3],axis=1)*1e-9
-time = np.linspace(fyear,lyear,lyear-fyear+1)
-plt.figure()
-line1, = plt.plot(amoc['max'],'k',label='max')
-line2, = plt.plot(amoc['26N'],'r',label='26N')
-line3, = plt.plot(amocref['max'],'b',label='refmax')
-line4, = plt.plot(amocref['26N'],'g',label='ref26N')
-plt.legend(loc='lower right')
+tt = fice.shape
+area = np.tile(area,(tt[0],1, 1))
 
-plt.figure()
-line1, = plt.plot(amoc['max']-amocref['max'],'k',label='max')
-line2, = plt.plot(amoc['26N']-amocref['26N'],'r',label='26N')
+fice = fice*area
+ficeref = ficeref*area
+
+fice = fice[:,191:,:]
+fice = np.nansum(fice,axis=(1,2))
+
+ficeref = ficeref[:,191:,:]
+ficeref = np.nansum(ficeref,axis=(1,2))
+
+
+plt.plot(np.mean(fice.reshape((fice.size/12,12)),1)*1e-12,'b',label='SPG')
+plt.plot(np.mean(ficeref.reshape((ficeref.size/12,12)),1)*1e-12,'k',label='CTRL')
 plt.legend(loc='lower right')

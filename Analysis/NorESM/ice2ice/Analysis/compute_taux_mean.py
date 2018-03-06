@@ -70,18 +70,25 @@ def get_dpm(time, calendar='standard'):
 gridfile = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx1v1/20120120/grid.nc'
 #fyear = 1701
 #lyear = 1922
+#fyear = 41
+#lyear = 60
 fyear = 3301
-lyear = 3600
+lyear = 3301
 root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
-root_folderc = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
+root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
+#root_folder = '/tos-project1/NS2345K/noresm/cases/'
+#root_folderref = '/tos-project1/NS2345K/noresm/cases/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
-expidc = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SO'
+expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific'
+#expid = 'NOIIA_T62_tn11_FAMOS_BG_POS'
+#expidref = 'NOIIA_T62_tn11_FAMOS_BG_CTR'
+
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
-foldernamec = root_folderc + expidc + '/ocn/hist/'
+foldernameref = root_folderref + expidref + '/ocn/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
 freq = '*hm*'
 list=sorted(glob.glob(foldername+freq+sdate))
@@ -92,7 +99,9 @@ for year in xrange(fyear+1,lyear+1):
     listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
 
 
-chunks = (385,360)
+fig = plt.figure()
+chunks = (190,180)
+#chunks = (385,360)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
 lon = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plon']
 lat = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plat']
@@ -107,13 +116,16 @@ data = xr.open_mfdataset(listref,chunks=xr_chunks)['taux']
 tauxc = np.copy(data.mean('time'))
 tauxc = np.copy(tauxc[:-1,:])
 [lon,lat,tauxdiff] = enable_global(lon,lat,taux-tauxc)
-fig = plt.figure()
 m=Basemap(llcrnrlon=-180,llcrnrlat=-80,urcrnrlon=180,urcrnrlat=90,projection='cyl')
+#m = Basemap(width=12000000,height=8000000,
+#            resolution='l',projection='stere',\
+#            lat_ts=40,lat_0=90,lon_0=0.)
+#m = Basemap(projection='stere',boundinglat=60,lon_0=0,resolution='l')
 m.drawcoastlines()
 m.fillcontinents()
 m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
 m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
 im1 = m.pcolormesh(np.transpose(lon-110),np.transpose(lat),np.transpose(np.ma.masked_invalid(tauxdiff))
-                  ,shading='flat',cmap='jet',vmin=-.25,vmax=.25,latlon=True)
+                  ,shading='flat',cmap='jet',vmin=-.1,vmax=.1,latlon=True)
 cb = m.colorbar(im1,"right", size="5%", pad="15%") #,ticks=[-4, -3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
 

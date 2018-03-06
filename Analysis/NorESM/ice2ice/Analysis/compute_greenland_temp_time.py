@@ -61,15 +61,15 @@ def running_mean(x, N):
 #fyear = 1701
 #lyear = 1922
 fyear = 3301
-lyear = 3600
+lyear = 3350
 plt.figure()
 root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
 root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific'
 expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SO'
 foldername = root_folder + expid + '/atm/hist/'
 foldernameref = root_folderref + expidref + '/atm/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')

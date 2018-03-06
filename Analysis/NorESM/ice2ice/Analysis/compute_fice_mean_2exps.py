@@ -78,7 +78,7 @@ root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
 expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SO'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SPG'
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
 foldernameref = root_folderref + expidref + '/ocn/hist/'
@@ -92,7 +92,9 @@ for year in xrange(fyear+1,lyear+1):
     listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
 
 
-chunks = (385,360)
+fig = plt.figure()
+chunks = (190,180)
+#chunks = (385,360)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
 lon = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plon']
 lat = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plat']
@@ -108,7 +110,6 @@ fice = np.copy(fice[:-1,:])
 ficeref = np.copy(ficeref[:-1,:])
 [lon,lat,fice] = enable_global(lon,lat,fice)
 [lonref,latref,ficeref] = enable_global(lon,lat,ficeref)
-fig = plt.figure()
 m=Basemap(llcrnrlon=-180,llcrnrlat=-80,urcrnrlon=180,urcrnrlat=90,projection='cyl')
 m.drawcoastlines()
 m.fillcontinents()

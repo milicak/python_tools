@@ -51,12 +51,15 @@ def get_dpm(time, calendar='standard'):
                 month_length[i] += 1
         return month_length
 
-fyear = 1701
-lyear = 1850
+fyear = 3301
+lyear = 3600
+#fyear = 1701
+#lyear = 1850
 root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
-expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI2'
+#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI2'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SO'
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
@@ -64,7 +67,7 @@ freq = '*hy*'
 list=sorted(glob.glob(foldername+freq+sdate))
 for year in xrange(fyear+1,lyear+1):
     sdate="%c%4.4d%c" % ('*',year,'*')
-    list.extend(sortef(glob.glob(foldername+freq+sdate)))
+    list.extend(sorted(glob.glob(foldername+freq+sdate)))
 
 
 chunks = (385,360)

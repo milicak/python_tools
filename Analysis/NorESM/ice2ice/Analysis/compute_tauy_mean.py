@@ -1,4 +1,6 @@
 import numpy as np
+import numpy.ma as ma
+from mpl_toolkits.basemap import Basemap
 import pandas as pd
 import xarray as xr
 from netCDF4 import num2date
@@ -35,6 +37,19 @@ def leap_year(year, calendar='standard'):
     return leap
 
 
+def enable_global(tlon,tlat,data):
+  """Fix the data in such a way that it can to be plotted on a global projection on its native grid"""
+  tlon = np.where(np.greater_equal(tlon,min(tlon[:,0])),tlon-360,tlon)
+  tlon=tlon+abs(ma.max(tlon)); tlon=tlon+360
+  # stack grids side-by-side (in longitiudinal direction), so
+  # any range of longitudes may be plotted on a world map.
+  tlon = np.concatenate((tlon,tlon+360),1)
+  tlat = np.concatenate((tlat,tlat),1)
+  data = ma.concatenate((data,data),1)
+  tlon = tlon-360.
+  return tlon, tlat, data
+
+
 def get_dpm(time, calendar='standard'):
         """
             return a array of days per month corresponding to the months
@@ -51,22 +66,31 @@ def get_dpm(time, calendar='standard'):
                 month_length[i] += 1
         return month_length
 
+
+gridfile = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx1v1/20120120/grid.nc'
 #fyear = 1701
 #lyear = 1922
-fyear = 3301
-lyear = 3600
+#fyear = 41
+#lyear = 60
+fyear = 3501
+lyear = 3550
 root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
 root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
+#root_folder = '/tos-project1/NS2345K/noresm/cases/'
+#root_folderref = '/tos-project1/NS2345K/noresm/cases/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
 expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
 expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SPG'
+#expid = 'NOIIA_T62_tn11_FAMOS_BG_POS'
+#expidref = 'NOIIA_T62_tn11_FAMOS_BG_CTR'
+
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
 foldernameref = root_folderref + expidref + '/ocn/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
-freq = '*hy*'
+freq = '*hm*'
 list=sorted(glob.glob(foldername+freq+sdate))
 listref=sorted(glob.glob(foldernameref+freq+sdate))
 for year in xrange(fyear+1,lyear+1):
@@ -75,37 +99,33 @@ for year in xrange(fyear+1,lyear+1):
     listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
 
 
-# 1 for atlantic_arctic_ocean region
-# 2 for indian_pacific_ocean region
-# 3 for global_ocean
-region = 1;
-chunks = (385,360)
+fig = plt.figure()
+chunks = (190,180)
+#chunks = (385,360)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
-data = xr.open_mfdataset(list,chunks=xr_chunks)['mmflxd']
-dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['mmflxd']
-lat = xr.open_mfdataset(list,chunks=xr_chunks)['lat']
-lat1 = 20.0;
-lat2 = 60.0;
-lat3 = 26.5;
-ind1 = np.int(np.min(np.where(lat>=lat1)));
-ind2 = np.int(np.max(np.where(lat<=lat2)));
-ind3 = np.int(np.max(np.where(lat<=lat3)));
+lon = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plon']
+lat = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plat']
+lon = np.copy(lon.data)
+lat = np.copy(lat.data)
+lon = np.copy(lon[:-1,:])
+lat = np.copy(lat[:-1,:])
+data = xr.open_mfdataset(list,chunks=xr_chunks)['tauy']
+tauy = np.copy(data.mean('time'))
+tauy = np.copy(tauy[:-1,:])
+data = xr.open_mfdataset(listref,chunks=xr_chunks)['tauy']
+tauyc = np.copy(data.mean('time'))
+tauyc = np.copy(tauyc[:-1,:])
+[lon,lat,tauxdiff] = enable_global(lon,lat,tauy-tauyc)
+m=Basemap(llcrnrlon=-180,llcrnrlat=-80,urcrnrlon=180,urcrnrlat=90,projection='cyl')
+#m = Basemap(width=12000000,height=8000000,
+#            resolution='l',projection='stere',\
+#            lat_ts=40,lat_0=90,lon_0=0.)
+#m = Basemap(projection='stere',boundinglat=60,lon_0=0,resolution='l')
+m.drawcoastlines()
+m.fillcontinents()
+m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+im1 = m.pcolormesh(np.transpose(lon-110),np.transpose(lat),np.transpose(np.ma.masked_invalid(tauxdiff))
+                  ,shading='flat',cmap='jet',vmin=-.25,vmax=.25,latlon=True)
+cb = m.colorbar(im1,"right", size="5%", pad="15%") #,ticks=[-4, -3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
 
-amoc= {}
-amocref= {}
-amoc['max'] = np.nanmax(data[:,region-1,:,ind1-1:ind2-1],axis=(1,2))*1e-9
-amoc['26N'] = np.nanmax(data[:,region-1,:,ind3],axis=1)*1e-9
-amocref['max'] = np.nanmax(dataref[:,region-1,:,ind1-1:ind2-1],axis=(1,2))*1e-9
-amocref['26N'] = np.nanmax(dataref[:,region-1,:,ind3],axis=1)*1e-9
-time = np.linspace(fyear,lyear,lyear-fyear+1)
-plt.figure()
-line1, = plt.plot(amoc['max'],'k',label='max')
-line2, = plt.plot(amoc['26N'],'r',label='26N')
-line3, = plt.plot(amocref['max'],'b',label='refmax')
-line4, = plt.plot(amocref['26N'],'g',label='ref26N')
-plt.legend(loc='lower right')
-
-plt.figure()
-line1, = plt.plot(amoc['max']-amocref['max'],'k',label='max')
-line2, = plt.plot(amoc['26N']-amocref['26N'],'r',label='26N')
-plt.legend(loc='lower right')

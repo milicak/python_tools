@@ -3,6 +3,9 @@ import pandas as pd
 import xarray as xr
 from netCDF4 import num2date
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import cartopy.crs as ccrs
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import glob
 
 plt.ion()
@@ -51,22 +54,28 @@ def get_dpm(time, calendar='standard'):
                 month_length[i] += 1
         return month_length
 
+
+def running_mean(x, N):
+     cumsum = np.cumsum(np.insert(x, 0, 0))
+     return (cumsum[N:] - cumsum[:-N]) / float(N)
+
+
 #fyear = 1701
 #lyear = 1922
 fyear = 3301
-lyear = 3600
+lyear = 3301
+plt.figure()
 root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
 root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
 expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SPG'
-foldername = '/ocn/hist/'
-foldername = root_folder + expid + '/ocn/hist/'
-foldernameref = root_folderref + expidref + '/ocn/hist/'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific'
+foldername = root_folder + expid + '/atm/hist/'
+foldernameref = root_folderref + expidref + '/atm/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
-freq = '*hy*'
+freq = '*h0*'
 list=sorted(glob.glob(foldername+freq+sdate))
 listref=sorted(glob.glob(foldernameref+freq+sdate))
 for year in xrange(fyear+1,lyear+1):
@@ -75,37 +84,32 @@ for year in xrange(fyear+1,lyear+1):
     listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
 
 
-# 1 for atlantic_arctic_ocean region
-# 2 for indian_pacific_ocean region
-# 3 for global_ocean
-region = 1;
-chunks = (385,360)
-xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
-data = xr.open_mfdataset(list,chunks=xr_chunks)['mmflxd']
-dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['mmflxd']
-lat = xr.open_mfdataset(list,chunks=xr_chunks)['lat']
-lat1 = 20.0;
-lat2 = 60.0;
-lat3 = 26.5;
-ind1 = np.int(np.min(np.where(lat>=lat1)));
-ind2 = np.int(np.max(np.where(lat<=lat2)));
-ind3 = np.int(np.max(np.where(lat<=lat3)));
+chunks = (96,144)
+xr_chunks = {'lat': chunks[-2], 'lon': chunks[-1]}
+data = xr.open_mfdataset(list,chunks=xr_chunks)['TS']
+dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['TS']
 
-amoc= {}
-amocref= {}
-amoc['max'] = np.nanmax(data[:,region-1,:,ind1-1:ind2-1],axis=(1,2))*1e-9
-amoc['26N'] = np.nanmax(data[:,region-1,:,ind3],axis=1)*1e-9
-amocref['max'] = np.nanmax(dataref[:,region-1,:,ind1-1:ind2-1],axis=(1,2))*1e-9
-amocref['26N'] = np.nanmax(dataref[:,region-1,:,ind3],axis=1)*1e-9
-time = np.linspace(fyear,lyear,lyear-fyear+1)
-plt.figure()
-line1, = plt.plot(amoc['max'],'k',label='max')
-line2, = plt.plot(amoc['26N'],'r',label='26N')
-line3, = plt.plot(amocref['max'],'b',label='refmax')
-line4, = plt.plot(amocref['26N'],'g',label='ref26N')
-plt.legend(loc='lower right')
+dnm = data.mean('time')
+dnmref = dataref.mean('time')
 
-plt.figure()
-line1, = plt.plot(amoc['max']-amocref['max'],'k',label='max')
-line2, = plt.plot(amoc['26N']-amocref['26N'],'r',label='26N')
-plt.legend(loc='lower right')
+plt.clf();
+ax = plt.axes(projection=ccrs.PlateCarree())
+ax.coastlines()
+gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                  linewidth=0.5, color='gray', alpha=0.5, linestyle='--')
+gl.ylabels_right = False
+gl.xformatter = LONGITUDE_FORMATTER
+gl.yformatter = LATITUDE_FORMATTER
+
+#gl.xlabels_top = False
+#     ...: gl.ylabels_left = False
+#     ...: gl.xlines = False
+#     ...: gl.xlocator = mticker.FixedLocator([-180, -45, 0, 45, 180])
+#     ...: gl.xformatter = LONGITUDE_FORMATTER
+#     ...: gl.yformatter = LATITUDE_FORMATTER
+#     ...: gl.xlabel_style = {'size': 15, 'color': 'gray'}
+#     ...: gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
+
+plt.pcolormesh(data.lon,data.lat,dnm-dnmref,vmin=-3,vmax=3,cmap='RdYlBu_r',transform=ccrs.PlateCarree())
+plt.colorbar(ax=ax, shrink=.62)
+
