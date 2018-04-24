@@ -21,7 +21,7 @@ from needJet2 import shfn
 from disc_cb import discrete_cmap
 
 def compute_dissipation_energy(uvel,vvel,wvel,u_rho,v_rho,w_rho,delta_x,delta_y,delta_z,visc):
-# compute epsilon = tke dissipation    
+# compute epsilon = tke dissipation
     # x-component
     dudx=(uvel[:,:,1:]-uvel[:,:,:-1])/delta_x;
     eps11=visc*(dudx**2)#*delta_x*delta_y*delta_z;
@@ -54,7 +54,7 @@ def compute_dissipation_energy(uvel,vvel,wvel,u_rho,v_rho,w_rho,delta_x,delta_y,
 
     dvdy=(vvel[:,1:,:]-vvel[:,:-1,:])/delta_y;
     eps22=visc*(dvdy**2)#*delta_x*delta_y*delta_z;
-    
+
     dvdz_w=np.zeros([nz,ny,nz])
     dvdz_w[1:,:,:]=(v_rho[1:,:,:]-v_rho[:-1,:,:])/(0.5*(delta_z[1:,:,:]+delta_z[:-1,:,:]));
     dvdz_w=np.concatenate((dvdz_w, np.zeros([1,ny,nx])), axis=0)
@@ -104,8 +104,8 @@ itr=900*14
 variable_name=['S']; #T for temp; S for salt
 
 # IMPORTANT
-# in MITgcm when you read it, the dimensions are Nz, Ny Nz 
-   
+# in MITgcm when you read it, the dimensions are Nz, Ny Nz
+
 for i in range(0,9):
     print i,projects[i]
     foldername=root_folder+projects[i]+'/'
@@ -125,17 +125,17 @@ for i in range(0,9):
         delta_z_ref=np.copy(delta_z)
         delta_x=np.tile(dxc,(nz,1,1))
         delta_y=np.tile(dyc,(nz,1,1))
-        
+
     salt = rdmds(foldername+'S',itr);
-    uvel = rdmds(foldername+'U',itr);    
-    vvel = rdmds(foldername+'V',itr);    
+    uvel = rdmds(foldername+'U',itr);
+    vvel = rdmds(foldername+'V',itr);
     wvel = rdmds(foldername+'W',itr);
     eta = rdmds(foldername+'Eta',itr);
     # This is due to zstar used in MITGCM; look at table 7.1 in mom4p1 manual
     corr = (1.0+eta/depth);
     #corr=repmat(corr,[1 1 Nz]);
     delta_z = delta_z_ref*corr;
-    # for periodic and/or closed boundries in MITgcm    
+    # for periodic and/or closed boundries in MITgcm
     uvel = np.concatenate((uvel, np.zeros([nz,ny,1])), axis=2)
     uvel[:,:,-1] = uvel[:,:,0]
     vvel = np.concatenate((vvel, np.zeros([nz,1,nx])), axis=1)
@@ -143,11 +143,11 @@ for i in range(0,9):
     wvel = np.concatenate((wvel, np.zeros([1,ny,nx])), axis=0)
     #wvel=np.append(wvel, np.zeros([1,ny,nx]), axis=0)
     u_rho = 0.5*(uvel[:,:,:-1]+uvel[:,:,1:]);
-    v_rho = 0.5*(vvel[:,:-1,:]+vvel[:,1:,:]);    
+    v_rho = 0.5*(vvel[:,:-1,:]+vvel[:,1:,:]);
     w_rho = 0.5*(wvel[1:,:,:]+wvel[:-1,:,:]);
 
     # compute rho using linear EOS
-    rho = (rho0-alpha_T*(-2)+beta_S*salt);  
+    rho = (rho0-alpha_T*(-2)+beta_S*salt);
 
     epsilon = compute_dissipation_energy(uvel,vvel,wvel,u_rho,v_rho,w_rho,delta_x,delta_y,delta_z,visc)
 
@@ -156,14 +156,14 @@ for i in range(0,9):
     #im1 = pcolor(x,-Z,np.squeeze(variable[:,section,:]),cmap=cmap_needjet2,vmin=32,vmax=32.02)
     im1 = plt.pcolormesh(x,-Z,np.log10(np.squeeze(epsilon[:,section,:])),linewidth=0,rasterized=True,shading='flat',cmap="jet",vmin=-10,vmax=-6)
     #im1.set_edgecolor('face')
-    plt.ylim((-128,0))           
-    plt.xlim((0,128))    
+    plt.ylim((-128,0))
+    plt.xlim((0,128))
     cb = plt.colorbar(im1,pad=0.02) # pad is the distance between colorbar and figure
     cb.set_label(r'log$_{10} \varepsilon$' ' [W/kg]')
 #    cb.set_label('[' r'$^\circ$' 'C]')
-    plt.ylabel('depth [m]')    
+    plt.ylabel('depth [m]')
     plt.xlabel('x [m]')
-    #plt.show() 
+    #plt.show()
     plt.savefig('paperfigs/verticalxz_epsilon_section_'+projectslbs[i]+'_'+str(itr)+'.eps', bbox_inches='tight',format='eps', dpi=300)
     plt.clf()
     plt.close(fig)
@@ -172,14 +172,14 @@ for i in range(0,9):
     #im1 = pcolor(x,-Z,np.squeeze(variable[:,section,:]),cmap=cmap_needjet2,vmin=32,vmax=32.02)
     im1 = plt.pcolormesh(y,-Z,np.log10(np.squeeze(epsilon[:,:,section])),linewidth=0,rasterized=True,shading='flat',cmap="jet",vmin=-10,vmax=-6)
     #im1.set_edgecolor('face')
-    plt.ylim((-128,0))           
-    plt.xlim((0,128))    
+    plt.ylim((-128,0))
+    plt.xlim((0,128))
     cb = plt.colorbar(im1,pad=0.02) # pad is the distance between colorbar and figure
     cb.set_label(r'log$_{10} \varepsilon$' ' [W/kg]')
 #    cb.set_label('[' r'$^\circ$' 'C]')
-    plt.ylabel('depth [m]')    
+    plt.ylabel('depth [m]')
     plt.xlabel('y [m]')
-    #plt.show() 
+    #plt.show()
     plt.savefig('paperfigs/verticalyz_epsilon_section_'+projectslbs[i]+'_'+str(itr)+'.eps', bbox_inches='tight',format='eps', dpi=300)
     plt.clf()
     plt.close(fig)
