@@ -55,11 +55,13 @@ fyear = 3301
 lyear = 3600
 #fyear = 1701
 #lyear = 1850
-root_folder = '/cluster/work/users/milicak/archive/'
-#root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
+#root_folder = '/cluster/work/users/milicak/archive/'
+root_folder = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
+#root_folder = '/tos-project1/NS4659K/milicak/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI2'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SO'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3'
+#expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific2'
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
@@ -72,17 +74,18 @@ for year in xrange(fyear+1,lyear+1):
 
 chunks = (385,360)
 xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
-data = xr.open_mfdataset(list,chunks=xr_chunks)['templvl']
-data1 = xr.open_mfdataset(list,chunks=xr_chunks)['salnlvl']
+data = xr.open_mfdataset(list, decode_times=False, chunks=xr_chunks)['templvl']
+#data1 = xr.open_mfdataset(list, decode_times=False, chunks=xr_chunks)['salnlvl']
 zr = xr.open_mfdataset(list,chunks=xr_chunks)['depth']
 temp = np.copy(data.data[:,:,315,107])
-salt = np.copy(data1.data[:,:,315,107])
+#salt = np.copy(data1.data[:,:,315,107])
 
 time = np.linspace(fyear,lyear,lyear-fyear+1)
-plt.figure()
-plt.clf()
+plt.figure(figsize=(8,4))
 plt.pcolormesh(time,-zr,np.transpose(temp),cmap='gist_ncar');plt.colorbar()
 plt.ylim((-1400,0))
-plt.figure()
-plt.pcolormesh(time,-zr,np.transpose(salt),cmap='gist_ncar');plt.colorbar()
-plt.ylim((-1400,0))
+plt.tight_layout()
+plt.savefig('Ctl_seacore.png',dpi=300,bbox_inches='tight')
+#plt.figure()
+#plt.pcolormesh(time,-zr,np.transpose(salt),cmap='gist_ncar');plt.colorbar()
+#plt.ylim((-1400,0))

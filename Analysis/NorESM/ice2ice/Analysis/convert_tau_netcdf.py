@@ -3,9 +3,7 @@ import pandas as pd
 import xarray as xr
 from netCDF4 import num2date
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
 import cartopy.crs as ccrs
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import glob
 
 plt.ion()
@@ -63,19 +61,20 @@ def running_mean(x, N):
 #fyear = 1701
 #lyear = 1922
 fyear = 3301
-lyear = 3500
-plt.figure()
+lyear = 3600
+#plt.figure()
 root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
 root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SPG'
 expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific2'
-foldername = root_folder + expid + '/atm/hist/'
-foldernameref = root_folderref + expidref + '/atm/hist/'
+foldername = root_folder + expid + '/ocn/hist/'
+foldernameref = root_folderref + expidref + '/ocn/hist/'
 sdate="%c%4.4d%c" % ('*',fyear,'*')
-freq = '*h0*'
+freq = '*hm*'
+#listini=(glob.glob(foldername+freq+sdate))
 list=sorted(glob.glob(foldername+freq+sdate))
 listref=sorted(glob.glob(foldernameref+freq+sdate))
 for year in xrange(fyear+1,lyear+1):
@@ -84,32 +83,12 @@ for year in xrange(fyear+1,lyear+1):
     listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
 
 
+# 1 for atlantic_arctic_ocean region
+# 2 for indian_pacific_ocean region
+# 3 for global_ocean
 chunks = (96,144)
 xr_chunks = {'lat': chunks[-2], 'lon': chunks[-1]}
-data = xr.open_mfdataset(list,chunks=xr_chunks)['TS']
-dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['TS']
-
-dnm = data.mean('time')
-dnmref = dataref.mean('time')
-
-plt.clf();
-ax = plt.axes(projection=ccrs.PlateCarree())
-ax.coastlines()
-gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-                  linewidth=0.5, color='gray', alpha=0.5, linestyle='--')
-gl.ylabels_right = False
-gl.xformatter = LONGITUDE_FORMATTER
-gl.yformatter = LATITUDE_FORMATTER
-
-#gl.xlabels_top = False
-#     ...: gl.ylabels_left = False
-#     ...: gl.xlines = False
-#     ...: gl.xlocator = mticker.FixedLocator([-180, -45, 0, 45, 180])
-#     ...: gl.xformatter = LONGITUDE_FORMATTER
-#     ...: gl.yformatter = LATITUDE_FORMATTER
-#     ...: gl.xlabel_style = {'size': 15, 'color': 'gray'}
-#     ...: gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
-
-plt.pcolormesh(data.lon,data.lat,dnm-dnmref,vmin=-3,vmax=3,cmap='RdYlBu_r',transform=ccrs.PlateCarree())
-plt.colorbar(ax=ax, shrink=.62)
-
+data = xr.open_mfdataset(list, decode_times=False)['taux']
+data.to_netcdf('/tos-project1/NS4659K/milicak/data/SPG_taux.nc')
+dataref = xr.open_mfdataset(listref, decode_times=False)['taux']
+dataref.to_netcdf('/tos-project1/NS4659K/milicak/data/ctl_taux.nc')

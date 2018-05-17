@@ -3,7 +3,7 @@ import pandas as pd
 import xarray as xr
 from netCDF4 import num2date
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
+from mpl_toolkits.basemap import Basemap
 import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import glob
@@ -63,34 +63,41 @@ def running_mean(x, N):
 #fyear = 1701
 #lyear = 1922
 fyear = 3301
-lyear = 3500
-plt.figure()
-root_folder = '/cluster/work/users/milicak/archive/'
-#root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
-root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
-#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
-#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
-expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific2'
-foldername = root_folder + expid + '/atm/hist/'
-foldernameref = root_folderref + expidref + '/atm/hist/'
-sdate="%c%4.4d%c" % ('*',fyear,'*')
-freq = '*h0*'
-list=sorted(glob.glob(foldername+freq+sdate))
-listref=sorted(glob.glob(foldernameref+freq+sdate))
-for year in xrange(fyear+1,lyear+1):
-    sdate="%c%4.4d%c" % ('*',year,'*')
-    list.extend(sorted(glob.glob(foldername+freq+sdate)))
-    listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
+lyear = 3600
 
 
+# 1 for atlantic_arctic_ocean region
+# 2 for indian_pacific_ocean region
+# 3 for global_ocean
 chunks = (96,144)
 xr_chunks = {'lat': chunks[-2], 'lon': chunks[-1]}
-data = xr.open_mfdataset(list,chunks=xr_chunks)['TS']
-dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['TS']
-
+fname = '/tos-project1/NS4659K/milicak/data/Pacific2_airtemp.nc'
+ctlname = '/tos-project1/NS4659K/milicak/data/ctl_airtemp.nc'
+#data = xr.open_mfdataset(fname,chunks=xr_chunks)['TREFHT']
+#dataref = xr.open_mfdataset(ctlname,chunks=xr_chunks)['TREFHT']
+data = xr.open_dataset(fname, decode_times=False)['TREFHT']
+dataref = xr.open_dataset(ctlname, decode_times=False)['TREFHT']
 dnm = data.mean('time')
 dnmref = dataref.mean('time')
+#
+#
+plt.figure(figsize=(8,4))
+
+m=Basemap(llcrnrlon=-180,llcrnrlat=-80,urcrnrlon=180,urcrnrlat=90,projection='cyl')
+#m = Basemap(width=12000000,height=8000000,
+#            resolution='l',projection='stere',\
+#            lat_ts=40,lat_0=90,lon_0=0.)
+#m = Basemap(projection='stere',boundinglat=60,lon_0=0,resolution='l')
+m.drawcoastlines()
+#m.fillcontinents()
+m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+im1 = m.pcolormesh(data.lon,data.lat
+                  ,np.ma.masked_invalid(dnm-dnmref)
+                  ,shading='gouraud',cmap='RdYlBu_r',vmin=-3,vmax=3,latlon=True)
+cb = m.colorbar(im1,"right", size="5%", pad="15%") #,ticks=[-4, -3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
+plt.tight_layout()
+plt.savefig('Pacific2_temp_mean2.png',dpi=300,bbox_inches='tight')
 
 plt.clf();
 ax = plt.axes(projection=ccrs.PlateCarree())
@@ -100,16 +107,20 @@ gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
 gl.ylabels_right = False
 gl.xformatter = LONGITUDE_FORMATTER
 gl.yformatter = LATITUDE_FORMATTER
-
-#gl.xlabels_top = False
-#     ...: gl.ylabels_left = False
-#     ...: gl.xlines = False
-#     ...: gl.xlocator = mticker.FixedLocator([-180, -45, 0, 45, 180])
-#     ...: gl.xformatter = LONGITUDE_FORMATTER
-#     ...: gl.yformatter = LATITUDE_FORMATTER
-#     ...: gl.xlabel_style = {'size': 15, 'color': 'gray'}
-#     ...: gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
-
-plt.pcolormesh(data.lon,data.lat,dnm-dnmref,vmin=-3,vmax=3,cmap='RdYlBu_r',transform=ccrs.PlateCarree())
-plt.colorbar(ax=ax, shrink=.62)
-
+#
+##gl.xlabels_top = False
+##     ...: gl.ylabels_left = False
+##     ...: gl.xlines = False
+##     ...: gl.xlocator = mticker.FixedLocator([-180, -45, 0, 45, 180])
+##     ...: gl.xformatter = LONGITUDE_FORMATTER
+##     ...: gl.yformatter = LATITUDE_FORMATTER
+##     ...: gl.xlabel_style = {'size': 15, 'color': 'gray'}
+##     ...: gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
+#
+plt.pcolormesh(data.lon,data.lat,dnm-dnmref,vmin=-3,vmax=3,cmap='RdYlBu_r',
+               shading='flat',transform=ccrs.PlateCarree())
+plt.colorbar(ax=ax, shrink=.75)
+plt.tight_layout()
+plt.savefig('Pacific2_temp_mean.png',dpi=300,bbox_inches='tight')
+plt.close()
+#

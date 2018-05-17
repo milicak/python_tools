@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import numpy as np
 import numpy.ma as ma
+import pandas as pd
+import xarray as xr
 import pdb
 from mpl_toolkits.basemap import Basemap
 from netCDF4 import Dataset
@@ -10,6 +12,8 @@ from netcdf_functions import nc_read
 from netcdf_functions import ncgetdim
 import NorESM_utils as noresmutils
 import argparse
+import glob
+import ESMF
 
 plt.ion()
 
@@ -279,7 +283,7 @@ def zonalmean_bias_old(root_folder, cmpnt, mdl, ext, varname, woafname, woavname
     var_w[:,:,:180] = dnm
     return var_w, t1_w, m1_w, mask
 
-def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2
+def levelvar_bias(root_folder, expid, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2
                  , gridtype, **kwargs):
     ''' compute any 3D variable mean'''
     prefix = kwargs.get('prefix', None)
@@ -304,6 +308,51 @@ def levelvar_bias(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2
     varwoa[varwoa < -10] =0
     return varsurface, varwoa, lonwoa, latwoa
 
+
+def enable_global(tlon,tlat,data):
+  """Fix the data in such a way that it can to be plotted on a global projection on its native grid"""
+  tlon = np.where(np.greater_equal(tlon,min(tlon[:,0])),tlon-360,tlon)
+  tlon = tlon+abs(ma.max(tlon)); tlon=tlon+360
+  # stack grids side-by-side (in longitiudinal direction), so
+  # any range of longitudes may be plotted on a world map.
+  tlon = np.concatenate((tlon,tlon+360),1)
+  tlat = np.concatenate((tlat,tlat),1)
+  data = ma.concatenate((data,data),1)
+  tlon = tlon-360.
+  return tlon, tlat, data
+
+
+def levelvar_bias_xr(root_folder, cmpnt, mdl, ext, varname,woafname,woavname,z1,z2
+                 , gridtype, **kwargs):
+    ''' compute any 3D variable mean'''
+    prefix = kwargs.get('prefix', None)
+    sdate = kwargs.get('sdate', None)
+    m2y = kwargs.get('m2y', None)
+    expid = kwargs.get('expid', None)
+    foldername = root_folder + '/' + expid + '/' + cmpnt + '/hist/'
+    sdate="%c%4.4d%c" % ('*',fyear,'*')
+    freq = '*'+ext
+    list=sorted(glob.glob(foldername+freq+sdate))
+    for year in xrange(fyear+1,lyear+1):
+        sdate="%c%4.4d%c" % ('*',year,'*')
+        list.extend(sorted(glob.glob(foldername+freq+sdate)))
+
+
+    chunks = (385,360)
+    xr_chunks = {'x': chunks[-2], 'y': chunks[-2]}
+    data = xr.open_mfdataset(list,decode_times=False, chunks=xr_chunks)[varname]
+    var = np.copy(data[:,z1,:,:].mean('time'))
+    #var = np.copy(var[z1,:,:])
+    lon = nc_read(grid_file,'plon')
+    lat = nc_read(grid_file,'plat')
+    [lon,lat,varsurface] = enable_global(lon,lat,var)
+    varwoa = nc_read(woafname, woavname)
+    varwoa = np.copy(varwoa[z2,:,:])
+    lonwoa = nc_read(woafname, 'lon')
+    latwoa = nc_read(woafname, 'lat')
+    varwoa[varwoa < -10] =0
+    #return varsurface, varwoa, lonwoa, latwoa
+    return varsurface, varsurface, lon, lat
 
 def compute_heat_transport(root_folder, project_name, cmpnt, mdl, ext):
     ''' computes ocean and atmosphere heat transport '''
@@ -432,6 +481,7 @@ def main():
 
 
     global fyear, lyear
+    global grid_file
     global lon, lat
     print 'input order = root_folder expid fyear lyear m2y cmpnt mdl ext varname diagname'
     # general_diagnostics.py /work/milicak/mnt/norstore/NS2345K/noresm/cases/
@@ -476,6 +526,7 @@ def main():
     #ext = 'hm' # hm, hy, h0
     #varname = 'templvl'
     #cmpnt = 'atm' # ocn, atm
+
     #mdl = 'cam2' # micom, cam2, cam
     #ext = 'h0' # hm, hy, h0
     print 'expid = ', expid
@@ -487,6 +538,8 @@ def main():
     woafnames = '/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/s00an1.nc'
     woafname = '/export/grunchfs/unibjerknes/milicak/bckup//Analysis/obs/WOA13/Analysis/WOA13_' \
                + gridtype +'_65layers.nc'
+    woafnamet = '/tos-project1/NS2345K/noresm_diagnostics/packages/MICOM_DIAG/obs_data/WOA13/0.25deg/woa13_decav_t00_04.nc'
+    woafnames = '/tos-project1/NS2345K/noresm_diagnostics/packages/MICOM_DIAG/obs_data/WOA13/0.25deg/woa13_decav_s00_04.nc'
     #mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/woa_mask.mat';
 
     print gridtype
@@ -501,7 +554,7 @@ def main():
         mask_woa09_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/general/Analysis/noresm_tnx0_25v1_mask.mat';
         maskvariable = 'mask'
         grid_file = '/export/grunchfs/unibjerknes/milicak/bckup/noresm/CORE2/Arctic/maps/grid_0_25degree.nc';
-        grid_file = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx0.25v3/20170623/grid.nc'
+        grid_file = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx0.25v4/20170619/grid.nc'
     # bi-polar grid
     #grid_file='/fimm/home/bjerknes/milicak/Analysis/NorESM/climatology/Analysis/grid_bipolar.nc';
 
@@ -538,25 +591,26 @@ def main():
         temp = var3Dmean(root_folder, cmpnt, mdl, ext, varname)
     elif diagno == 6:
         global sst, sstwoa
-        sst,sstwoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'templvl',
-                                      woafnamet,'t',0,0,gridtype,
-                                           prefix=prefix, sdate=sdate, m2y=m2y)
+        sst,sstwoa,lon,lat = levelvar_bias_xr(root_folder, cmpnt, mdl, ext, 'templvl',
+                                      woafnamet,'t_an',0,0,gridtype,
+                                           prefix=prefix, sdate=sdate, m2y=m2y,
+                                             expid=expid)
         plt.figure()
         #m = Basemap(llcrnrlon=280,llcrnrlat=20,urcrnrlon=360,urcrnrlat=80,projection='cyl')
-        m = Basemap(llcrnrlon=0,llcrnrlat=-88,urcrnrlon=360,urcrnrlat=88,projection='cyl')
+        m = Basemap(llcrnrlon=-180,llcrnrlat=-88,urcrnrlon=180,urcrnrlat=90,projection='cyl')
         m.drawcoastlines()
         m.fillcontinents()
         m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
         m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
         #m.drawparallels(np.arange(20,80,10),labels=[1,1,0,0])
         #m.drawmeridians(np.arange(280,360,10),labels=[0,0,0,1])
-        im1 = m.pcolormesh(lon,lat,np.ma.masked_invalid(sst-sstwoa),
-                           shading='flat',vmin=-3,vmax=3,cmap='RdBu_r');
+        im1 = m.pcolormesh(lon-110,lat,np.ma.masked_invalid(sst-0*sstwoa),
+                           shading='flat',vmin=-3,vmax=30,cmap='RdBu_r');
         cb = m.colorbar(im1,"right", size="5%", pad="10%")
         #plt.pcolor(lon,lat,np.ma.masked_invalid(sst-sstwoa),vmin=-5,vmax=5);plt.colorbar()
     elif diagno == 7:
         global sss, ssswoa
-        sss,ssswoa,lon,lat = levelvar_bias(root_folder, cmpnt, mdl, ext, 'salnlvl',
+        sss,ssswoa,lon,lat = levelvar_bias(root_folder, expid, cmpnt, mdl, ext, 'salnlvl',
                                       woafnames,'s',0,0,gridtype,
                                           prefix=prefix, sdate=sdate, m2y=m2y)
         plt.figure()

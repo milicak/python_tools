@@ -55,13 +55,14 @@ def get_dpm(time, calendar='standard'):
 #lyear = 1922
 fyear = 3301
 lyear = 3600
-root_folder = '/cluster/work/users/milicak/archive/'
+#root_folder = '/cluster/work/users/milicak/archive/'
 #root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
+root_folder = '/tos-project1/NS4659K/milicak/'
 root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
 #expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
 expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_SPG'
+expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific2'
 foldername = '/ocn/hist/'
 foldername = root_folder + expid + '/ocn/hist/'
 foldernameref = root_folderref + expidref + '/ocn/hist/'
@@ -105,7 +106,12 @@ line3, = plt.plot(amocref['max'],'b',label='refmax')
 line4, = plt.plot(amocref['26N'],'g',label='ref26N')
 plt.legend(loc='lower right')
 
-plt.figure()
-line1, = plt.plot(amoc['max']-amocref['max'],'k',label='max')
-line2, = plt.plot(amoc['26N']-amocref['26N'],'r',label='26N')
-plt.legend(loc='lower right')
+plt.figure(figsize=(8,4))
+line1, = plt.plot(amoc['max']-amocref['max'],'g',label='max')
+#line2, = plt.plot(amoc['26N']-amocref['26N'],'r',label='26N')
+#plt.legend(loc='lower right')
+plt.ylabel('AMOC [Sv]')
+plt.xlabel('Time [years]')
+plt.tight_layout()
+plt.savefig('Pacific2_amocdiff.png',dpi=300,bbox_inches='tight')
+

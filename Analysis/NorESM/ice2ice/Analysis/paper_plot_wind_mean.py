@@ -1,10 +1,12 @@
 import numpy as np
 import numpy.ma as ma
-from mpl_toolkits.basemap import Basemap
 import pandas as pd
 import xarray as xr
 from netCDF4 import num2date
 import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
+import cartopy.crs as ccrs
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import glob
 
 plt.ion()
@@ -67,56 +69,45 @@ def get_dpm(time, calendar='standard'):
         return month_length
 
 
-gridfile = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx1v1/20120120/grid.nc'
+def running_mean(x, N):
+     cumsum = np.cumsum(np.insert(x, 0, 0))
+     return (cumsum[N:] - cumsum[:-N]) / float(N)
+
+
 #fyear = 1701
 #lyear = 1922
-#fyear = 41
-#lyear = 60
 fyear = 3301
-lyear = 3301
-#root_folder = '/cluster/work/users/milicak/archive/'
-root_folder = '/tos-project1/NS4659K/milicak/'
-root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
-#root_folder = '/tos-project1/NS2345K/noresm/cases/'
-#root_folderref = '/tos-project1/NS2345K/noresm/cases/'
-#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
-#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
-expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific'
-#expid = 'NOIIA_T62_tn11_FAMOS_BG_POS'
-#expidref = 'NOIIA_T62_tn11_FAMOS_BG_CTR'
+lyear = 3600
 
-foldername = '/ocn/hist/'
-foldername = root_folder + expid + '/ocn/hist/'
-foldernameref = root_folderref + expidref + '/ocn/hist/'
-sdate="%c%4.4d%c" % ('*',fyear,'*')
-freq = '*hm*'
-list=sorted(glob.glob(foldername+freq+sdate))
-listref=sorted(glob.glob(foldernameref+freq+sdate))
-for year in xrange(fyear+1,lyear+1):
-    sdate="%c%4.4d%c" % ('*',year,'*')
-    list.extend(sorted(glob.glob(foldername+freq+sdate)))
-    listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
-
-
-#fig = plt.figure()
-plt.figure(figsize=(8,5))
-chunks = (190,180)
-#chunks = (385,360)
-xr_chunks = {'x': chunks[-1], 'y': chunks[-2]}
-lon = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plon']
-lat = xr.open_mfdataset(gridfile,chunks=xr_chunks)['plat']
+gridfile = '/tos-project1/NS2345K/noresm/inputdata/ocn/micom/tnx1v1/20120120/grid.nc'
+lon = xr.open_dataset(gridfile, decode_times=False)['plon']
+lat = xr.open_dataset(gridfile, decode_times=False)['plat']
 lon = np.copy(lon.data)
 lat = np.copy(lat.data)
 lon = np.copy(lon[:-1,:])
 lat = np.copy(lat[:-1,:])
-data = xr.open_mfdataset(list,chunks=xr_chunks)['taux']
+
+# 1 for atlantic_arctic_ocean region
+# 2 for indian_pacific_ocean region
+# 3 for global_ocean
+chunks = (96,144)
+xr_chunks = {'lat': chunks[-2], 'lon': chunks[-1]}
+fname = '/tos-project1/NS4659K/milicak/data/SO_taux.nc'
+ctlname = '/tos-project1/NS4659K/milicak/data/ctl_taux.nc'
+#data = xr.open_mfdataset(fname,chunks=xr_chunks)['TREFHT']
+#dataref = xr.open_mfdataset(ctlname,chunks=xr_chunks)['TREFHT']
+data = xr.open_dataset(fname, decode_times=False)['taux']
+dataref = xr.open_dataset(ctlname, decode_times=False)['taux']
 taux = np.copy(data.mean('time'))
 taux = np.copy(taux[:-1,:])
-data = xr.open_mfdataset(listref,chunks=xr_chunks)['taux']
-tauxc = np.copy(data.mean('time'))
+tauxc = np.copy(dataref.mean('time'))
 tauxc = np.copy(tauxc[:-1,:])
+#
+[lon1,lat1,tauxreal] = enable_global(lon,lat,tauxc)
 [lon,lat,tauxdiff] = enable_global(lon,lat,taux-tauxc)
+#
+plt.figure(figsize=(8,4))
+
 m=Basemap(llcrnrlon=-180,llcrnrlat=-80,urcrnrlon=180,urcrnrlat=90,projection='cyl')
 #m = Basemap(width=12000000,height=8000000,
 #            resolution='l',projection='stere',\
@@ -126,7 +117,54 @@ m.drawcoastlines()
 m.fillcontinents()
 m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
 m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
-im1 = m.pcolormesh(np.transpose(lon-110),np.transpose(lat),np.transpose(np.ma.masked_invalid(tauxdiff))
-                  ,shading='flat',cmap='jet',vmin=-.1,vmax=.1,latlon=True)
+im1 = m.pcolormesh(np.transpose(lon-110),np.transpose(lat)
+                   ,np.transpose(np.ma.masked_invalid(tauxreal))
+                   ,shading='flat',cmap='RdYlBu_r',vmin=-.3,vmax=.3,latlon=True)
 cb = m.colorbar(im1,"right", size="5%", pad="15%") #,ticks=[-4, -3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
+plt.tight_layout()
+plt.savefig('SO_taux_mean_real.png',dpi=300,bbox_inches='tight')
 
+plt.clf()
+plt.figure(figsize=(8,4))
+
+m=Basemap(llcrnrlon=-180,llcrnrlat=-80,urcrnrlon=180,urcrnrlat=90,projection='cyl')
+#m = Basemap(width=12000000,height=8000000,
+#            resolution='l',projection='stere',\
+#            lat_ts=40,lat_0=90,lon_0=0.)
+#m = Basemap(projection='stere',boundinglat=60,lon_0=0,resolution='l')
+m.drawcoastlines()
+m.fillcontinents()
+m.drawparallels(np.arange(-80,81,20),labels=[1,1,0,0])
+m.drawmeridians(np.arange(0,360,60),labels=[0,0,0,1])
+im1 = m.pcolormesh(np.transpose(lon-110),np.transpose(lat)
+                   ,np.transpose(np.ma.masked_invalid(tauxdiff))
+                   ,shading='flat',cmap='RdYlBu_r',vmin=-.1,vmax=.1,latlon=True)
+cb = m.colorbar(im1,"right", size="5%", pad="15%") #,ticks=[-4, -3, -2, -1, 0, 1, 2, 3, 4]) # pad is the distance between colorbar and figure
+plt.tight_layout()
+plt.savefig('SO_taux_mean2.png',dpi=300,bbox_inches='tight')
+
+plt.clf();
+ax = plt.axes(projection=ccrs.PlateCarree())
+ax.coastlines()
+gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                  linewidth=0.5, color='gray', alpha=0.5, linestyle='--')
+gl.ylabels_right = False
+gl.xformatter = LONGITUDE_FORMATTER
+gl.yformatter = LATITUDE_FORMATTER
+#
+##gl.xlabels_top = False
+##     ...: gl.ylabels_left = False
+##     ...: gl.xlines = False
+##     ...: gl.xlocator = mticker.FixedLocator([-180, -45, 0, 45, 180])
+##     ...: gl.xformatter = LONGITUDE_FORMATTER
+##     ...: gl.yformatter = LATITUDE_FORMATTER
+##     ...: gl.xlabel_style = {'size': 15, 'color': 'gray'}
+##     ...: gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
+#
+plt.pcolormesh(lon-110,lat,tauxdiff,vmin=-.1,vmax=.1,cmap='RdYlBu_r',
+               shading='flat',transform=ccrs.PlateCarree())
+plt.colorbar(ax=ax, shrink=.75)
+plt.tight_layout()
+plt.savefig('SO_taux_mean.png',dpi=300,bbox_inches='tight')
+plt.close()
+#

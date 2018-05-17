@@ -3,7 +3,7 @@ import pandas as pd
 import xarray as xr
 from netCDF4 import num2date
 import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
+#import cartopy.crs as ccrs
 import glob
 
 plt.ion()
@@ -62,25 +62,6 @@ def running_mean(x, N):
 #lyear = 1922
 fyear = 3301
 lyear = 3600
-plt.figure()
-root_folder = '/cluster/work/users/milicak/archive/'
-#root_folder = '/tos-project1/NS4659K/chuncheng/cases_fram/'
-root_folderref = '/tos-project1/NS4659K/chuncheng/cases_ice2ice/'
-#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_fram'
-#expid = 'NBF1850_f19_tn11_test_mis3b_fwf3b_MI'
-expid = 'NBF1850_f19_tn11_test_mis3b_mixing3_Pacific2'
-expidref = 'NBF1850_f19_tn11_test_mis3b_mixing3'
-foldername = root_folder + expid + '/atm/hist/'
-foldernameref = root_folderref + expidref + '/atm/hist/'
-sdate="%c%4.4d%c" % ('*',fyear,'*')
-freq = '*h0*'
-#listini=(glob.glob(foldername+freq+sdate))
-list=sorted(glob.glob(foldername+freq+sdate))
-listref=sorted(glob.glob(foldernameref+freq+sdate))
-for year in xrange(fyear+1,lyear+1):
-    sdate="%c%4.4d%c" % ('*',year,'*')
-    list.extend(sorted(glob.glob(foldername+freq+sdate)))
-    listref.extend(sorted(glob.glob(foldernameref+freq+sdate)))
 
 
 # 1 for atlantic_arctic_ocean region
@@ -88,16 +69,12 @@ for year in xrange(fyear+1,lyear+1):
 # 3 for global_ocean
 chunks = (96,144)
 xr_chunks = {'lat': chunks[-2], 'lon': chunks[-1]}
-data = xr.open_mfdataset(list,chunks=xr_chunks)['TS']
-#data = xr.open_mfdataset(list,chunks=xr_chunks)['TREFHT']
-#land = xr.open_mfdataset(list,chunks=xr_chunks)['LANDFRAC']
-dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['TS']
-#dataref = xr.open_mfdataset(listref,chunks=xr_chunks)['TREFHT']
-#landref = xr.open_mfdataset(listref,chunks=xr_chunks)['LANDFRAC']
-#lon = xr.open_mfdataset(listiniref,chunks=xr_chunks)['lon']
-#lat = xr.open_mfdataset(listiniref,chunks=xr_chunks)['lat']
-#lon = np.copy(lon.data)
-#lat = np.copy(lat.data)
+fname = '/tos-project1/NS4659K/milicak/data/Pacific2_airtemp.nc'
+ctlname = '/tos-project1/NS4659K/milicak/data/ctl_airtemp.nc'
+#data = xr.open_mfdataset(fname,chunks=xr_chunks)['TREFHT']
+#dataref = xr.open_mfdataset(ctlname,chunks=xr_chunks)['TREFHT']
+data = xr.open_dataset(fname, decode_times=False)['TREFHT']
+dataref = xr.open_dataset(ctlname, decode_times=False)['TREFHT']
 lat1 = 65.0;
 lat2 = 80.0;
 lon1 = -55.0+360;
@@ -106,10 +83,11 @@ jnd1 = np.int(np.min(np.where(data.lat>=lat1)));
 jnd2 = np.int(np.max(np.where(data.lat<=lat2)));
 ind1 = np.int(np.min(np.where(data.lon>=lon1)));
 ind2 = np.int(np.max(np.where(data.lon<=lon2)));
-
-area = xr.open_mfdataset('area_cam.nc',chunks=xr_chunks)['area']
+#
+area = xr.open_dataset('/tos-project1/NS4659K/milicak/data/area_cam.nc',
+                       decode_times=False)['area']
 areatime = np.tile(np.copy(area.data),((lyear-fyear+1)*12,1,1))
-
+#
 sat = {}
 satannual = {}
 dnm = np.nansum(data[:,jnd1:jnd2+1,ind1:ind2+1]*areatime[:,jnd1:jnd2+1,ind1:ind2+1],axis=(1,2))
@@ -123,19 +101,24 @@ satannual['SO'] = np.mean(dnm,axis=1)
 dnm = np.copy(sat['ctrl'])
 dnm = np.reshape(dnm,(lyear-fyear+1,12))
 satannual['ctrl'] = np.mean(dnm,axis=1)
-dnm = running_mean(satannual['SO']-satannual['ctrl'],10)
+satrunmean = running_mean(satannual['SO']-satannual['ctrl'],10)
+#
+#cmap = plt.get_cmap('Set1')
+#plt.figure(figsize=(8,4))
+#line1, = plt.plot(satannual['SO']-satannual['ctrl'],'r',label='Air Temp diff')
+#line2, = plt.plot(satrunmean,'k',label='10 year mean')
+#plt.ylabel('Temperature [$^\circ$C]')
+#plt.xlabel('Time [years]')
+#plt.legend(loc='lower right')
+#plt.tight_layout()
+#
+satrunmean = running_mean(satannual['SO']-satannual['ctrl'],5)
+plt.figure(figsize=(8,4))
 line1, = plt.plot(satannual['SO']-satannual['ctrl'],'r',label='Air Temp diff')
-line2, = plt.plot(dnm,'k',label='10 year mean')
+line2, = plt.plot(satrunmean,'k',label='5 year mean')
 plt.legend(loc='lower right')
-
-# new real figure
-cmap = plt.get_cmap('Set1')
-plt.figure(figsize=(6,5))
-dnm = running_mean(satannual['SO']-satannual['ctrl'],5)
-line1, = plt.plot(satannual['SO']-satannual['ctrl'],'r',label='Air Temp diff')
-line2, = plt.plot(dnm,'k',label='5 year mean')
-plt.legend(loc='lower right')
-
-
-#plt.clf();ax = plt.axes(projection=ccrs.PlateCarree());plt.pcolormesh(xx,yy,data.data[17,:,:]-dataref.data[24,:,:],vmin=-10,vmax=10,cmap='RdYlBu',transform=ccrs.PlateCarree());plt.colorbar();ax.coastlines()
+plt.ylabel('Temperature [$^\circ$C]')
+plt.xlabel('Time [years]')
+#plt.tight_layout()
+plt.savefig('Pacific2_temp_greenland.png',dpi=300,bbox_inches='tight')
 
