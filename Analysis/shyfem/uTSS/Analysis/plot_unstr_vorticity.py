@@ -20,9 +20,11 @@ cmap_needjet2=shfn()
 root_folder  = '/work/mi19918/Projects/'
 project_name = 'uTSS'
 
-expid = 'Exp01.2'
+expid = 'Exp_20160101'
+#expid = 'Exp01.2'
 
-fname = root_folder+project_name+'/'+expid+'/'+'uTSSm0_ous.nc'
+#fname = root_folder+project_name+'/'+expid+'/'+'uTSSm0_ous.nc'
+fname = root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_0000.ous.nc'
 
 data = xr.open_dataset(fname)
 data['element_index'] -= 1
@@ -146,5 +148,5 @@ cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[-1,-0.75,-0.5, -0.25,
 #cb.set_label(r'$\zeta/f$')
 cb.set_label('$\zeta/f$',rotation=0,y=1.07,labelpad=-45)
 #cb.set_label(r'$\zeta/f$',rotation=0,y=1.07,labelpad=-45)
-plt.savefig('paperfigs/uTSS_vorticity.png', bbox_inches='tight',format='png',dpi=300)
+#plt.savefig('paperfigs/uTSS_vorticity.png', bbox_inches='tight',format='png',dpi=300)
 
