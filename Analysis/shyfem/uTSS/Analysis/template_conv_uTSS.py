@@ -45,6 +45,7 @@ def setCONV_OUS(bas,day,simul):
 	f.write('#BSUB -J ous2nc%s\n' % day)
 	f.write('#BSUB -o logout.%J.out\n' )
 	f.write('#BSUB -e logerr.%J.err\n' )
+	f.write('#BSUB -w \"done(nos2nc%s)\"\n\n' % (day))
 #	f.write('#BSUB -w \"done(amedbs%s)\"\n\n' % day)
 	f.write('sim_ous_name=\"%s%s.ous\"\n'% (simul,str(day).zfill(4)))
 	f.write('sim_bas_name=\"../%s\"\n\n'% bas)

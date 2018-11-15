@@ -27,16 +27,16 @@ Nnode = 240993
 fzero = 9.5681e-5
 
 fyear = 0;
-lyear = 259;
+lyear = 1;
 
 sdate = "%c%4.4d%c" % ('*',fyear,'*')
-fname = root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_'+sdate+'.ous.nc'
+fname = root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_'+sdate+'.nos.nc'
 list = sorted(glob.glob(fname))
 str1 = ''.join(list)
 grd = xr.open_dataset(str1)
 for year in xrange(fyear+1,lyear+1):
     sdate = "%c%4.4d%c" % ('*',year,'*')
-    list.extend(sorted(glob.glob(root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_'+sdate+'.ous.nc')))
+    list.extend(sorted(glob.glob(root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_'+sdate+'.nos.nc')))
 
 
 
@@ -104,45 +104,10 @@ def compute_shapefnc(grd):
     return shapef,area
 
 
-shapef,area = compute_shapefnc(grd)
-
 # velocity time,node,level indexing
-varu = data.u_velocity[:,:,0]
-varv = data.v_velocity[:,:,0]
+varsss = data.salinity[:,:,0]
 
-u1 = varu[:,grd.element_index[:,0]]
-u2 = varu[:,grd.element_index[:,1]]
-u3 = varu[:,grd.element_index[:,2]]
-v1 = varv[:,grd.element_index[:,0]]
-v2 = varv[:,grd.element_index[:,1]]
-v3 = varv[:,grd.element_index[:,2]]
-
-# relative vorticity ksi = vx-uy
-vx = v1*shapef['xderiv'][0][0]
-vx = vx+v2*shapef['xderiv'][0][1]
-vx = vx+v3*shapef['xderiv'][0][2]
-
-uy = u1*shapef['yderiv'][0][0]
-uy = uy+u2*shapef['yderiv'][0][1]
-uy = uy+u3*shapef['yderiv'][0][2]
-
-ksi = vx-uy
-
-# compute ksi at node points
-ksinode=np.zeros((ksi.shape[0],Nnode))
-ksinode[:,grd.element_index[grd.element,0]] = ksinode[:,grd.element_index[grd.element,0]]+ksi[:,grd.element]*area
-ksinode[:,grd.element_index[grd.element,1]] = ksinode[:,grd.element_index[grd.element,1]]+ksi[:,grd.element]*area
-ksinode[:,grd.element_index[grd.element,2]] = ksinode[:,grd.element_index[grd.element,2]]+ksi[:,grd.element]*area
-
-weight = np.zeros(Nnode)
-weight[grd.element_index[grd.element,0]] = weight[grd.element_index[grd.element,0]]+area
-weight[grd.element_index[grd.element,1]] = weight[grd.element_index[grd.element,1]]+area
-weight[grd.element_index[grd.element,2]] = weight[grd.element_index[grd.element,2]]+area
-
-ksinode = ksinode/weight
-
-fcor = coriolis(grd.latitude)
-
+# for ind in xrange(fyear,fyear+1):
 for ind in xrange(fyear,lyear+1):
     print ind
     sdate = "%4.4d" % (ind)
@@ -159,11 +124,11 @@ for ind in xrange(fyear,lyear+1):
     
     longitude,latitude = m(np.copy(grd.longitude),np.copy(grd.latitude))
     im1=plt.tripcolor(longitude,latitude,grd.element_index,
-                      ksinode[ind,:]/fcor,cmap='seismic',vmin=-1,vmax=1,shading='gouraud')
-    cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[-1,-0.75,-0.5, -0.25,
-                                                             0, 0.25, 0.5, 0.75, 1]) # pad is the distance between colorbar and figure
-    cb.set_label('$\zeta/f$',rotation=0,y=1.07,labelpad=-45)
-    printname = 'gifs/vorticity_'+sdate+'.png'
+                      varsss[ind,:],cmap='nice_gfdl',vmin=15,vmax=42,shading='gouraud')
+    cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[0, 0.05, 0.1, 0.15,
+                                                             0.2, 0.25, 0.3, 0.35]) # pad is the distance between colorbar and figure
+    cb.set_label('$psu$',rotation=0,y=1.0,labelpad=-45)
+    printname = 'gifs/sss_'+sdate+'.png'
     plt.savefig(printname, bbox_inches='tight',format='png',dpi=300)
     plt.close()
 
