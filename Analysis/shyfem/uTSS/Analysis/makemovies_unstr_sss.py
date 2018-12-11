@@ -9,6 +9,7 @@ import matplotlib.tri as mtri
 from matplotlib import rc
 # import ESMF
 from mpl_toolkits.basemap import Basemap                                            
+from datetime import date, timedelta
 #import cartopy.crs as ccrs                                                          
 #from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
  
@@ -27,7 +28,11 @@ Nnode = 240993
 fzero = 9.5681e-5
 
 fyear = 0;
-lyear = 1;
+lyear = 340;
+fyeardate = '1/1/2016';
+d0 = date(2016, 1, 1);
+d1 = d0 + timedelta(lyear-fyear)
+dates0 = pd.date_range(start=d0, end=d1)
 
 sdate = "%c%4.4d%c" % ('*',fyear,'*')
 fname = root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_'+sdate+'.nos.nc'
@@ -128,6 +133,7 @@ for ind in xrange(fyear,lyear+1):
     cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[0, 0.05, 0.1, 0.15,
                                                              0.2, 0.25, 0.3, 0.35]) # pad is the distance between colorbar and figure
     cb.set_label('$psu$',rotation=0,y=1.0,labelpad=-45)
+    plt.title(dates0.date[ind])
     printname = 'gifs/sss_'+sdate+'.png'
     plt.savefig(printname, bbox_inches='tight',format='png',dpi=300)
     plt.close()

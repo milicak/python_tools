@@ -9,6 +9,7 @@ import matplotlib.tri as mtri
 from matplotlib import rc
 # import ESMF
 from mpl_toolkits.basemap import Basemap                                            
+from datetime import date, timedelta
 #import cartopy.crs as ccrs                                                          
 #from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
  
@@ -27,7 +28,11 @@ Nnode = 240993
 fzero = 9.5681e-5
 
 fyear = 0;
-lyear = 259;
+lyear = 340;
+fyeardate = '1/1/2016';
+d0 = date(2016, 1, 1);
+d1 = d0 + timedelta(lyear-fyear)
+dates0 = pd.date_range(start=d0, end=d1)
 
 sdate = "%c%4.4d%c" % ('*',fyear,'*')
 fname = root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_'+sdate+'.ous.nc'
@@ -143,6 +148,8 @@ ksinode = ksinode/weight
 
 fcor = coriolis(grd.latitude)
 
+rdbludsc = plt.get_cmap('RdBu_r',32)
+
 for ind in xrange(fyear,lyear+1):
     print ind
     sdate = "%4.4d" % (ind)
@@ -159,10 +166,12 @@ for ind in xrange(fyear,lyear+1):
     
     longitude,latitude = m(np.copy(grd.longitude),np.copy(grd.latitude))
     im1=plt.tripcolor(longitude,latitude,grd.element_index,
-                      ksinode[ind,:]/fcor,cmap='seismic',vmin=-1,vmax=1,shading='gouraud')
+                      ksinode[ind,:]/fcor,cmap=rdbludsc,vmin=-1,vmax=1,shading='gouraud')
+                      # ksinode[ind,:]/fcor,cmap='seismic',vmin=-1,vmax=1,shading='gouraud')
     cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[-1,-0.75,-0.5, -0.25,
                                                              0, 0.25, 0.5, 0.75, 1]) # pad is the distance between colorbar and figure
     cb.set_label('$\zeta/f$',rotation=0,y=1.07,labelpad=-45)
+    plt.title(dates0.date[ind])
     printname = 'gifs/vorticity_'+sdate+'.png'
     plt.savefig(printname, bbox_inches='tight',format='png',dpi=300)
     plt.close()
