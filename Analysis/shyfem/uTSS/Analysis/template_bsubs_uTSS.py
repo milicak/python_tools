@@ -1,5 +1,6 @@
 date=20160101
-days=[0,366]
+days=[0,732]
+#days=[366,732]
 #days=[0,31]
 dtt=86400
 title='uTSS'
@@ -33,7 +34,8 @@ def setBSUBS(paramfile,day,day0,simul, Nprocs):
 	f.write('export LD_LIBRARY_PATH=/users/home/sco116/PETSC/2015/petsc-3.7.4/linux-gnu-intel/lib:${LD_LIBRARY_PATH}\n')
 	f.write('export RUNTIME_OPTS=\"-ksp_type bcgs -ksp_rtol 1e-8 -ksp_atol 1e-8\"\n\n')
 	#f.write('time mpirun_Impi5 -l /work/tessa_gpfs2/sanifs/mpi_codes/oper_saniv2fixsp/fem3d/shympi %s%s.str $RUNTIME_OPTS\n\n' % (paramfile,str(day).zfill(4)) )
-	f.write('time mpirun_Impi5 -l /users/home/mi19918/models/shympi_def_start/fem3d/shympi %s%s.str $RUNTIME_OPTS > logmsS.log\n\n' % (paramfile,str(day).zfill(4)) )
+	# f.write('time mpirun_Impi5 -l /users/home/mi19918/models/shympi_def_start/fem3d/shympi %s%s.str $RUNTIME_OPTS > logmsS.log\n\n' % (paramfile,str(day).zfill(4)) )
+	f.write('time mpirun_Impi5 -l /users/home/mi19918/models/shympi_def_start/fem3d/shympi_novmom %s%s.str $RUNTIME_OPTS > logmsS.log\n\n' % (paramfile,str(day).zfill(4)) )
 	f.write('echo \"Job completed at: \" `date`\n\n')
 	f.write('sleep 100 \n\n') 
 	f.write('mv %s%s*.rst restart_files \n\n' %(simul,str(day).zfill(4))) 

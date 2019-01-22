@@ -1,5 +1,7 @@
 date=20160101
-days=[0,366]
+# days=[366,732]
+days=[0,732]
+# days=[0,366]
 dtt=86400
 title='uTSS'
 bas='Marmara_basbathy_ser.bas'
@@ -110,7 +112,7 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
             'ibarcl = 1\n\t'
             'itemp = 1\n\t'
             'isalt = 1\n\n\t'
-            'idhtyp = 2\n\t'
+            'idhtyp = 3\n\t'
             'ahpar = 0.5\n\n\t'
             'vismol = 1.e-6\n\t'
             'difmol = 1.e-7\n\t'

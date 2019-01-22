@@ -2,7 +2,9 @@ bas='Marmara_basbathy_ser.bas'
 simul='uTSS_lobc_chunk_'
 param='param_lobc_chunk_'
 
-days=[0,366]
+# days=[0,366]
+# days=[366,732]
+days=[0,732]
 ## set the resolution (0 for non-structured output)
 resol=0
 ## set box for zoom (Optional)
@@ -147,5 +149,5 @@ def setCONV_NOS(bas,day,simul):
 	f.close()
 
 for day in range(days[0],days[1]):
-	setCONV_NOS(bas,day,simul)	
-	# setCONV_OUS(bas,day,simul)	
+	# setCONV_NOS(bas,day,simul)	
+	setCONV_OUS(bas,day,simul)	
