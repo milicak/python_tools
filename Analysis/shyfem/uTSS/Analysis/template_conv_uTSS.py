@@ -149,5 +149,5 @@ def setCONV_NOS(bas,day,simul):
 	f.close()
 
 for day in range(days[0],days[1]):
-	# setCONV_NOS(bas,day,simul)	
-	setCONV_OUS(bas,day,simul)	
+	setCONV_NOS(bas,day,simul)	
+	# setCONV_OUS(bas,day,simul)	

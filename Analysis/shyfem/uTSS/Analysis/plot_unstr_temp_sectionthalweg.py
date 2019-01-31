@@ -9,7 +9,6 @@ import matplotlib.tri as mtri
 import ESMF
 from mpl_toolkits.basemap import Basemap                                            
 from scipy.interpolate import interp1d
-import geopy.distance
 #import cartopy.crs as ccrs                                                          
 #from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
  
@@ -20,9 +19,8 @@ project_name = 'uTSS'
 
 # expid = 'Exp01.2'
 # expid = 'Exp_20160101'
-# expid = 'Exp_2016_analysis'
+expid = 'Exp_2016_analysis'
 # expid = 'Exp_2016_analysis_keps'
-expid = 'Exp_2016_analysis_newTSIC'
 
 # aa = np.loadtxt('thalwegCoords_sortednew.txt')
 aa = np.loadtxt('newthalweg.txt')
@@ -39,14 +37,9 @@ g = interp1d(x,lat)
 xnew = np.linspace(1, lon.shape[0], num=2*lon.shape[0], endpoint=True)
 lon_thlweg = f(xnew)
 lat_thlweg = g(xnew)
-dnm = np.vstack([lat_thlweg,lon_thlweg])
-dist = np.zeros(lon_thlweg.shape)
-for ind in range(0,np.copy(lon_thlweg.shape)-1):
-    dist[ind+1] = dist[ind]+geopy.distance.distance(dnm[:,ind+1],dnm[:,ind]).km
 
-
-fyear = 44;
-lyear = 44;
+fyear = 0;
+lyear = 0;
 # lyear = 396;
 
 sdate = "%c%4.4d%c" % ('*',fyear,'*')
@@ -60,8 +53,8 @@ for year in xrange(fyear+1,lyear+1):
 
 
 
-data = xr.open_mfdataset(list, chunks={'time':5, 'node':20000})['salinity']
-# data = xr.open_mfdataset(list, chunks={'time':5, 'node':20000})['temperature']
+# data = xr.open_mfdataset(list, chunks={'time':5, 'node':20000})['salinity']
+data = xr.open_mfdataset(list, chunks={'time':5, 'node':20000})['temperature']
 # data['element_index'] -= 1
 grd['element_index'] -= 1
 ds = data.mean('time')
@@ -98,8 +91,8 @@ for kind in range(0,93):
             dst_mask_values=np.array([0])                                      
     
     regrid = ESMF.Regrid(srcfield, dstfield,
-        regrid_method=ESMF.RegridMethod.NEAREST_STOD,
-        # regrid_method=ESMF.RegridMethod.BILINEAR,
+        # regrid_method=ESMF.RegridMethod.NEAREST_STOD,
+        regrid_method=ESMF.RegridMethod.BILINEAR,
         # regrid_method=ESMF.RegridMethod.PATCH,
         unmapped_action=ESMF.UnmappedAction.IGNORE,dst_mask_values=dst_mask_values)
     
@@ -111,8 +104,7 @@ for kind in range(0,93):
 plt.figure()
 # triang=mtri.Triangulation(grd.longitude,grd.latitude,grd.element_index)
 # plt.pcolormesh(np.linspace(1,295,295),-data.level,np.transpose(ma.masked_equal(secfield-secfieldold,0)));
-# plt.pcolormesh(np.linspace(1,lon_thlweg.shape[0],lon_thlweg.shape[0]),
-plt.pcolormesh(dist,
+plt.pcolormesh(np.linspace(1,lon_thlweg.shape[0],lon_thlweg.shape[0]),
                # -data.level,np.transpose(ma.masked_equal(secfield,0))
                -data.level,np.transpose(ma.masked_invalid(secfield))
               ,cmap='needJet2');
