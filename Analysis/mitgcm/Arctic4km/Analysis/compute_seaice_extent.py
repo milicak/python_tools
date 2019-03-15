@@ -25,7 +25,7 @@ dropvars = ['SIuice','SIvice','oceTAUY','ETAN','SALT','SIqneti','oceSPDep',
            'oceTAUX','dxG','dyG','rAz','dxC','dyC','rAw','rAs']
 
 ens_list = []
-SI = np.zeros((lyear-fyear)*12)
+SI_extent = np.zeros((lyear-fyear)*12)
 k=0
 for year in range(fyear,lyear):
     for month in range(1,13):
@@ -34,13 +34,19 @@ for year in range(fyear,lyear):
         print(fname)
         ds1 = xr.open_dataset(fname, chunks={'i':500, 'j':500})['SIarea']
                               # drop_variables=dropvars)
+        ds1.data[ds1.data>0.15] = 1
+        ds1.data[ds1.data<=0.15] = 0
         si = ds1*ds1.rA
-        SI[k]=si.sum(dim=['i','j']).compute()
+        SI_extent[k]=si.sum(dim=['i','j']).compute()
         k+=1
         # ens_list.append(ds1)
         # os.system(cmmnd)
 
 
+
+SI_extent = np.reshape(SI_extent,[lyear-fyear,12])
+df = pd.DataFrame(SI_extent)
+df.to_csv("SI_extent_ctrl_1992_2017")
 
 # ds = xr.concat(ens_list, dim='ensemble')
 # os.chdir('/cluster/home/milicak/python_tools/Analysis/mitgcm/Arctic4km/Analysis')
