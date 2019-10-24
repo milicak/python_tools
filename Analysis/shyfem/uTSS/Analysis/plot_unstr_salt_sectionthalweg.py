@@ -45,8 +45,8 @@ for ind in range(0,np.copy(lon_thlweg.shape)-1):
     dist[ind+1] = dist[ind]+geopy.distance.distance(dnm[:,ind+1],dnm[:,ind]).km
 
 
-fyear = 44;
-lyear = 44;
+fyear = 70;
+lyear = 70;
 # lyear = 396;
 
 sdate = "%c%4.4d%c" % ('*',fyear,'*')
@@ -98,8 +98,8 @@ for kind in range(0,93):
             dst_mask_values=np.array([0])                                      
     
     regrid = ESMF.Regrid(srcfield, dstfield,
-        regrid_method=ESMF.RegridMethod.NEAREST_STOD,
-        # regrid_method=ESMF.RegridMethod.BILINEAR,
+        # regrid_method=ESMF.RegridMethod.NEAREST_STOD,
+        regrid_method=ESMF.RegridMethod.BILINEAR,
         # regrid_method=ESMF.RegridMethod.PATCH,
         unmapped_action=ESMF.UnmappedAction.IGNORE,dst_mask_values=dst_mask_values)
     
