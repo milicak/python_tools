@@ -1,7 +1,7 @@
 date=20160101
-# days=[366,732]
 days=[0,732]
-# days=[0,366]
+# days=[366,732]
+days=[0,1]
 dtt=86400
 title='uTSS'
 bas='Marmara_basbathy_ser.bas'
@@ -37,7 +37,7 @@ levels = [1.0, 2.5, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 40.0,60.0,
 
 levels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
           14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-          25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+          25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
           36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
           47, 48, 49, 50, 55, 60, 65, 70, 75, 80, 85,
           90, 95, 100, 120, 140, 160, 180, 200, 250, 300,
@@ -94,8 +94,8 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
             'azpar = 0.6\n\t'
             'aapar = 0\n\n\t'
             'ievap = 1\n\t'
-            'isolp = 0\n\t'
-            'hdecay = 23\n\t'
+            'isolp = 1\n\t'
+            'hdecay = 0\n\t'
             'botabs = 1\n\t'
             'ihtype = 3\n\t'
             'iheat  = 8\n\t'
@@ -106,14 +106,16 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
             'noslip = 1\n\n\t'
             'iturb = 1\n\n\t'
             'ireib = 6\n\t'
+            'ihwadv = 2\n\t'
             'czdef = 0.01\n\n\t'
             'itvd = 2\n\t'
             'itvdv = 1\n\n\t'
             'ibarcl = 1\n\t'
+            'idtau = 1\n\t'
             'itemp = 1\n\t'
             'isalt = 1\n\n\t'
             'idhtyp = 3\n\t'
-            'ahpar = 0.5\n\n\t'
+            'ahpar = 2.2\n\n\t'
             'vismol = 1.e-6\n\t'
             'difmol = 1.e-7\n\t'
             'ilytyp = 3\n\t'
@@ -130,39 +132,39 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
     f.write('$bound1\n')
     f.write('\tkbound = \n')
     for nknb in bound1:
-	f.write('\t%s\n'% nknb)
-    f.write('\tibtyp = 1\n')		
-    f.write('\tintpol = 2\n')		
-    f.write('\ttnudge = 300\n')		
-    f.write("\tboundn   = 'input/boundn_L1a_TSS.dat'\n")		
-    f.write("\tsaltn  	= 'input/saltn_L1_TSS.dat'\n")		
-    f.write("\ttempn  	= 'input/tempn_L1_TSS.dat'\n")		
+        f.write('\t%s\n'% nknb)
+    f.write('\tibtyp = 1\n')
+    f.write('\tintpol = 2\n')
+    f.write('\ttnudge = 300\n')
+    f.write("\tboundn   = 'input/boundn_L1a_TSS.dat'\n")
+    f.write("\tsaltn  	= 'input/saltn_L1_TSS.dat'\n")
+    f.write("\ttempn  	= 'input/tempn_L1_TSS.dat'\n")
     f.write("\tvel3dn 	= 'input/uv3d_L1_TSS.dat'\n")
-    f.write('$end\n\n')		
+    f.write('$end\n\n')
     f.write('$bound2\n')
     f.write('\tkbound = \n')
     for nknb in bound2:
-	f.write('\t%s\n'% nknb)
-    f.write('\tibtyp = 1\n')		
-    f.write('\tintpol = 2\n')		
-    f.write('\ttnudge = 300\n')		
-    f.write("\tboundn   = 'input/boundn_L2a_TSS.dat'\n")		
-    f.write("\tsaltn  	= 'input/saltn_L2_TSS.dat'\n")		
-    f.write("\ttempn  	= 'input/tempn_L2_TSS.dat'\n")		
+        f.write('\t%s\n'% nknb)
+    f.write('\tibtyp = 1\n')
+    f.write('\tintpol = 2\n')
+    f.write('\ttnudge = 300\n')
+    f.write("\tboundn   = 'input/boundn_L2a_TSS.dat'\n")
+    f.write("\tsaltn  	= 'input/saltn_L2_TSS.dat'\n")
+    f.write("\ttempn  	= 'input/tempn_L2_TSS.dat'\n")
     f.write("\tvel3dn 	= 'input/uv3d_L2_TSS.dat'\n")
-    f.write('$end\n\n')		
+    f.write('$end\n\n')
     f.write('$bound3\n')
     f.write('\tkbound = \n')
     for nknb in bound3:
-	f.write('\t%s\n'% nknb)
-    f.write('\tibtyp = 1\n')		
-    f.write('\tintpol = 2\n')		
-    f.write('\ttnudge = 300\n')		
-    f.write("\tboundn   = 'input/boundn_L3a_TSS.dat'\n")		
-    f.write("\tsaltn  	= 'input/saltn_L3_TSS.dat'\n")		
-    f.write("\ttempn  	= 'input/tempn_L3_TSS.dat'\n")		
+        f.write('\t%s\n'% nknb)
+    f.write('\tibtyp = 1\n')
+    f.write('\tintpol = 2\n')
+    f.write('\ttnudge = 300\n')
+    f.write("\tboundn   = 'input/boundn_L3a_TSS.dat'\n")
+    f.write("\tsaltn  	= 'input/saltn_L3_TSS.dat'\n")
+    f.write("\ttempn  	= 'input/tempn_L3_TSS.dat'\n")
     f.write("\tvel3dn 	= 'input/uv3d_L3_TSS.dat'\n")
-    f.write('$end\n\n')		
+    f.write('$end\n\n')
     f.write('$name\n')
     if day==0:
         f.write("\ttempin = 'input/tempin_%s.dat'\n" % date)
@@ -170,11 +172,12 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
         #f.write("\tuvinit = 'input/uvin_%s.dat'\n" % date)
     else:
         f.write("\trestrt = 'restart_files/%s%s.rst'\n" % (simul,str(day-1).zfill(4)))
+
     f.write("\twind   = 'input/wp.dat'\n\tqflux  = 'input/tc.dat'\n\train   = 'input/rain.dat'\n\tgotmpa = 'input/gotmturb.nml'\n$end")
     #f.write("\twind   = 'input/wp1.dat'\n\tqflux  = 'input/tc1.dat'\n\tgotmpa = 'input/gotmturb.nml'\n\tqsol = 'input/qsol.dat'\n$end")
     f.close()
 
-# loop on days of simulation to 
+# loop on days of simulation to
 # create param files. For each day
 # 1 param file is created
 for day in range(days[0],days[1]):

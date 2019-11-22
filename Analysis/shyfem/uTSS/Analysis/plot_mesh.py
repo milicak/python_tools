@@ -17,6 +17,7 @@ root_folder  = '/work/mi19918/Projects/'
 project_name = 'uTSS'
 
 expid = 'Exp01.2'
+expid = 'Exp_2016_analysis'
 
 fname = root_folder+project_name+'/'+expid+'/'+'uTSSm0_nos.nc'
 
