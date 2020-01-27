@@ -1,7 +1,9 @@
-date=20160101
+# date=20160101
+date=20171002
 # days=[0,732]
 #days=[366,732]
-days=[0,1]
+# days=[0,12]
+days=[0,82]
 dtt=86400
 title='uTSS'
 bas='Marmara_basbathy_ser.bas'
@@ -11,15 +13,15 @@ param='param_lobc_chunk_'
 def setBSUBS(paramfile,day,day0,simul, Nprocs):
     f = open('shympi_chunk_%s.sh'% str(day).zfill(4), 'w')
     f.write('#!/bin/bash\n\n')
-    f.write('#SBATCH -A googr\n')
+    f.write('#SBATCH -A gooogr\n')
     f.write('#SBATCH -p b224q\n')
-    f.write('#SBATCH --time=06:00:00\n')
+    f.write('#SBATCH --time=02:00:00\n')
     f.write('#SBATCH -J uTSS%s\n' % day)
     f.write('#SBATCH -n %s\n' % Nprocs)
     f.write('#SBATCH --output=%j.out\n')
     f.write('#SBATCH --error=%j.err\n')
     if day>day0:
-    	f.write('#BSUB -w \"done(uTSS%s)\"\n\n' % (day-1))
+        f.write('#SBATCH --dependency=afterok:uTSS%s\n\n' % (day-1))
     else:
     	f.write('\n')
     f.write('source /okyanus/users/milicak/loadmodule_shyfem \n')
@@ -46,10 +48,12 @@ def setBSUBS(paramfile,day,day0,simul, Nprocs):
     f.write('mv %s%s*.wnd out_%s\n\n' %(simul,str(day).zfill(4),str(day).zfill(4)))
     f.write('cd out_%s\n\n' %(str(day).zfill(4)))
     f.write('sleep 100 \n\n')
+    # f.write('sbatch nosnc_conv%s.sh \n\n' %(str(day).zfill(3)))
+    # f.write('sbatch ousnc_conv%s.sh \n\n' %(str(day).zfill(3)))
     f.write('sbatch nosnc_conv%s.sh \n\n' %(str(day).zfill(3)))
-    f.write('sbatch ousnc_conv%s.sh \n\n' %(str(day).zfill(3)))
-    # f.write(' && ')
-    f.write('sbatch wndnc_conv%s.sh' %(str(day).zfill(3)))
+    f.write('sbatch --dependency=$(squeue --noheader --format %%i --name nos2nc%s)  ousnc_conv%s.sh \n\n' %(str(day).zfill(1),(str(day).zfill(3))))
+    f.write('sbatch --dependency=$(squeue --noheader --format %%i --name ous2nc%s)  wndnc_conv%s.sh \n\n' %(str(day).zfill(1),(str(day).zfill(3))))
+    # f.write('sbatch wndnc_conv%s.sh' %(str(day).zfill(3)))
     f.close()
 
 

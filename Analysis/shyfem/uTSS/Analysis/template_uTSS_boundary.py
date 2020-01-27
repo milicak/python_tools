@@ -1,7 +1,9 @@
-date=20160101
+# date=20160101
+date=20171002
 days=[0,732]
 # days=[366,732]
-days=[0,1]
+# days=[0,12]
+days=[0,82]
 dtt=86400
 title='uTSS'
 bas='Marmara_basbathy_ser.bas'
