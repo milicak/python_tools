@@ -13,12 +13,13 @@ plt.ion()
 
 # make plots
 make_plots = False
-#make_plots = True
+# make_plots = True
 
 # mnthnames = ['20160101', '20160201', '20160301', '20160401',
              # '20160501', '20160601', '20160701', '20160801',
              # '20160901', '20161001', '20161101', '20161201']
-mnthnames = ['20162017years_analysis']
+# mnthnames = ['20162017years_analysis']
+mnthnames = ['201620172018years_analysis']
 # mnthnames = ['dnm']
 # mnthnames = ['2016year']
 
@@ -42,9 +43,9 @@ for foldername in mnthnames:
     fbound3, nbound3 	= 'boundn_L3_TSS.dat', 92
     
     # name of new files
-    fbound1a = fbound1.replace('_TSS.dat','a_TSS.dat')
-    fbound2a = fbound2.replace('_TSS.dat','a_TSS.dat')
-    fbound3a = fbound3.replace('_TSS.dat','a_TSS.dat')
+    fbound1a = fbound1.replace('_TSS.dat','anew_TSS.dat')
+    fbound2a = fbound2.replace('_TSS.dat','anew_TSS.dat')
+    fbound3a = fbound3.replace('_TSS.dat','anew_TSS.dat')
     
     newfiles = [fbound1a,fbound2a,fbound3a]
     
@@ -112,7 +113,10 @@ for foldername in mnthnames:
     # remove average Black Sea mean ssh from boundary values
     # 2.06 was the 2016 annual mean of Basin BS ssh 
     # boundn3    = boundn3 - 2.06 
-    boundn3    = boundn3 - 2.32 
+    # 2016 and 2017 working one is 2.32
+    boundn3[:365+366,:]    = boundn3[:365+366,:] - 2.32 
+    diff = boundn3[365+366-1]-boundn3[365+366]
+    boundn3[365+366:]+=diff
     
     # remove average from boundaries
     boundn1a	= boundn1 - l1l2_ave
@@ -123,6 +127,10 @@ for foldername in mnthnames:
     # boundn3a	= boundn3 - l1l2_min
     #boundn1a	= boundn1 + 0.5 
     #boundn2a	= boundn2 + 0.5
+    adddlin = (np.arange(550,boundn3.shape[0],1)-550)*0.15/(boundn3.shape[0]-550)
+    aa = np.tile(adddlin,(92,1))
+    boundn3a[550::,:] = boundn3a[550::,:]+0.3+np.transpose(aa)
+        
     
     # coordinates for boundaries in plot
     x1 = np.arange(nbound1)

@@ -47,6 +47,8 @@ longitude,latitude = m(np.copy(data.longitude),np.copy(data.latitude))
 im1=plt.tripcolor(longitude,latitude,data.element_index,
                 -data.total_depth,cmap=cmap_needjet2,vmin=-2100,vmax=-2,shading='gouraud')
 #plt.tripcolor(longitude,latitude,data.element_index,ksinode/fzero,cmap=plt.cm.get_cmap('RdBu_r'),vmin=-1,vmax=1,shading='gouraud')
+im1=plt.tripcolor(longitude,latitude,data.element_index,
+                -data.total_depth,cmap=cmap_needjet2,vmin=-2100,vmax=-2,shading='gouraud',edgecolors='k')
 
 
 cb = m.colorbar(im1,"right", size="5%", pad="10%",

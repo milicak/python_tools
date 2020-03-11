@@ -20,15 +20,16 @@ plt.ioff()
 root_folder  = '/work/mi19918/Projects/'
 project_name = 'uTSS'
 
-expid = 'Exp_2016_analysis'
+expid = 'Exp_2016_analysis_newTSIC'
+# expid = 'Exp_2016_analysis'
 #expid = 'Exp01.2'
 
 Nnode = 240993
 # coriolis(41N)
 fzero = 9.5681e-5
 
-fyear = 0;
-lyear = 340;
+fyear = 91;
+lyear = 325;
 fyeardate = '1/1/2016';
 d0 = date(2016, 1, 1);
 d1 = d0 + timedelta(lyear-fyear)
@@ -110,9 +111,10 @@ def compute_shapefnc(grd):
 
 
 # velocity time,node,level indexing
-varsss = data.salinity[:,:,0]
+varsst = data.temperature[:,:,0]
 
 # for ind in xrange(fyear,fyear+1):
+plt.ioff()
 for ind in xrange(fyear,lyear+1):
     print ind
     sdate = "%4.4d" % (ind)
@@ -129,12 +131,12 @@ for ind in xrange(fyear,lyear+1):
     
     longitude,latitude = m(np.copy(grd.longitude),np.copy(grd.latitude))
     im1=plt.tripcolor(longitude,latitude,grd.element_index,
-                      varsss[ind,:],cmap='nice_gfdl',vmin=15,vmax=42,shading='gouraud')
+                      varsst[ind,:],cmap='needJet2',vmin=10,vmax=32,shading='gouraud')
     cb = m.colorbar(im1,"right", size="5%", pad="10%",ticks=[0, 0.05, 0.1, 0.15,
                                                              0.2, 0.25, 0.3, 0.35]) # pad is the distance between colorbar and figure
     cb.set_label('$psu$',rotation=0,y=1.0,labelpad=-45)
     plt.title(dates0.date[ind])
-    printname = 'gifs/sss_'+sdate+'.png'
+    printname = 'gifs/sst_'+sdate+'.png'
     plt.savefig(printname, bbox_inches='tight',format='png',dpi=300)
     plt.close()
 

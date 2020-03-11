@@ -33,11 +33,10 @@ stations = df[timecol].unique()
 
 # for each station
 timeind = 0
-expname = '2017-05_ISKI_MARMARA'
+expname = '2017-07_ISKI_MARMARA'
 tmp_pro = df.loc[df['Cruise']==expname]
 # stationame = 'M23'  # 'M23' 'B2' 'B2B' 'B5' 'B7' 'K0A' 'K0' 'M14' 'M18' 'K0' 'K2' 'BL1' 'B14' 'B13' 'M1' 'M8' 'MBA' 'M20'
-stationames = ['M23', 'B2', 'B5', 'B7', 'K0A', 'K0', 'M14',
-                'K0', 'K2', 'BL1', 'B14', 'B13', 'M1', 'M8', 'MBA', 'M20']
+stationames = ['K2', 'K0', 'K0H', 'B14', 'M3', 'M23']
 for stationame in stationames:
     tmp_prof = tmp_pro.loc[tmp_pro['Station']==stationame]
     # tmp_pro = df.loc[df['Cruise']=='2016-09_ISKI_MARMARA']
@@ -146,9 +145,9 @@ for stationame in stationames:
     df2 = pd.DataFrame({"Temp_uTSS": secfield2[0,:],"Salt_uTSS": secfield[0,:],
                        "zr_uTSS": -data.level.compute()})
     
-    fname = 'obs_ctd/2017_05_'+stationame+'_obs.csv'
+    fname = 'obs_ctd/2017_07_'+stationame+'_obs.csv'
     df1.to_csv(fname)
-    fname = 'obs_ctd/2017_05_'+stationame+'_uTSS.csv'
+    fname = 'obs_ctd/2017_07_'+stationame+'_uTSS.csv'
     print(fname)
     df2.to_csv(fname)
     # df2.to_csv(r'obs_ctd/016_09_K0_uTSS.csv')

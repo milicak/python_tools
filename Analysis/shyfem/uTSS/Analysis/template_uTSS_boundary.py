@@ -1,6 +1,7 @@
 date=20160101
 # days=[366,732]
-days=[0,732]
+# days=[0,732]
+days=[0,1096]
 # days=[0,366]
 dtt=86400
 title='uTSS'
@@ -115,7 +116,7 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
             'itemp = 1\n\t'
             'isalt = 1\n\n\t'
             'idhtyp = 3\n\t'
-            'ahpar = 2.0\n\n\t'
+            'ahpar = 2.2\n\n\t'
             'vismol = 1.e-6\n\t'
             'difmol = 1.e-7\n\t'
             'ilytyp = 3\n\t'
@@ -136,7 +137,7 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
     f.write('\tibtyp = 1\n')		
     f.write('\tintpol = 2\n')		
     f.write('\ttnudge = 300\n')		
-    f.write("\tboundn   = 'input/boundn_L1a_TSS.dat'\n")		
+    f.write("\tboundn   = 'input/boundn_L1anew_TSS.dat'\n")		
     f.write("\tsaltn  	= 'input/saltn_L1_TSS.dat'\n")		
     f.write("\ttempn  	= 'input/tempn_L1_TSS.dat'\n")		
     f.write("\tvel3dn 	= 'input/uv3d_L1_TSS.dat'\n")
@@ -148,7 +149,7 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
     f.write('\tibtyp = 1\n')		
     f.write('\tintpol = 2\n')		
     f.write('\ttnudge = 300\n')		
-    f.write("\tboundn   = 'input/boundn_L2a_TSS.dat'\n")		
+    f.write("\tboundn   = 'input/boundn_L2anew_TSS.dat'\n")		
     f.write("\tsaltn  	= 'input/saltn_L2_TSS.dat'\n")		
     f.write("\ttempn  	= 'input/tempn_L2_TSS.dat'\n")		
     f.write("\tvel3dn 	= 'input/uv3d_L2_TSS.dat'\n")
@@ -160,7 +161,7 @@ def setParam(title, day, date, bas, param, simul, dtt, itmrst, idtrst,
     f.write('\tibtyp = 1\n')		
     f.write('\tintpol = 2\n')		
     f.write('\ttnudge = 300\n')		
-    f.write("\tboundn   = 'input/boundn_L3a_TSS.dat'\n")		
+    f.write("\tboundn   = 'input/boundn_L3anew_TSS.dat'\n")		
     f.write("\tsaltn  	= 'input/saltn_L3_TSS.dat'\n")		
     f.write("\ttempn  	= 'input/tempn_L3_TSS.dat'\n")		
     f.write("\tvel3dn 	= 'input/uv3d_L3_TSS.dat'\n")
