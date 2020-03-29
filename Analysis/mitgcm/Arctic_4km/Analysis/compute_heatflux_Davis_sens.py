@@ -39,31 +39,12 @@ df['time'] = newtime['time']
 # heat transport at fram strait Cm^3/s
 ds = df.UTHMASS*df.dyG*df.drF
 
-ht = ds.data[:,:,496:664,580]
+ht = ds.data[:,:,866:1012,680]
 HT_fram = ht.sum(axis=(1,2))
 dnm = HT_fram.compute()
 
 data = xr.DataArray(dnm, dims=('time'), coords={'time': time})
 dsnew = data.to_dataset(name='heat_transport')
-fname = expid + '_Fram_heat_transport.nc'
+fname = expid + '_Davis_heat_transport.nc'
 dsnew.to_netcdf(fname)
 
-# HT_fram = []
-# for year in range(fyear,lyear):                                             
-#     fname = datadir+'/'+prename+np.str(year)+'_1-12.nc'        
-#     print(fname)                                                        
-#     df = xr.open_dataset(fname, chunks={'i':500, 'j':500})   
-#     uht = np.copy(df.UTHMASS[:,:,496:664,580]*df.hFacW[:,496:664,580]
-#                   *df.drF*np.copy(df.dyC[496:664,580]))
-#     HT_fram = np.append(HT_fram,uht.sum(axis=(1,2)))
-#
-#
-# HT_fram= np.reshape(HT_fram,[lyear-fyear,12])  
-# df = pd.DataFrame(HT_fram)                        
-# if expid=='Exp02_1':
-#     df.to_csv("HT_fram_Atlantic_warm_1992_2007")               
-# elif expid=='Exp02_2':
-#     df.to_csv("HT_fram_Pacific_warm_1992_2007")               
-# elif expid=='Exp02_0':
-#     df.to_csv("HT_fram_ctrl_1992_2007")               
-#

@@ -24,6 +24,7 @@ prename = '3DArcticOcean_monthly_UVELMASS_'
 fname = datadir + '/' + prename +'*.nc'
 list=sorted(glob.glob(fname))
 
+time = pd.date_range('1992-01-01', freq='M', periods=12 * 25)
 
 df = xr.open_mfdataset(list)
 # old way 
@@ -39,13 +40,13 @@ df['time'] = newtime['time']
 # dynew = df.dyC.rename({'j_g': 'j', 'i': 'i_g'})   
 ds = df.UVELMASS*df.dyG*df.drF
 
-vt = ds.data[:,:,496:664,580]
-VT_fram = vt.sum(axis=(1,2))
-dnm = VT_fram.compute()
+vt = ds.data[:,:,1061,788]
+VT_caa = vt.sum(axis=(1))
+dnm = VT_caa.compute()
 
 data = xr.DataArray(dnm, dims=('time'), coords={'time': time})
 dsnew = data.to_dataset(name='volume_transport')
-fname = expid + '_Fram_volume_transport.nc'
+fname = expid + '_CAA_volume_transport.nc'
 dsnew.to_netcdf(fname)
 
 

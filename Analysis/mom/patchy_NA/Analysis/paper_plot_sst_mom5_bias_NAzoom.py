@@ -40,65 +40,46 @@ yloc = -83
 
 proj = ccrs.PlateCarree()
 
-fig, axes = plt.subplots(figsize=(10,15)) #, subplot_kw=dict(projection=proj))
+fig, axes = plt.subplots(figsize=(10,10)) #, subplot_kw=dict(projection=proj))
 # plot control
-ax1 = plt.subplot(3, 1, 1, projection=ccrs.PlateCarree())
-# ax1 = plt.subplot(3, 1, 1, projection=ccrs.PlateCarree(central_longitude=-100))
+ax1 = plt.subplot(2, 1, 1, projection=ccrs.PlateCarree())
 sstbias_plot = plt.pcolormesh(gr.x_T,gr.y_T,data-sstclim,
                vmin=-5,vmax=5,cmap='RdBu_r',transform=ccrs.PlateCarree()
                              ,rasterized=True);
 ax1.add_feature(cartopy.feature.LAND,color='grey');
 ax1.coastlines();
-plt.text(xloc,yloc,'a)',fontsize=18); 
+ax1.set_extent([-120, 15, 10, 80], ccrs.PlateCarree())
+# plt.text(xloc,yloc,'a)',fontsize=18); 
 # add colorbar
 axpos = ax1.get_position()
 cbar_ax = fig.add_axes([axpos.x1+0.01,axpos.y0,0.03,axpos.height])
 cbar = fig.colorbar(sstbias_plot, cax=cbar_ax)
 cbar.ax.tick_params(labelsize=16)
 cbar.set_label('Temperature [$\circ$C]', fontsize=16)
-ax1.set_yticks([-90,-60,-30,0,30,60,90])
-ax1.set_yticklabels([-90,-60,-30,0,30,60,90],fontsize=16) 
+ax1.set_yticks([20,40,60,80])                    
+ax1.set_yticklabels([20,40,60,80],fontsize=16)   
 ax1.set_ylabel('Lat', fontsize=16)
 # plot patchy
-ax2 = plt.subplot(3, 1, 2, projection=ccrs.PlateCarree())
-# ax2 = plt.subplot(3, 1, 2, projection=ccrs.PlateCarree(central_longitude=-100))
-sstbias_plot = plt.pcolormesh(gr.x_T,gr.y_T,data2-sstclim,
-               vmin=-5,vmax=5,cmap='RdBu_r',transform=ccrs.PlateCarree()
-                              ,rasterized=True);
-ax2.add_feature(cartopy.feature.LAND,color='grey');
-ax2.coastlines();
-plt.text(xloc,yloc,'b)',fontsize=18); 
-# add colorbar
-axpos = ax2.get_position()
-cbar_ax = fig.add_axes([axpos.x1+0.01,axpos.y0,0.03,axpos.height])
-cbar = fig.colorbar(sstbias_plot, cax=cbar_ax)
-cbar.ax.tick_params(labelsize=16)
-cbar.set_label('Temperature [$\circ$C]', fontsize=16)
-ax2.set_yticks([-90,-60,-30,0,30,60,90])
-ax2.set_yticklabels([-90,-60,-30,0,30,60,90],fontsize=16) 
-ax2.set_ylabel('Lat', fontsize=16)
-# plot difference between patchy and control
-ax3 = plt.subplot(3, 1, 3, projection=ccrs.PlateCarree())
-# ax3 = plt.subplot(3, 1, 3, projection=ccrs.PlateCarree(central_longitude=-100))
+ax3 = plt.subplot(2, 1, 2, projection=ccrs.PlateCarree())
 sstbias_plot = plt.pcolormesh(gr.x_T,gr.y_T,data2-data,
                vmin=-2.5,vmax=2.5,cmap='RdBu_r',transform=ccrs.PlateCarree()
                               ,rasterized=True);
 ax3.add_feature(cartopy.feature.LAND,color='grey');
 ax3.coastlines();
-plt.text(xloc,yloc,'c)',fontsize=18); 
+ax3.set_extent([-120, 15, 10, 80], ccrs.PlateCarree())
+# plt.text(xloc,yloc,'c)',fontsize=18); 
 # add colorbar
 axpos = ax3.get_position()
 cbar_ax = fig.add_axes([axpos.x1+0.01,axpos.y0,0.03,axpos.height])
 cbar = fig.colorbar(sstbias_plot, cax=cbar_ax)
 cbar.ax.tick_params(labelsize=16)
 cbar.set_label('Temperature [$\circ$C]', fontsize=16)
-ax3.set_xticks([-180,-120,-60,0,60,120,180])
-ax3.set_yticks([-90,-60,-30,0,30,60,90])
-ax3.set_xticklabels(np.array([-180,-120,-60,0,60,120,180]),fontsize=16) 
-# ax3.set_xticklabels(np.array([-180,-120,-60,0,60,120,180])-100,fontsize=16) 
-ax3.set_yticklabels([-90,-60,-30,0,30,60,90],fontsize=16) 
+ax3.set_yticks([20,40,60,80])                    
+ax3.set_yticklabels([20,40,60,80],fontsize=16)   
+ax3.set_xticks([-120,-90,-60,-30,0])                            
+ax3.set_xticklabels(np.array([-120,-90,-60,-30,0]),fontsize=16) 
 ax3.set_xlabel('Lon', fontsize=16)
 ax3.set_ylabel('Lat', fontsize=16)
 
-plt.savefig('paperfigs/sst_bias_diff_new2.png', bbox_inches='tight',format='png',dpi=300)
+plt.savefig('paperfigs/sst_bias_diff_NA_mom5.png', bbox_inches='tight',format='png',dpi=300)
 

@@ -19,11 +19,12 @@ lyear = 2018
 # lyear = fyear+1
 datadir = root_folder+expid
 # os.chdir(datadir)
-prename = '3DArcticOcean_monthly_UVELMASS_'
+prename = '3DArcticOcean_monthly_VVELMASS_'
 
 fname = datadir + '/' + prename +'*.nc'
 list=sorted(glob.glob(fname))
 
+time = pd.date_range('1992-01-01', freq='M', periods=12 * 25)
 
 df = xr.open_mfdataset(list)
 # old way 
@@ -37,15 +38,15 @@ df['time'] = newtime['time']
 
 # volume transport at fram strait m^3/s
 # dynew = df.dyC.rename({'j_g': 'j', 'i': 'i_g'})   
-ds = df.UVELMASS*df.dyG*df.drF
+ds = df.VVELMASS*df.dxG*df.drF
 
-vt = ds.data[:,:,496:664,580]
-VT_fram = vt.sum(axis=(1,2))
-dnm = VT_fram.compute()
+vt = ds.data[:,:,456,205:531]
+VT_barents = vt.sum(axis=(1,2))
+dnm = VT_barents.compute()
 
 data = xr.DataArray(dnm, dims=('time'), coords={'time': time})
 dsnew = data.to_dataset(name='volume_transport')
-fname = expid + '_Fram_volume_transport.nc'
+fname = expid + '_Barents_volume_transport.nc'
 dsnew.to_netcdf(fname)
 
 
