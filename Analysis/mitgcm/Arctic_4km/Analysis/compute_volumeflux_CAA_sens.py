@@ -6,12 +6,13 @@ import sys
 import pandas as pd
 import os
 from datetime import date
+import datetime
 
 root_folder = '/shared/projects/uniklima/globclim/milicak/mitgcm/Arctic_4km/'
 
-expid = 'Exp02_0';
+# expid = 'Exp02_0';
 # expid = 'Exp02_1';
-# expid = 'Exp02_2';
+expid = 'Exp02_2';
 
 fyear = 1992
 # fyear = 1992
@@ -26,7 +27,8 @@ list=sorted(glob.glob(fname))
 
 time = pd.date_range('1992-01-01', freq='M', periods=12 * 25)
 
-df = xr.open_mfdataset(list)
+# df = xr.open_mfdataset(list)
+df = xr.open_mfdataset(list,combine='by_coords')     
 # old way 
 time = pd.date_range('1992-01-01', freq='M', periods=12 * 25)
 # new way
@@ -34,7 +36,7 @@ time = pd.date_range('1992-01-01', freq='M', periods=12 * 25)
 arr = np.array([datetime.datetime(1992, 1, 1) + datetime.timedelta(days=i-1) for i in range(30,365*25+7,30)])
 arr = arr[:300]
 newtime = xr.Dataset({'time': arr}) 
-df['time'] = newtime['time']
+# df['time'] = newtime['time']
 
 # volume transport at fram strait m^3/s
 # dynew = df.dyC.rename({'j_g': 'j', 'i': 'i_g'})   
@@ -44,7 +46,8 @@ vt = ds.data[:,:,1061,788]
 VT_caa = vt.sum(axis=(1))
 dnm = VT_caa.compute()
 
-data = xr.DataArray(dnm, dims=('time'), coords={'time': time})
+# data = xr.DataArray(dnm, dims=('time'), coords={'time': time})
+data = xr.DataArray(dnm, dims=('time'), coords={'time': df['time']})
 dsnew = data.to_dataset(name='volume_transport')
 fname = expid + '_CAA_volume_transport.nc'
 dsnew.to_netcdf(fname)

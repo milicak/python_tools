@@ -10,7 +10,7 @@ import datetime
 
 root_folder = '/shared/projects/uniklima/globclim/milicak/mitgcm/Arctic_4km/'
 
-expid = 'Exp02_0';
+expid = 'Exp02_2';
 
 fyear = 1992
 # fyear = 1992
@@ -25,22 +25,24 @@ fname = datadir+'/'+prename+'*'+'SIarea*'
 list=sorted(glob.glob(fname))
 
 # old way 
-time = pd.date_range('1992-01-01', freq='M', periods=12 * 25)
+time = pd.date_range('1992-01-01', freq='M', periods=12 * 25+4)
 # new way
 # arr = np.array([datetime.datetime(1991, 12, 16) + datetime.timedelta(days=i-1) for i in range(30,365*25+7,30)])
 arr = np.array([datetime.datetime(1992, 1, 1) + datetime.timedelta(days=i-1) for i in range(30,365*25+7,30)])
-arr = arr[:300]
+# arr = arr[:300]
 newtime = xr.Dataset({'time': arr}) 
-df['time'] = newtime['time']
 
-df = xr.open_mfdataset(list)
-df['time'] = time
-
-si = df*df.rA
+# df = xr.open_mfdataset(list)
+df = xr.open_mfdataset(list,combine='by_coords')     
+# df['time'] = time
+# df['time'] = newtime['time']
+#
+si = df.SIarea*df.rA
 SI = si.sum(dim=['i','j'])
+ds1 = SI.to_dataset(name='SI_area')
 fname = expid + '_seaice_area.nc'
-SI.to_netcdf(fname)
-siann = SI.groupby('time.year').mean('time')*1e-12
+ds1.to_netcdf(fname)
+# siann = SI.groupby('time.year').mean('time')*1e-12
 
 aa = xr.where(df.SIarea<0.15,0,1)
 aa = aa*df.rA
