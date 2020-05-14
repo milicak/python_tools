@@ -22,7 +22,7 @@ plt.ion()
 grid1 = 'mom6_05deg_esmf_meshinfo.nc'
 datagrid = xr.open_dataset('analysis_vgrid_lev35.v1.nc')
 
-grid2 = '/cluster/NS2345K/noresm_diagnostics/packages/MICOM_DIAG/obs_data/WOA13/0.25deg/woa13_decav_t00_04.nc'
+grid2 = '/cluster/NS2345K/noresm_diagnostics/packages/MICOM_DIAG/obs_data/WOA13/0.25deg/woa13_decav_s00_04.nc'
 
 ##### From WOA to NorESM Grid ###############
 
@@ -44,7 +44,7 @@ woadata = []
 # create a temporary source file for the surface size of tempsrc = [1,102,720,1440]
 for depthind in range(0,102):
     print(depthind)
-    tmpsrc = np.copy(tempsrc['t_an'].data[0,depthind,:,:])
+    tmpsrc = np.copy(tempsrc['s_an'].data[0,depthind,:,:])
     # set it to zero
     field1.data[:] = 0
     field1.data[:] = np.transpose(tmpsrc)
@@ -77,7 +77,7 @@ for ii in range(0,nx):
 # create data fram for the field2
 #df = xr.DataArray(data=field2.data,dims=['x','y'],name='sstwoa_noresm')
 #df = xr.DataArray(data=woadata,dims=['x','y','depth'],name='tempwoa_noresm')
-df = xr.DataArray(data=dnm,dims=['x','y','depth'],name='tempwoa_mom6')
+df = xr.DataArray(data=dnm,dims=['x','y','depth'],name='saltwoa_mom6')
 
-df.to_netcdf('tempwoa_mom6_0_5deg.nc')
+df.to_netcdf('saltwoa_mom6_0_5deg.nc')
 

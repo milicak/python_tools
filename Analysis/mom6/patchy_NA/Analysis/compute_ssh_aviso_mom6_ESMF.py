@@ -19,10 +19,9 @@ plt.ion()
 #m.drawcoastlines()
 
 # 0.5 degree
-grid1 = 'mom6_05deg_esmf_meshinfo.nc'
-datagrid = xr.open_dataset('analysis_vgrid_lev35.v1.nc')
-
-grid2 = '/cluster/NS2345K/noresm_diagnostics/packages/MICOM_DIAG/obs_data/WOA13/0.25deg/woa13_decav_t00_04.nc'
+# grid1 = 'mom6_05deg_esmf_meshinfo.nc'
+grid1 = 'mom6_0666deg_esmf_meshinfo.nc'
+grid2 = 'zos_AVISO_L4_199210-201012.nc'
 
 ##### From WOA to NorESM Grid ###############
 
@@ -42,42 +41,32 @@ tempsrc = xr.open_dataset(grid2,decode_times=False)
 woadata = []
 
 # create a temporary source file for the surface size of tempsrc = [1,102,720,1440]
-for depthind in range(0,102):
-    print(depthind)
-    tmpsrc = np.copy(tempsrc['t_an'].data[0,depthind,:,:])
-    # set it to zero
-    field1.data[:] = 0
-    field1.data[:] = np.transpose(tmpsrc)
+tmpsrc = np.copy(tempsrc['zos'].data[3:-12,:,:])
+tmpsrc[tmpsrc>10] = np.nan
+tmpsrc = np.nanmean(tmpsrc, axis=0)
 
-    # Create a field on the centers of the grid
-    field2 = ESMF.Field(dstgrid, staggerloc=ESMF.StaggerLoc.CENTER)
-    # set it to zero
-    field2.data[:] = 0
+# set it to zero
+field1.data[:] = 0
+field1.data[:] = np.transpose(tmpsrc)
 
-    # Set up a regridding object between source and destination
-    regridS2D = ESMF.Regrid(field1, field2,
-                            regrid_method=ESMF.RegridMethod.BILINEAR)
-    field2 = regridS2D(field1, field2)
-    dnm = np.expand_dims(field2.data, axis=2)
-    if depthind == 0:
-        woadata = dnm
-    else:
-        woadata = np.append(woadata,dnm,axis=2);
+# Create a field on the centers of the grid
+field2 = ESMF.Field(dstgrid, staggerloc=ESMF.StaggerLoc.CENTER)
+# set it to zero
+field2.data[:] = 0
 
-
-
-nx = woadata.shape[0]
-ny = woadata.shape[1]
-dnm = np.zeros([nx,ny,datagrid.zt.shape[0]])
-for ii in range(0,nx):
-    for jj in range(0,ny):
-        dnm[ii,jj,:] = np.interp(datagrid.zt,tempsrc.depth,woadata[ii,jj,:])
+# Set up a regridding object between source and destination
+regridS2D = ESMF.Regrid(field1, field2,
+                       regrid_method=ESMF.RegridMethod.BILINEAR)
+field2 = regridS2D(field1, field2)
+dnm = np.expand_dims(field2.data, axis=2)
+woadata = dnm[:,:,0]
 
 
 # create data fram for the field2
 #df = xr.DataArray(data=field2.data,dims=['x','y'],name='sstwoa_noresm')
 #df = xr.DataArray(data=woadata,dims=['x','y','depth'],name='tempwoa_noresm')
-df = xr.DataArray(data=dnm,dims=['x','y','depth'],name='tempwoa_mom6')
+df = xr.DataArray(data=woadata,dims=['x','y'],name='ssh_Aviso_mom6')
 
-df.to_netcdf('tempwoa_mom6_0_5deg.nc')
+# df.to_netcdf('SSH_Aviso_mom6_0_5deg.nc')
+df.to_netcdf('SSH_Aviso_mom6_0_666deg.nc')
 
