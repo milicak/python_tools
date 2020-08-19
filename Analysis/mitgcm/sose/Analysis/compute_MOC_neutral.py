@@ -57,46 +57,44 @@ def vertical_rebin_wrapper(
 
 
 
-
-root_folder = '/archive/milicak/MITgcm_c65/Projects/mitgcm_sose/'
-
+root_folder = '/archive2/milicak/mitgcm/sose/'
 project_name = 'Exp01_0'
+fname = root_folder + project_name + '/grid.nc'
+gr  = xr.open_dataset(fname)
 
-# fnames = project_name+root_folder+'UVELMASS_2007_1-12_01cyc.nc'
-fnames = root_folder+project_name+'/'+'*VVELMASS*'
+fname = root_folder + project_name + '/' + 'THETA_' + '2011_12_30.nc'
+dft = xr.open_dataset(fname)
+fname = root_folder + project_name + '/' + 'SALT_' + '2011_12_30.nc'
+dfs = xr.open_dataset(fname)
+fname = root_folder + project_name + '/' + 'VVELMASS_' + '2011_12_30.nc'
+dfv = xr.open_dataset(fname)
 
-list = sorted(glob.glob(fnames))
+dft = dft.rename_dims({'i': 'XC', 'j': 'YC', 'i_g': 'XG', 'j_g': 'YG', 'k': 'Z', 'k_l': 'Zl', 'k_p1': 'Zp1', 'k_u': 'Zu'})
+dfs = dfs.rename_dims({'i': 'XC', 'j': 'YC', 'i_g': 'XG', 'j_g': 'YG', 'k': 'Z', 'k_l': 'Zl', 'k_p1': 'Zp1', 'k_u': 'Zu'})
+dfv = dfv.rename_dims({'i': 'XC', 'j': 'YC', 'i_g': 'XG', 'j_g': 'YG', 'k': 'Z', 'k_l': 'Zl', 'k_p1': 'Zp1', 'k_u': 'Zu'})
 
-df = xr.open_mfdataset(list)
-
-dfv = xr.open_dataset('/archive/milicak/dataset/SOSE/1_over_3_degree/bsose_i105_2008to2012_3day_Vvel.nc')
-dfs = xr.open_dataset('/archive/milicak/dataset/SOSE/1_over_3_degree/bsose_i105_2008to2012_3day_Salt.nc')
-dft = xr.open_dataset('/archive/milicak/dataset/SOSE/1_over_3_degree/bsose_i105_2008to2012_3day_Theta.nc')
-dfg = xr.open_dataset('/archive/milicak/dataset/SOSE/1_over_3_degree/bsose_i105_2008to2012_3day_GAMMA.nc')
-dfg = dfg.rename({'iTIME': 'time', 'iDEPTH': 'Z', 'iLAT': 'YG','iLON': 'XC',})
-
-dfs1=dfs.isel(time=0)
-dft1=dft.isel(time=0)
-dfv1=dfv.isel(time=0)
+dfs1 = dfs.isel(time=0)
+dft1 = dft.isel(time=0)
+dfv1 = dfv.isel(time=0)
 sigma2 = xr.apply_ufunc(gsw.sigma2, dfs1.SALT, dft1.THETA,
                             dask='parallelized', output_dtypes=[dfs1.SALT.dtype])
 df1 = sigma2.to_dataset(name='sigma2')
 df1['VVEL'] = df1.sigma2
+df1['drF'] = df1.Z
 
 lon = df1['XC'].values
 lat = df1['YC'].values
 zlev  = df1['Z'].values
-me = xr.DataArray(np.copy(dfv1.VVEL), coords={'YC': lat, 'XC': lon,
+me = xr.DataArray(np.copy(dfv1.VVELMASS), coords={'YC': lat, 'XC': lon,
                                 'Z': zlev},
              dims=['Z', 'YC', 'XC'])
 df1['VVEL'] = me
+me = xr.DataArray(np.copy(gr.drF), coords={'Z': zlev},
+             dims=['Z'])
+df1['drF'] = me
 
-# df1=xr.DataArray(sigma2,name='sigma2')
-
-df = df1.merge(dfv1)
 # select bins for sigma2 or neutral
-bins = np.arange(24,28,0.2)
-bins = np.arange(20, 40, 0.5)
+bins = np.arange(34, 38, 0.025)
 
 df_rebinned = vertical_rebin_wrapper(df1,
                                      'sigma2',
@@ -104,15 +102,12 @@ df_rebinned = vertical_rebin_wrapper(df1,
                                      dz_name='drF',
                                      vert_dim='Z')
 df_rebinned = df_rebinned.fillna(0)
-
-# df = dft.merge(dfs)
-# df = dfg.merge(dfv)
-
-# dfv1['sigma2']=sigma2
-voltrV = dfv1.VVEL*dfv1.hFacS*dfv1.dxG*dfv1.drF
-
-df_rebinned = vertical_rebin(voltrV, sigma2, bins, voltrV.drF,vert_dim='Z')
+me = xr.DataArray(np.copy(gr.dxC), coords={'YC': lat, 'XC': lon},
+             dims=['YC', 'XC'])
+df_rebinned['dxC'] = me
+voltr = df_rebinned.VVEL*df_rebinned.drF*df_rebinned.dxC
 
 
-# plt.pcolormesh(df2.YG,df2.Z,Trxsummean*1e-6,vmin=-10,vmax=25,cmap='jet');plt.colorbar()
+
+
 

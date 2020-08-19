@@ -38,6 +38,10 @@ def areawgtmeansalt(df, gr, mask):
 
 # Subpolar gyre area
 sparea = np.genfromtxt('subpolar_gyre_lonlat.txt',usecols=(0,1))
+dnm = sparea[:5,:]
+b = np.array([[dnm[-1,0], 45],[dnm[0,0], dnm[0,1]]])
+SP_NA = np.concatenate((dnm,b))
+
 # Subtropical gyre area
 starea = np.genfromtxt('subtropical_gyre_lonlat.txt',usecols=(0,1))
 
@@ -52,36 +56,49 @@ lat = np.copy(dfs.lat)
 lons_lats_model = np.column_stack((lon.flatten(),lat.flatten()))
 
 maskSP = crmask(sparea,lons_lats_model,lon)
-maskST = crmask(starea,lons_lats_model,lon)
 areaSP = gr.areacello.where(maskSP==1)
-areaST = gr.areacello.where(maskST==1)
 areaSP = areaSP.where(landmask==0)
+
+maskST = crmask(starea,lons_lats_model,lon)
+areaST = gr.areacello.where(maskST==1)
 areaST = areaST.where(landmask==0)
+
+maskSP_NA = crmask(SP_NA,lons_lats_model,lon)
+areaSP_NA = gr.areacello.where(maskSP_NA==1)
+areaSP_NA = areaSP_NA.where(landmask==0)
 
 sstSPmean = areawgtmean(dfs,gr,maskSP)
 sstSTmean = areawgtmean(dfs,gr,maskST)
+sstSP_NAmean = areawgtmean(dfs,gr,maskSP_NA)
 
 tempSPmean = areamean(sstSPmean,areaSP)
 tempSTmean = areamean(sstSTmean,areaST)
+tempSP_NAmean = areamean(sstSP_NAmean,areaSP_NA)
 
 ds = tempSPmean.to_dataset(name='sstSP')
 ds.to_netcdf('CESM_tempSP_ssp585.nc')
 ds = tempSTmean.to_dataset(name='sstST')
 ds.to_netcdf('CESM_tempST_ssp585.nc')
+ds = tempSP_NAmean.to_dataset(name='sstSP')
+ds.to_netcdf('CESM_tempSP_NA_ssp585.nc')
 
 # Salinity
 dfs = read_data('gs://cmip6/ScenarioMIP/NCAR/CESM2/ssp585/r1i1p1f1/Omon/so/gn/')
 
 sssSPmean = areawgtmeansalt(dfs,gr,maskSP)
 sssSTmean = areawgtmeansalt(dfs,gr,maskST)
+sssSP_NAmean = areawgtmeansalt(dfs,gr,maskSP_NA)
 
 saltSPmean = areamean(sssSPmean,areaSP)
 saltSTmean = areamean(sssSTmean,areaST)
+saltSP_NAmean = areamean(sssSP_NAmean,areaSP_NA)
 
 ds = saltSPmean.to_dataset(name='sssSP')
 ds.to_netcdf('CESM_saltSP_ssp585.nc')
 ds = saltSTmean.to_dataset(name='sssST')
 ds.to_netcdf('CESM_saltST_ssp585.nc')
+ds = saltSP_NAmean.to_dataset(name='sssSP')
+ds.to_netcdf('CESM_saltSP_NA_ssp585.nc')
 
 # MOC
 moc = read_data('gs://cmip6/ScenarioMIP/NCAR/CESM2/ssp585/r1i1p1f1/Omon/msftmz/gn/')

@@ -34,7 +34,7 @@ def landmask(M, color='0.8'):
 
 def LevelColormap(levels, cmap=None):
     """Make a colormap based on an increasing sequence of levels"""
-
+    
     # Start with an existing colormap
     if cmap == None:
         cmap = pl.get_cmap()
@@ -49,11 +49,11 @@ def LevelColormap(levels, cmap=None):
     L = (levels-levels[0])/(levels[-1]-levels[0])
 
     # Make the colour dictionary
-    R = [(L[i], A[i,0], A[i,0]) for i in range(nlev)]
-    G = [(L[i], A[i,1], A[i,1]) for i in range(nlev)]
-    B = [(L[i], A[i,2], A[i,2]) for i in range(nlev)]
+    R = [(L[i], A[i,0], A[i,0]) for i in xrange(nlev)]
+    G = [(L[i], A[i,1], A[i,1]) for i in xrange(nlev)]
+    B = [(L[i], A[i,2], A[i,2]) for i in xrange(nlev)]
     cdict = dict(red=tuple(R),green=tuple(G),blue=tuple(B))
 
-    # Use
+    # Use 
     return matplotlib.colors.LinearSegmentedColormap(
         '%s_levels' % cmap.name, cdict, 256)
