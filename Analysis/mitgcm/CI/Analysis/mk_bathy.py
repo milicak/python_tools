@@ -72,8 +72,9 @@ dnm[dnm<0] = 0
 dnm[np.logical_and(dnm>0,dnm<4)]=4
 depth_mitgcm = dnm
 depth_mitgcm.astype('>f8').tofile(outputfile)
-
-
+data = xr.DataArray(depth_mitgcm,dims=('y','x'),coords={'x': lon_roms[0,:],'y': lat_roms[:,0]})
+dnm = xr.Dataset({'depth':data})
+dnm.to_netcdf('Marmara_bathy_Nx_900_Ny_600.nc')
 
 # 2nd Way
 xs, ys, zs = lon_lat_to_cartesian(lon_input.flatten(), lat_input.flatten())
