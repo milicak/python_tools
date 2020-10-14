@@ -101,11 +101,11 @@ for date in dates:
 	transect_vvel = np.ma.masked_array(ds_vel2.vo.data,mask=mask2d)
 	transect_ssh  = np.ma.masked_array(ds_ssh2.zos.data,mask=mask1d)
 
-	transect_salt_sol  = seaoverland_2d(transect_salt[0,:],20,copy=True)
-	transect_temp_sol  = seaoverland_2d(transect_temp[0,:],20,copy=True)
-	transect_uvel_sol  = seaoverland_2d(transect_uvel[0,:],20,copy=True)
-	transect_vvel_sol  = seaoverland_2d(transect_vvel[0,:],20,copy=True)
-	transect_ssh_sol   = seaoverland_1d(transect_ssh[0,:],10,copy=True)
+	transect_salt_sol  = seaoverland_2d(transect_salt[0,:],30,copy=True)
+	transect_temp_sol  = seaoverland_2d(transect_temp[0,:],30,copy=True)
+	transect_uvel_sol  = seaoverland_2d(transect_uvel[0,:],30,copy=True)
+	transect_vvel_sol  = seaoverland_2d(transect_vvel[0,:],30,copy=True)
+	transect_ssh_sol   = seaoverland_1d(transect_ssh[0,:],20,copy=True)
 
 	## assign new variables with Sea Over Land to datasets, besides original transects
 	#ds_temp2 = ds_temp2.assign(thetao_sol=ds_temp2["thetao"])

@@ -1,8 +1,9 @@
-date=20160101
+date=20170101
 #days=[0,732]
-days=[0,1096]
+# days=[0,1460]
 #days=[366,732]
-#days=[0,31]
+days=[31,366]
+# days=[1458,1460]
 dtt=86400
 title='uTSS'
 bas='Marmara_basbathy_ser.bas'
@@ -14,7 +15,9 @@ def setBSUBS(paramfile,day,day0,simul, Nprocs):
 	f = open('shympi_chunk_%s.sh'% str(day).zfill(4), 'w')
 	f.write('#!/bin/bash\n\n')
 	f.write('#BSUB -x\n')
-	f.write('#BSUB -q poe_medium\n')
+	# f.write('#BSUB -q poe_medium\n')
+	f.write('#BSUB -q poe_short\n')
+	f.write('#BSUB -P 0285\n')
 	# f.write('#BSUB -q poe_long\n')
 	# f.write('#BSUB -a poe\n')
 	f.write('#BSUB -J uTSS%s\n' % day)
@@ -44,7 +47,7 @@ def setBSUBS(paramfile,day,day0,simul, Nprocs):
 	# f.write('time mpirun_Impi5 -l /users/home/mi19918/models/shympi_def_start/fem3d/shympi_novmom2 %s%s.str $RUNTIME_OPTS > logmsS.log\n\n' % (paramfile,str(day).zfill(4)) )
 	f.write('echo \"Job completed at: \" `date`\n\n')
 	f.write('sleep 100 \n\n') 
-	f.write('mv %s%s*.rst restart_files \n\n' %(simul,str(day).zfill(4))) 
+	f.write('mv %s%s*.rst restart_files2 \n\n' %(simul,str(day).zfill(4))) 
 	f.write('sleep 100 \n\n') 
 	f.write('mkdir out_%s\n\n' %(str(day).zfill(4))) 
 	f.write('sleep 100 \n\n') 
@@ -67,4 +70,5 @@ def setBSUBS(paramfile,day,day0,simul, Nprocs):
 
 
 for day in range(days[0],days[1]):
-    setBSUBS(param,day,days[0],simul, Nprocs=768)
+    setBSUBS(param,day,days[0],simul, Nprocs=228)
+    # setBSUBS(param,day,days[0],simul, Nprocs=768)

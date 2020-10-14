@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 import ESMF
-from mpl_toolkits.basemap import Basemap                                            
+# from mpl_toolkits.basemap import Basemap                                            
 from scipy.interpolate import interp1d
 import geopy.distance
 
@@ -58,7 +58,7 @@ for stationame in stationames:
     lat_thlweg = np.array([ tmp_prof['Latitude'].tolist()[0]])
     
     sdate = "%4.4d" % (day_of_the_year)
-    fname = root_folder+project_name+'/'+expid+'/OUT/'+'uTSS_lobc_chunk_'+sdate+'.nos.nc'
+    fname = root_folder+project_name+'/'+expid+'/OUT_2017_2018_2019/'+'uTSS_lobc_chunk_'+sdate+'.nos.nc'
     fname
     
     domask = False
@@ -147,9 +147,9 @@ for stationame in stationames:
     df2 = pd.DataFrame({"Temp_uTSS": secfield2[0,:],"Salt_uTSS": secfield[0,:],
                        "zr_uTSS": -data.level.compute()})
     
-    fname = 'obs_ctd/2017_01_'+stationame+'_obs.csv'
+    fname = 'obs_ctd_netcdf/2017_01_'+stationame+'_obs.csv'
     df1.to_csv(fname)
-    fname = 'obs_ctd/2017_01_'+stationame+'_uTSS.csv'
+    fname = 'obs_ctd_netcdf/2017_01_'+stationame+'_uTSS.csv'
     print(fname)
     df2.to_csv(fname)
     # df2.to_csv(r'obs_ctd/016_09_K0_uTSS.csv')

@@ -19,7 +19,8 @@ make_plots = False
              # '20160501', '20160601', '20160701', '20160801',
              # '20160901', '20161001', '20161101', '20161201']
 # mnthnames = ['20162017years_analysis']
-mnthnames = ['201620172018years_analysis']
+# mnthnames = ['201620172018years_analysis']
+mnthnames = ['2016201720182019years_analysis']
 # mnthnames = ['dnm']
 # mnthnames = ['2016year']
 

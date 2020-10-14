@@ -76,7 +76,7 @@ for i in range(len(dates)):
 	g.write(header)
 	g.write(dates[i].strftime(date_format))
 	g.write('%s %s %s %s %s %s 1e+20\n'%(nx,ny,minlon,minlat,dx,dy))
-	g.write('solar radiation [W/m**s]\n')
+	g.write('solar radiation [W/m**2]\n')
 	for y in range(ny):
 		for x in range(nx):
 			g.write('%f ' % airt[i,y,x])
@@ -94,7 +94,7 @@ for i in range(len(dates)):
 			g.write('%f ' % d2t[i,y,x])
 			if x == nx-1:
 				g.write('\n')
-	g.write('total cloud cover [0-1]\n')
+	g.write('cloud cover [0-1]\n')
 	for y in range(ny):
 		for x in range(nx):
 			g.write('%f ' % tcc[i,y,x])

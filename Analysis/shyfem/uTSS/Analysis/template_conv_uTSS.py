@@ -5,7 +5,9 @@ param='param_lobc_chunk_'
 # days=[0,366]
 # days=[366,732]
 # days=[0,732]
-days=[0,1096]
+# days=[0,1460]
+# days=[1458,1460]
+days=[31,366]
 ## set the resolution (0 for non-structured output)
 resol=0
 ## set box for zoom (Optional)
@@ -46,6 +48,7 @@ def setCONV_OUS(bas,day,simul):
 	#f.write('#BSUB -q serial_30min\n')
 	f.write('#BSUB -q serial_6h\n')
 	f.write('#BSUB -J ous2nc%s\n' % day)
+	f.write('#BSUB -P 0285\n')
 	f.write('#BSUB -o logout.%J.out\n' )
 	f.write('#BSUB -e logerr.%J.err\n' )
 	f.write('#BSUB -w \"done(nos2nc%s)\"\n\n' % (day))
@@ -105,6 +108,7 @@ def setCONV_NOS(bas,day,simul):
 	#f.write('#BSUB -q serial_30min\n')
 	f.write('#BSUB -q serial_6h\n')
 	f.write('#BSUB -J nos2nc%s\n' % day)
+	f.write('#BSUB -P 0285\n')
 	f.write('#BSUB -o logout.%J.out\n' )
 	f.write('#BSUB -e logerr.%J.err\n' )
 #	f.write('#BSUB -w \"done(amedbs%s)\"\n\n' % day)
@@ -155,6 +159,7 @@ def setCONV_WND(bas,day,simul):
 	f.write('#!/bin/bash\n\n')
 	f.write('#BSUB -q serial_6h\n')
 	f.write('#BSUB -J wnd2nc%s\n' % day)
+	f.write('#BSUB -P 0285\n')
 	f.write('#BSUB -o logout.%J.out\n' )
 	f.write('#BSUB -e logerr.%J.err\n' )
 	f.write('#BSUB -w \"done(ous2nc%s)\"\n\n' % (day))
@@ -206,5 +211,5 @@ def setCONV_WND(bas,day,simul):
 
 for day in range(days[0],days[1]):
 	# setCONV_WND(bas,day,simul)	
-	setCONV_NOS(bas,day,simul)	
-	# setCONV_OUS(bas,day,simul)	
+	# setCONV_NOS(bas,day,simul)	
+	setCONV_OUS(bas,day,simul)	
