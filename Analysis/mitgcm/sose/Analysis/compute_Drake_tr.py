@@ -1,7 +1,8 @@
 import xmitgcm
 
 root_folder = '/archive2/milicak/mitgcm/sose/'
-project_name = 'Exp01_0'
+project_name = 'Exp03_0'
+print(project_name)
 outname = project_name + '_Drake_Tr.nc'
 fnames = root_folder+project_name+'/*UVELMASS*'
 grname = root_folder+project_name+'/grid.nc'

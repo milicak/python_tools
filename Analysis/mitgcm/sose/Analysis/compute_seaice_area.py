@@ -2,7 +2,8 @@ import numpy as np
 import xmitgcm
 
 root_folder = '/archive2/milicak/mitgcm/sose/'
-expid = 'Exp01_0'
+expid = 'Exp03_0'
+print(expid)
 outname = expid + '_SIarea.nc'
 grname = root_folder+expid+'/grid.nc'
 gr = xr.open_dataset(grname)
