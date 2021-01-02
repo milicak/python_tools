@@ -1,4 +1,10 @@
 import os
+import numpy as np
+import numpy.ma as ma
+import glob
+import xarray as xr
+import sys
+import pandas as pd
 os.environ['NUMPY_EXPERIMENTAL_ARRAY_FUNCTION'] = '0'
 
 from matplotlib import pyplot as plt
@@ -58,54 +64,52 @@ def vertical_rebin_wrapper(
 
 
 root_folder = '/archive2/milicak/mitgcm/sose/'
-project_name = 'Exp01_0'
+project_name = 'Exp03_0'
 fname = root_folder + project_name + '/grid.nc'
 gr  = xr.open_dataset(fname)
-
-fname = root_folder + project_name + '/' + 'THETA_' + '2011_12_30.nc'
-dft = xr.open_dataset(fname)
-fname = root_folder + project_name + '/' + 'SALT_' + '2011_12_30.nc'
-dfs = xr.open_dataset(fname)
-fname = root_folder + project_name + '/' + 'VVELMASS_' + '2011_12_30.nc'
-dfv = xr.open_dataset(fname)
-
-dft = dft.rename_dims({'i': 'XC', 'j': 'YC', 'i_g': 'XG', 'j_g': 'YG', 'k': 'Z', 'k_l': 'Zl', 'k_p1': 'Zp1', 'k_u': 'Zu'})
-dfs = dfs.rename_dims({'i': 'XC', 'j': 'YC', 'i_g': 'XG', 'j_g': 'YG', 'k': 'Z', 'k_l': 'Zl', 'k_p1': 'Zp1', 'k_u': 'Zu'})
-dfv = dfv.rename_dims({'i': 'XC', 'j': 'YC', 'i_g': 'XG', 'j_g': 'YG', 'k': 'Z', 'k_l': 'Zl', 'k_p1': 'Zp1', 'k_u': 'Zu'})
-
-dfs1 = dfs.isel(time=0)
-dft1 = dft.isel(time=0)
-dfv1 = dfv.isel(time=0)
-sigma2 = xr.apply_ufunc(gsw.sigma2, dfs1.SALT, dft1.THETA,
-                            dask='parallelized', output_dtypes=[dfs1.SALT.dtype])
-df1 = sigma2.to_dataset(name='sigma2')
-df1['VVEL'] = df1.sigma2
-df1['drF'] = df1.Z
-
-lon = df1['XC'].values
-lat = df1['YC'].values
-zlev  = df1['Z'].values
-me = xr.DataArray(np.copy(dfv1.VVELMASS), coords={'YC': lat, 'XC': lon,
-                                'Z': zlev},
-             dims=['Z', 'YC', 'XC'])
-df1['VVEL'] = me
-me = xr.DataArray(np.copy(gr.drF), coords={'Z': zlev},
-             dims=['Z'])
-df1['drF'] = me
-
 # select bins for sigma2 or neutral
 bins = np.arange(34, 38, 0.025)
 
-df_rebinned = vertical_rebin_wrapper(df1,
-                                     'sigma2',
-                                     bins,
-                                     dz_name='drF',
-                                     vert_dim='Z')
-df_rebinned = df_rebinned.fillna(0)
-me = xr.DataArray(np.copy(gr.dxC), coords={'YC': lat, 'XC': lon},
+list = sorted(glob.glob('/archive2/milicak/mitgcm/sose/Exp01_0/THETA*.nc'))
+comp = dict(zlib=True, complevel=5)
+
+for ind in np.arange(0,len(list)):
+    inname = list[ind][-13:]
+    fname = root_folder + project_name + '/' + 'SIGMA2_' + inname
+    dfs = xr.open_dataset(fname)
+    fname = root_folder + project_name + '/' + 'VVELMASS_' + inname
+    dfv = xr.open_dataset(fname)
+    dfv = dfv.rename_dims({'i': 'XC', 'j': 'YC', 'i_g': 'XG', 'j_g': 'YG', 'k': 'Z', 'k_l': 'Zl', 'k_p1': 'Zp1', 'k_u': 'Zu'})
+    dfv1 = dfv.isel(time=0)
+    dfs['VVEL'] = dfs.sigma2
+    dfs['drF'] = dfs.Z
+    lon = dfs['XC'].values
+    lat = dfs['YC'].values
+    zlev  = dfs['Z'].values
+    tmp1 = xr.DataArray(np.copy(gr.drF), coords={'Z': zlev},
+                 dims=['Z'])
+    tmp2 = xr.DataArray(np.copy(gr.dxC), coords={'YC': lat, 'XC': lon},
              dims=['YC', 'XC'])
-df_rebinned['dxC'] = me
-voltr = df_rebinned.VVEL*df_rebinned.drF*df_rebinned.dxC
+    me = xr.DataArray(np.copy(dfv1.VVELMASS), coords={'YC': lat, 'XC': lon,
+                                    'Z': zlev},
+                 dims=['Z', 'YC', 'XC'])
+    dfs['VVEL'] = me
+    dfs['drF'] = tmp1
+    dfs['Z']=np.copy(gr.Z)
+    df_rebinned = vertical_rebin_wrapper(dfs,
+                                         'sigma2',
+                                         bins,
+                                         dz_name='drF',
+                                         vert_dim='Z')
+    df_rebinned = df_rebinned.fillna(0)
+    df_rebinned['dxC'] = tmp2
+    voltr = df_rebinned.VVEL*df_rebinned.drF*df_rebinned.dxC
+    voltr = voltr.to_dataset(name='vol_sigma_tr')
+    voltr = voltr.sum('XC')
+    fname = root_folder + project_name + '/' + 'VVEL_SIGMA2_' + inname
+    encoding = {var: comp for var in voltr.data_vars}
+    print(fname)
+    voltr.to_netcdf(fname, encoding=encoding)
 
 
 

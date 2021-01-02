@@ -6,7 +6,7 @@ import xarray as xr
 
 
 root_folder = '/archive2/milicak/mitgcm/sose/'
-project_name = 'Exp01_0'
+project_name = 'Exp03_0'
 outname = project_name + '_MOC_depth.nc'
 fname = root_folder + project_name + '/grid.nc'
 gr  = xr.open_dataset(fname)

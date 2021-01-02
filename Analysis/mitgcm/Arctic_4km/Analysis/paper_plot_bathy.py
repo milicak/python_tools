@@ -9,9 +9,11 @@ import matplotlib as mpllib
 _palette_data = cpt2seg('/home/milicak/python_tools/Analysis/NorESM/FAMOS/Analysis/coldblue.cpt')
 palette = mpllib.colors.LinearSegmentedColormap('palette', _palette_data, 11)
 
-df = xr.open_dataset('/archive/milicak/MITgcm_c65/Projects/Arctic_4km/Exp02_0/3DArcticOcean_monthly_THETA_2017_1-12.nc')
-lon = np.copy(df.XC)
-lat = np.copy(df.YC)
+# df = xr.open_dataset('/archive/milicak/MITgcm_c65/Projects/Arctic_4km/Exp02_0/3DArcticOcean_monthly_THETA_2017_1-12.nc')
+df = xr.open_dataset('/archive/milicak/MITgcm_c65/Projects/Arctic_4km/Exp02_0/grid.nc')
+dfs = xr.open_dataset('/archive/milicak/MITgcm_c65/Projects/Arctic_4km/ncfiles/2DArcticOcean_1999_06.nc')
+lon = np.copy(dfs.XC)
+lat = np.copy(dfs.YC)
 
 # contours
 conts = [-5000,-4000,-3000,-2500,-2000,-1500,-1000,-500,-250,-50,0]
@@ -22,6 +24,12 @@ m.drawcoastlines();
 m.fillcontinents(color='grey');
 im1 = m.contourf(lon,lat,ma.masked_where(df.Depth==0,-df.Depth),conts,cmap=mpl_util.LevelColormap(conts,cmap=palette),vmax=0, vmin=-5000,latlon=True)
 cb = m.colorbar(im1,"right", size="5%", pad="2%")
+cb.ax.tick_params(labelsize=14)
+parallels = np.arange(40.,86,5.)
+# labels = [left,right,top,bottom]
+m.drawparallels(parallels,labels=[True,False,False,False],fontsize=14);
+meridians = np.arange(10.,351.,20.)
+m.drawmeridians(meridians,labels=[False,False,False,True],fontsize=14);
 
 # Fram Strait
 lon1 = lon[496:664,580]

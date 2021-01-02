@@ -6,28 +6,12 @@ from cpttoseg import cpt2seg
 import matplotlib as mpllib
 
 
-def coriolis(lat):
-    """Compute the Coriolis parameter for the given latitude:
-    ``f = 2*omega*sin(lat)``, where omega is the angular velocity
-    of the Earth.
-
-    Parameters
-    ----------
-    lat : array
-      Latitude [degrees].
-    """
-    omega   = 7.2921159e-05  # angular velocity of the Earth [rad/s]
-    return 2*omega*np.sin(lat/360.*2*np.pi)
-
-
-
 dfs = xr.open_dataset('/archive/milicak/MITgcm_c65/Projects/Arctic_4km/ncfiles/2DArcticOcean_1999_06.nc')
 lon = np.copy(dfs.XC)
 lat = np.copy(dfs.YC)
 df = xr.open_dataset('/archive/milicak/MITgcm_c65/Projects/Arctic_4km/ncfiles/Exp02_0_SST.nc')
 dnm = df.sel(year=slice(2007,2016))
 sst = dnm.mean('year')
-fcor = coriolis(lat)
 
 fig = plt.figure(figsize=(6,6))
 fig.canvas.draw()
@@ -39,6 +23,12 @@ m.fillcontinents(color='grey');
 im1 = m.pcolormesh(lon,lat,ma.masked_where(df.Depth==0,sst.sst),cmap='needJet2',vmin=-2,
            vmax=12,latlon=True, rasterized=True)
 cb = m.colorbar(im1,"right", size="5%", pad="4%")
+cb.ax.tick_params(labelsize=14)
+parallels = np.arange(40.,86,5.)
+# labels = [left,right,top,bottom]
+m.drawparallels(parallels,labels=[True,False,False,False],fontsize=14);
+meridians = np.arange(10.,351.,20.)
+m.drawmeridians(meridians,labels=[False,False,False,True],fontsize=14);
 
 plt.savefig('paperfigs/ctrl_sst_mean.png', bbox_inches='tight',format='png',dpi=300)
 
@@ -46,17 +36,6 @@ plt.savefig('paperfigs/ctrl_sst_mean.png', bbox_inches='tight',format='png',dpi=
 #             ax=axes[0]);
 
 
-fig = plt.figure(figsize=(6,6))
-m = Basemap(width=2600000,height=2300000,
-            resolution='l',projection='stere',
-            lat_ts=50,lat_0=70,lon_0=0.)
-m.drawcoastlines()
-m.fillcontinents(color='grey');
-im1 = m.pcolormesh(lon,lat,ma.masked_where(dfs.Depth==0,dfs.momVort3[6,:,:]/fcor),
-                   cmap=plt.cm.get_cmap('RdBu_r',16),vmin=-.5,vmax=.5,latlon=True, rasterized=True)
-cb = m.colorbar(im1,"right", size="5%", pad="4%")
-
-plt.savefig('paperfigs/ctrl_vorticity_snap.png', bbox_inches='tight',format='png',dpi=300)
 
 
 # m = Basemap(width=6000000,height=6000000,

@@ -123,7 +123,7 @@ f1_axes[2].set_ylim(-5,130);
 # f1_axes[2].legend()
 f1_axes[2].legend(loc='lower right')
 
-plt.savefig('paperfigs/Atlantic_warm_seaice_volume_heat.png', bbox_inches='tight',format='png',dpi=300)
+# plt.savefig('paperfigs/Atlantic_warm_seaice_volume_heat.png', bbox_inches='tight',format='png',dpi=300)
 
 
 

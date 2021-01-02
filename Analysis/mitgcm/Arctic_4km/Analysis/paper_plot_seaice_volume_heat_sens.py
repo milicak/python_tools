@@ -21,21 +21,25 @@ dfw2 = xr.open_dataset(warm2)
 # annual mean
 siareaann_w1 = dfw1.SI_area.groupby('time.year').mean('time')-dfc.SIarea.groupby('time.year').mean('time')
 siareaann_w2 = dfw2.SI_area.groupby('time.year').mean('time')-dfc.SIarea.groupby('time.year').mean('time')
+siareaann = dfc.SIarea.groupby('time.year').mean('time')
 
 # figure(1)
-fig1, f1_axes = plt.subplots(figsize=(8,12),ncols=1, nrows=3, constrained_layout=True)
+fig1, f1_axes = plt.subplots(figsize=(6,12),ncols=1, nrows=3, constrained_layout=True)
 # f1_axes[0].plot(siareamth.month,siareamth.data*1e-12)
 # f1_axes[0].plot(siareamth.month,siarea_mnth[:-1],'r')
 # f1_axes[0].plot(siareamth.month,siextent_mnth[:-1],'k')
 f1_axes[0].plot(siareaann.year,siareaann.data*1e-12,label='Ctrl')
 f1_axes[0].plot(nsidc_year,nsidcarea[:,-1],'k',label='Obs')
 f1_axes[0].set_ylim(8,12);
-f1_axes[0].set_ylabel(r'Sea-ice area [$10^6$ $\times$ km$^2$]')
-f1_axes[0].legend()
+f1_axes[0].set_ylabel(r'Sea-ice area [$10^6$ $\times$ km$^2$]',fontsize=16)
+f1_axes[0].legend(fontsize=14,loc='upper right',frameon=False)
+f1_axes[0].tick_params(labelsize=16)
+f1_axes[0].text(1991.1,8.2,'a)',fontsize=16)
 
 # Fram Strait Transport
 ctrlFram = root_folder + 'Exp02_0_Fram_volume_transport.nc'
 dfc_F = xr.open_dataset(ctrlFram)
+timeref = dfc_F.time
 dfc_F = dfc_F.volume_transport.groupby('time.year').mean('time')
 # Davis Strait Transport
 ctrlDavis = root_folder + 'Exp02_0_Davis_volume_transport.nc'
@@ -48,14 +52,18 @@ dfc_B = dfc_B.volume_transport.groupby('time.year').mean('time')
 # Barents Strait Transport
 ctrlBarents = root_folder + 'Exp02_0_Barents_volume_transport.nc'
 dfc_Br = xr.open_dataset(ctrlBarents)
+dfc_Br['volume_transport'] = dfc_Br.v1_volume_transport + dfc_Br.v2_volume_transport - dfc_Br.u1_volume_transport
+dfc_Br['time'] = timeref
 dfc_Br = dfc_Br.volume_transport.groupby('time.year').mean('time')
 # Into the Arctic
 f1_axes[1].plot(dfc_F.year,dfc_F.data*1e-6,label='Fram')
 f1_axes[1].plot(dfc_D.year,dfc_D.data*1e-6,label='Davis')
 f1_axes[1].plot(dfc_B.year,-dfc_B.data*1e-6,label='Bering')
 f1_axes[1].plot(dfc_Br.year,-dfc_Br.data*1e-6,label='Barents')
-f1_axes[1].set_ylabel('Transport [Sv]')
-f1_axes[1].legend()
+f1_axes[1].set_ylabel('Transport [Sv]',fontsize=16)
+# f1_axes[1].legend(fontsize=16,loc='upper right',frameon=False)
+f1_axes[1].tick_params(labelsize=16)
+f1_axes[1].text(1991.1,-2.8,'b)',fontsize=16)
 
 # Fram Strait Heat Transport
 ctrlFram = root_folder + 'Exp02_0_Fram_heat_transport.nc'
@@ -72,17 +80,21 @@ dfc_B = dfc_B.heat_transport.groupby('time.year').mean('time')
 # Barents Strait Heat Transport
 ctrlBarents = root_folder + 'Exp02_0_Barents_heat_transport.nc'
 dfc_Br = xr.open_dataset(ctrlBarents)
+dfc_Br['heat_transport'] = dfc_Br.v1_heat_transport + dfc_Br.v2_heat_transport - dfc_Br.u1_heat_transport
+dfc_Br['time'] = timeref
 dfc_Br = dfc_Br.heat_transport.groupby('time.year').mean('time')
 # Into the Arctic
-f1_axes[2].plot(dfc_F.year,dfc_F.data*cprho*1e-12,label='Fram')
+f1_axes[2].plot(dfc_F.year,0.6*dfc_F.data*cprho*1e-12,label='Fram')
 f1_axes[2].plot(dfc_D.year,dfc_D.data*cprho*1e-12,label='Davis')
 f1_axes[2].plot(dfc_B.year,-dfc_B.data*cprho*1e-12,label='Bering')
 f1_axes[2].plot(dfc_Br.year,-dfc_Br.data*cprho*1e-12,label='Barents')
-f1_axes[2].set_ylabel('Heat Transport [TW]')
-f1_axes[2].set_xlabel('Year')
+f1_axes[2].set_ylabel('Heat Transport [TW]',fontsize=16)
+f1_axes[2].set_xlabel('Year',fontsize=16)
 f1_axes[2].set_ylim(-5,130);
 # f1_axes[2].legend()
-f1_axes[2].legend(loc='lower right')
+f1_axes[2].legend(fontsize=14,loc='upper right',frameon=False,ncol=2)
+f1_axes[2].tick_params(labelsize=16)
+f1_axes[2].text(1991.1,0,'c)',fontsize=16)
 
 plt.savefig('paperfigs/ctrl_seaice_volume_heat.png', bbox_inches='tight',format='png',dpi=300)
 
