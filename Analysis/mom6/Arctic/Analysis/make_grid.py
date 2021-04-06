@@ -189,6 +189,8 @@ angle[:,0] = np.arctan( (lat[:,1]-lat[:,0]) / ((lon[:,1]-lon[:,0])*np.cos(np.deg
 angle[:,-1] = np.arctan( (lat[:,-1]-lat[:,-2]) /
                         ((lon[:,-1]-lon[:,-2])*np.cos(np.deg2rad(lat[:,-1]))) )
 
+area = dx[:-1,:]*dy[:,:-1]
+# area = area[:-1,:-1]
 
 # Create a mosaic file
 rg = scipy.io.netcdf_file('ocean_hgrid.nc','w')
@@ -197,7 +199,8 @@ rg.createDimension('nx',sni)
 rg.createDimension('nxp1',sni+1)
 rg.createDimension('ny',snj)
 rg.createDimension('nyp1',snj+1)
-rg.createDimension('string',255)
+# rg.createDimension('string',255)
+rg.createDimension('string',5)
 # Variables
 hx = rg.createVariable('x','float32',('nyp1','nxp1',))
 hx.units = 'degrees'

@@ -21,6 +21,7 @@ cd WHERE_MOSAIC_GRID_IS
 
 # for SEAWIFS
 ../../../python_tools/Analysis/mom6/Arctic/Analysis/OM4_025_seawifs/interp_and_fill/interp_and_fill.py ocean_hgrid.nc ocean_mask.nc ~/dataset/CORE2/NYF_v2.0/seawifs-clim-1997-2010.nc chlor_a --fms seawifs-clim-1997-2010.smoothed.nc
+/okyanus/users/milicak/python_tools/Analysis/mom6/Arctic/Analysis/OM4_025_seawifs/interp_and_fill/interp_and_fill.py ocean_hgrid.nc ocean_mask.nc ~/dataset/CORE2/NYF_v2.0/seawifs-clim-1997-2010.nc chlor_a --fms seawifs-clim-1997-2010.smoothed.nc
 
 # for SALT RESTORE
 ../../../python_tools/Analysis/mom6/Arctic/Analysis/OM4_025_seawifs/interp_and_fill/interp_and_fill.py ocean_hgrid.nc ocean_mask.nc ~/dataset/CORE2/NYF_v2.0/PHC2_salx.2004_08_03.corrected.nc SALT --fms --closest salt_restore_PHC2.nc
