@@ -46,6 +46,8 @@ for month in range(1,13):
     d2t  = np.copy(d2t)
     tcc  = np.copy(tcc)
     airt += -273.15
+    d2t  += -273.15
+    tcc  /= 100.0
     zerosolar = airt*0.0
 
     # convert time in seconds and create datetime list
@@ -72,13 +74,19 @@ for month in range(1,13):
     date_format = '%Y%m%d %H%M%S\n'
     header ='0 2 957839 %s 1 %d 11\n' % ((ny*nx),nvars)
     
-    ## write to file
+    #     character*80, save :: srad = 'solar radiation [W/m**2]'
+    #     character*80, save :: tair = 'air temperature [C]'
+    #     character*80, save :: rhum = 'humidity [%]'
+    #     character*80, save :: ccov = 'cloud cover [0-1]'
+    #     character*80, save :: wbtm = 'wet bulb temperature [C]'
+    #     character*80, save :: dewp = 'dew point temperature [C]'    
+    # ## write to file
     g = open(outfile,'a')
     for i in range(len(dates)):
     	g.write(header)
     	g.write(dates[i].strftime(date_format))
     	g.write('%s %s %s %s %s %s 1e+20\n'%(nx,ny,minlon,minlat,dx,dy))
-    	g.write('solar radiation [W/m**s]\n')
+    	g.write('solar radiation [W/m**2]\n')
     	for y in range(ny):
     		for x in range(nx):
     			g.write('%f ' % zerosolar[i,y,x])
@@ -96,7 +104,7 @@ for month in range(1,13):
     			g.write('%f ' % d2t[i,y,x])
     			if x == nx-1:
     				g.write('\n')
-    	g.write('total cloud cover [0-1]\n')
+    	g.write('cloud cover [0-1]\n')
     	for y in range(ny):
     		for x in range(nx):
     			g.write('%f ' % tcc[i,y,x])

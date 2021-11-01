@@ -9,14 +9,14 @@ cutoff_date = datetime(2020, 2, 2)
 
 root_folder = '/data/inputs/metocean/historical/model/ocean/CMCC/CMEMS/analysis/day/'
 date0 = datetime(2020,1,1,0)
-# dates = [date0 + timedelta(days=d) for d in range(366)]
-dates = [date0 + timedelta(days=d) for d in range(31)]
+dates = [date0 + timedelta(days=d) for d in range(366)]
+# dates = [date0 + timedelta(days=d) for d in range(31)]
 ssh_shift = 0.0 #0.3
 
 date_string = '%Y%m%d'
 # root_filename = '%s/%s/%s_d-CMCC--%s-MFSeas4-MEDATL-b20190101_an-sv05.00.nc'
 # root_filename = '%s/%s/%s_d-CMCC--%s-MFSeas4-MEDATL-b2019*_an-sv05.00.nc'
-root_filename = '%s/%s/%s_d-CMCC--%s-MFSeas5-MEDATL-b2019*_an-sv06.00.nc'
+root_filename = '%s/%s/%s_d-CMCC--%s-MFSeas6-MEDATL-b2021*_an-sv07.00.nc'
 outnetcdfname = 'uTSS_boundary_valuesL2.nc'
 
 boundary_nodes_path = 'uTSS_boundary_list_lonlat2.txt'
@@ -65,8 +65,8 @@ container = xr.Dataset()
 
 for date in dates:
     print ('loading date %s' % date.strftime('%Y/%m/%d'))
-    if date > cutoff_date:
-        root_filename = '%s/%s/%s_d-CMCC--%s-MFSeas5-MEDATL-b2020*_an-sv06.00.nc'
+    # if date > cutoff_date:
+    #     root_filename = '%s/%s/%s_d-CMCC--%s-MFSeas5-MEDATL-b2020*_an-sv06.00.nc'
 
     root_filename2 = root_folder + root_filename
     temp_filename = root_filename2 % (date.strftime('%Y'),date.strftime('%m'),date.strftime(date_string),'TEMP')

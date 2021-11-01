@@ -6,8 +6,8 @@ from my_sea_over_land import seaoverland_2d,seaoverland_1d
 from shyfem_utils import write_record_in_file1d, write_record_in_file2d, write_record_in_file2d_vel
 
 date0 = datetime(2020,1,1,0)
-# dates = [date0 + timedelta(days=d) for d in range(366)]
-dates = [date0 + timedelta(days=d) for d in range(31)]
+dates = [date0 + timedelta(days=d) for d in range(366)]
+# dates = [date0 + timedelta(days=d) for d in range(31)]
 itr = 0
 
 out_file_ssh1  = '/work/opa/mi19918/Projects/uTSS_SHYFEM/forcing_files/boundn_L1_adj.dat'

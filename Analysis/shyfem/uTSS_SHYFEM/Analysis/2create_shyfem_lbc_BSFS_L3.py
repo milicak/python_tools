@@ -8,8 +8,8 @@ from shyfem_utils import write_record_in_file1d, write_record_in_file2d, write_r
 
 root_folder = '/data/inputs/metocean/historical/model/ocean/CMCC/CMEMS/analysis/day/'
 date0 = datetime(2020,1,1,0)
-# dates = [date0 + timedelta(days=d) for d in range(366)]
-dates = [date0 + timedelta(days=d) for d in range(31)]
+dates = [date0 + timedelta(days=d) for d in range(366)]
+# dates = [date0 + timedelta(days=d) for d in range(31)]
 ssh_shift = 0.0 #0.3
 
 
@@ -64,8 +64,8 @@ container = xr.Dataset()
 
 for date in dates:
     print ('loading date %s' % date.strftime('%Y/%m/%d'))
-    if date.strftime('%m')=='12' and date.strftime('%d')=='23':
-        root_filename = '%s/%s/%s_d-CMCC--%s-BSeas3-BS-b2020*_an-sv09.00.nc'
+    # if date.strftime('%m')=='12' and date.strftime('%d')=='23':
+        # root_filename = '%s/%s/%s_d-CMCC--%s-BSeas3-BS-b2020*_an-sv09.00.nc'
     
     root_filename2 = root_folder + root_filename
     temp_filename = root_filename2 % (date.strftime('%Y'),date.strftime('%m'),date.strftime(date_string),'TEMP')
