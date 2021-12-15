@@ -5,7 +5,7 @@ import numpy as np
 root_folder = '/data/inputs/metocean/historical/model/atmos/ECMWF/IFS_010/analysis/6h/netcdf/'
 year = 2020
 freq_ecmwf = 6
-outfile = '/work/opa/mi19918/Projects/uTSS_SHYFEM/forcing_files/wp_2020.dat'
+outfile = '/work/opa/mi19918/Projects/uTSS_SHYFEM/forcing_files/wp_2020_v2.dat'
 date0 = datetime(2020,1,1,0,0,0)
 
 nvars	= 3
@@ -14,13 +14,16 @@ subset = True
 lon1, lon2 = 20, 32
 lat1, lat2 = 36, 44
 
+first_call = True
+
 for month in range(1,13):
     fnames = root_folder + np.str(year) + '/' + np.str(month).zfill(2) + '/*MEDATL*'
     ls1 = sorted(glob.glob(fnames))
     df = xr.open_mfdataset(ls1)   
     lons = np.copy(df.lon)  
+    lats = np.copy(df.lat)  
 
-    if subset == True:
+    if subset == True & first_call == True:
     	#latitude lower and upper index
     	latli = np.argmin( np.abs( lats - lat1 ) )
     	latui = np.argmin( np.abs( lats - lat2 ) ) 
@@ -29,6 +32,7 @@ for month in range(1,13):
     	lonli = np.argmin( np.abs( lons - lon1 ) )
     	lonui = np.argmin( np.abs( lons - lon2 ) )  
     
+    if subset == True:
     	# subset lons, lats, variables
     	lons 	= lons[lonli:lonui]
     	lats 	= lats[latui:latli]  # subsetting for lats is reversed
@@ -43,6 +47,7 @@ for month in range(1,13):
     windx = np.copy(windx)
     windy = np.copy(windy)
     patm  = np.copy(patm)
+    first_call = False
 
     # No need to convert to Pa because ECMWF has Pa in these years
     # convert patm to Pa

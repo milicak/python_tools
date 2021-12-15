@@ -52,6 +52,15 @@ nc.close()
 # date1   = date0 + timedelta(seconds=time_selected)
 date1   = date0 
 
+# set in marmara velocities below threshold to zero
+df = xr.open_dataset(filename)
+mask = xr.where(((df.longitude > 26.0) & 
+                 (df.longitude < 30) & 
+                 (df.latitude > 40.2) &
+                 (df.latitude < 41.2)),0,1) 
+mask2=np.tile(mask,(23,1))  
+uvel[:,70::] = uvel[:,70::]*np.transpose(mask2)
+vvel[:,70::] = vvel[:,70::]*np.transpose(mask2)
 
 ### write to file
 header          = '0 2 957839 %d %d %d 1\n'

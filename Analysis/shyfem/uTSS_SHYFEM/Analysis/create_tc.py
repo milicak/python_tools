@@ -15,14 +15,16 @@ subset = True
 lon1, lon2 = 20, 32
 lat1, lat2 = 36, 44
 
+first_call = True
+
 for month in range(1,13):
     fnames = root_folder + np.str(year) + '/' + np.str(month).zfill(2) + '/*MEDATL*'
     ls1 = sorted(glob.glob(fnames))
     df = xr.open_mfdataset(ls1)   
-    lons = np.copy(df.lon)  
+    lons = np.copy(df.lon)      
     lats = np.copy(df.lat) 
 
-    if subset == True:
+    if subset == True & first_call == True:
     	#latitude lower and upper index
     	latli = np.argmin( np.abs( lats - lat1 ) )
     	latui = np.argmin( np.abs( lats - lat2 ) ) 
@@ -31,6 +33,7 @@ for month in range(1,13):
     	lonli = np.argmin( np.abs( lons - lon1 ) )
     	lonui = np.argmin( np.abs( lons - lon2 ) )  
     
+    if subset == True:
     	# subset lons, lats, variables
     	lons 	= lons[lonli:lonui]
     	lats 	= lats[latui:latli]  # subsetting for lats is reversed
@@ -49,6 +52,7 @@ for month in range(1,13):
     d2t  += -273.15
     tcc  /= 100.0
     zerosolar = airt*0.0
+    first_call = False
 
     # convert time in seconds and create datetime list
     if month==1:

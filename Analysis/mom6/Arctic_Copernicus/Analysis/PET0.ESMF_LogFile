@@ -1,0 +1,132 @@
+20211129 184343.966 ERROR            PET0 ESMF_Regrid.F90:366 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211129 184343.966 ERROR            PET0 ESMF_FieldRegrid.F90:1415 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211129 184343.966 ERROR            PET0 ESMF_Field_C.F90:1261 f_esmf_regridstorefile Invalid argument  - Internal subroutine call returned Error
+20211129 192133.006 INFO             PET0 Finalizing ESMF
+20211129 192549.584 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~ Degenerate Element Detected ~~~~~~~~~~~~~~~~~~~~
+20211129 192549.584 ERROR            PET0   degenerate elem. id=1509800
+20211129 192549.584 ERROR            PET0 
+20211129 192549.584 ERROR            PET0   degenerate elem. coords (lon [-180 to 180], lat [-90 to 90]) (x,y,z)
+20211129 192549.584 ERROR            PET0   -----------------------------------------------------------------
+20211129 192549.584 ERROR            PET0     0  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 192549.584 ERROR            PET0     1  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 192549.584 ERROR            PET0     2  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 192549.584 ERROR            PET0     3  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 192549.584 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+20211129 192549.584 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:192 ESMCI_regrid_create() Invalid argument  - - Src contains a cell that has corners close enough that the cell collapses to a line or point
+20211129 192549.754 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:558 ESMCI_regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 192549.754 ERROR            PET0 ESMCI_MeshCap.C:1599 MeshCap::regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 192549.754 ERROR            PET0 ESMF_Regrid.F90:372 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211129 192549.754 ERROR            PET0 ESMF_FieldRegrid.F90:1172 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211129 192549.754 ERROR            PET0 ESMF_Field_C.F90:1137 f_esmf_regridstore Invalid argument  - Internal subroutine call returned Error
+20211129 192549.754 ERROR            PET0 ESMCI_Field.C:1468 ESMCI::Field::regridstore() Invalid argument  - Internal subroutine call returned Error
+20211129 192549.754 ERROR            PET0 ESMC_Field.C:459 ESMC_FieldRegridStore() Invalid argument  - Internal subroutine call returned Error
+20211129 193609.577 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~ Degenerate Element Detected ~~~~~~~~~~~~~~~~~~~~
+20211129 193609.579 ERROR            PET0   degenerate elem. id=1509800
+20211129 193609.579 ERROR            PET0 
+20211129 193609.579 ERROR            PET0   degenerate elem. coords (lon [-180 to 180], lat [-90 to 90]) (x,y,z)
+20211129 193609.580 ERROR            PET0   -----------------------------------------------------------------
+20211129 193609.580 ERROR            PET0     0  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 193609.580 ERROR            PET0     1  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 193609.580 ERROR            PET0     2  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 193609.580 ERROR            PET0     3  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 193609.580 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+20211129 193609.580 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:192 ESMCI_regrid_create() Invalid argument  - - Src contains a cell that has corners close enough that the cell collapses to a line or point
+20211129 193609.582 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:558 ESMCI_regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 193609.586 ERROR            PET0 ESMCI_MeshCap.C:1599 MeshCap::regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 193609.590 ERROR            PET0 ESMF_Regrid.F90:372 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211129 193609.594 ERROR            PET0 ESMF_FieldRegrid.F90:1204 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211129 193609.598 ERROR            PET0 ESMF_Field_C.F90:1137 f_esmf_regridstore Invalid argument  - Internal subroutine call returned Error
+20211129 193609.601 ERROR            PET0 ESMCI_Field.C:1468 ESMCI::Field::regridstore() Invalid argument  - Internal subroutine call returned Error
+20211129 193609.606 ERROR            PET0 ESMC_Field.C:459 ESMC_FieldRegridStore() Invalid argument  - Internal subroutine call returned Error
+20211129 193723.543 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~ Degenerate Element Detected ~~~~~~~~~~~~~~~~~~~~
+20211129 193723.545 ERROR            PET0   degenerate elem. id=1509800
+20211129 193723.545 ERROR            PET0 
+20211129 193723.546 ERROR            PET0   degenerate elem. coords (lon [-180 to 180], lat [-90 to 90]) (x,y,z)
+20211129 193723.547 ERROR            PET0   -----------------------------------------------------------------
+20211129 193723.548 ERROR            PET0     0  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 193723.548 ERROR            PET0     1  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 193723.548 ERROR            PET0     2  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 193723.548 ERROR            PET0     3  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 193723.548 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+20211129 193723.548 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:192 ESMCI_regrid_create() Invalid argument  - - Src contains a cell that has corners close enough that the cell collapses to a line or point
+20211129 193723.550 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:558 ESMCI_regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 193723.553 ERROR            PET0 ESMCI_MeshCap.C:1599 MeshCap::regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 193723.555 ERROR            PET0 ESMF_Regrid.F90:372 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211129 193723.557 ERROR            PET0 ESMF_FieldRegrid.F90:1172 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211129 193723.559 ERROR            PET0 ESMF_Field_C.F90:1137 f_esmf_regridstore Invalid argument  - Internal subroutine call returned Error
+20211129 193723.561 ERROR            PET0 ESMCI_Field.C:1468 ESMCI::Field::regridstore() Invalid argument  - Internal subroutine call returned Error
+20211129 193723.564 ERROR            PET0 ESMC_Field.C:459 ESMC_FieldRegridStore() Invalid argument  - Internal subroutine call returned Error
+20211129 193743.252 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~ Degenerate Element Detected ~~~~~~~~~~~~~~~~~~~~
+20211129 193743.254 ERROR            PET0   degenerate elem. id=1506920
+20211129 193743.254 ERROR            PET0 
+20211129 193743.254 ERROR            PET0   degenerate elem. coords (lon [-180 to 180], lat [-90 to 90]) (x,y,z)
+20211129 193743.254 ERROR            PET0   -----------------------------------------------------------------
+20211129 193743.254 ERROR            PET0     0  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 193743.254 ERROR            PET0     1  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 193743.254 ERROR            PET0     2  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 193743.254 ERROR            PET0     3  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 193743.254 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+20211129 193743.254 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:192 ESMCI_regrid_create() Invalid argument  - - Src contains a cell that has corners close enough that the cell collapses to a line or point
+20211129 193743.257 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:558 ESMCI_regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 193743.261 ERROR            PET0 ESMCI_MeshCap.C:1599 MeshCap::regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 193743.263 ERROR            PET0 ESMF_Regrid.F90:372 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211129 193743.265 ERROR            PET0 ESMF_FieldRegrid.F90:1172 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211129 193743.267 ERROR            PET0 ESMF_Field_C.F90:1137 f_esmf_regridstore Invalid argument  - Internal subroutine call returned Error
+20211129 193743.270 ERROR            PET0 ESMCI_Field.C:1468 ESMCI::Field::regridstore() Invalid argument  - Internal subroutine call returned Error
+20211129 193743.273 ERROR            PET0 ESMC_Field.C:459 ESMC_FieldRegridStore() Invalid argument  - Internal subroutine call returned Error
+20211129 195844.999 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~ Degenerate Element Detected ~~~~~~~~~~~~~~~~~~~~
+20211129 195845.001 ERROR            PET0   degenerate elem. id=1509800
+20211129 195845.001 ERROR            PET0 
+20211129 195845.001 ERROR            PET0   degenerate elem. coords (lon [-180 to 180], lat [-90 to 90]) (x,y,z)
+20211129 195845.001 ERROR            PET0   -----------------------------------------------------------------
+20211129 195845.001 ERROR            PET0     0  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 195845.001 ERROR            PET0     1  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211129 195845.001 ERROR            PET0     2  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 195845.001 ERROR            PET0     3  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211129 195845.001 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+20211129 195845.001 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:192 ESMCI_regrid_create() Invalid argument  - - Src contains a cell that has corners close enough that the cell collapses to a line or point
+20211129 195845.004 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:558 ESMCI_regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 195845.008 ERROR            PET0 ESMCI_MeshCap.C:1599 MeshCap::regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211129 195845.010 ERROR            PET0 ESMF_Regrid.F90:372 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211129 195845.012 ERROR            PET0 ESMF_FieldRegrid.F90:1204 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211129 195845.015 ERROR            PET0 ESMF_Field_C.F90:1137 f_esmf_regridstore Invalid argument  - Internal subroutine call returned Error
+20211129 195845.017 ERROR            PET0 ESMCI_Field.C:1468 ESMCI::Field::regridstore() Invalid argument  - Internal subroutine call returned Error
+20211129 195845.020 ERROR            PET0 ESMC_Field.C:459 ESMC_FieldRegridStore() Invalid argument  - Internal subroutine call returned Error
+20211129 195950.671 INFO             PET0 Finalizing ESMF
+20211130 081126.651 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~ Degenerate Element Detected ~~~~~~~~~~~~~~~~~~~~
+20211130 081126.662 ERROR            PET0   degenerate elem. id=1509800
+20211130 081126.662 ERROR            PET0 
+20211130 081126.662 ERROR            PET0   degenerate elem. coords (lon [-180 to 180], lat [-90 to 90]) (x,y,z)
+20211130 081126.662 ERROR            PET0   -----------------------------------------------------------------
+20211130 081126.662 ERROR            PET0     0  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211130 081126.662 ERROR            PET0     1  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211130 081126.663 ERROR            PET0     2  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211130 081126.663 ERROR            PET0     3  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211130 081126.663 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+20211130 081126.663 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:192 ESMCI_regrid_create() Invalid argument  - - Src contains a cell that has corners close enough that the cell collapses to a line or point
+20211130 081126.663 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:558 ESMCI_regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211130 081126.663 ERROR            PET0 ESMCI_MeshCap.C:1599 MeshCap::regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211130 081126.663 ERROR            PET0 ESMF_Regrid.F90:372 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211130 081126.663 ERROR            PET0 ESMF_FieldRegrid.F90:1172 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211130 081126.663 ERROR            PET0 ESMF_Field_C.F90:1137 f_esmf_regridstore Invalid argument  - Internal subroutine call returned Error
+20211130 081126.663 ERROR            PET0 ESMCI_Field.C:1468 ESMCI::Field::regridstore() Invalid argument  - Internal subroutine call returned Error
+20211130 081126.664 ERROR            PET0 ESMC_Field.C:459 ESMC_FieldRegridStore() Invalid argument  - Internal subroutine call returned Error
+20211130 082342.697 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~ Degenerate Element Detected ~~~~~~~~~~~~~~~~~~~~
+20211130 082342.700 ERROR            PET0   degenerate elem. id=1509800
+20211130 082342.700 ERROR            PET0 
+20211130 082342.700 ERROR            PET0   degenerate elem. coords (lon [-180 to 180], lat [-90 to 90]) (x,y,z)
+20211130 082342.700 ERROR            PET0   -----------------------------------------------------------------
+20211130 082342.700 ERROR            PET0     0  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211130 082342.700 ERROR            PET0     1  (-107.000160,  65.969322)  (-0.119062, -0.389432, 0.913328)
+20211130 082342.700 ERROR            PET0     2  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211130 082342.700 ERROR            PET0     3  (-107.000000,  66.000000)  (-0.118918, -0.388964, 0.913545)
+20211130 082342.700 ERROR            PET0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+20211130 082342.700 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:192 ESMCI_regrid_create() Invalid argument  - - Src contains a cell that has corners close enough that the cell collapses to a line or point
+20211130 082342.703 ERROR            PET0 ESMCI_Mesh_Regrid_Glue.C:558 ESMCI_regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211130 082342.709 ERROR            PET0 ESMCI_MeshCap.C:1599 MeshCap::regrid_create() Invalid argument  - Internal subroutine call returned Error
+20211130 082342.713 ERROR            PET0 ESMF_Regrid.F90:372 ESMF_RegridStore Invalid argument  - Internal subroutine call returned Error
+20211130 082342.717 ERROR            PET0 ESMF_FieldRegrid.F90:1172 ESMF_FieldRegridStoreNX Invalid argument  - Internal subroutine call returned Error
+20211130 082342.720 ERROR            PET0 ESMF_Field_C.F90:1137 f_esmf_regridstore Invalid argument  - Internal subroutine call returned Error
+20211130 082342.724 ERROR            PET0 ESMCI_Field.C:1468 ESMCI::Field::regridstore() Invalid argument  - Internal subroutine call returned Error
+20211130 082342.729 ERROR            PET0 ESMC_Field.C:459 ESMC_FieldRegridStore() Invalid argument  - Internal subroutine call returned Error
+20211130 082640.710 INFO             PET0 Finalizing ESMF

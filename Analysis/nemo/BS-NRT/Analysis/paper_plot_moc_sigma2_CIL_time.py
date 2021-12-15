@@ -1,4 +1,5 @@
 import numpy as np
+import os
 # read temperature change
 # ls1=sorted(glob.glob('/work/opa/da01720/Tools/hov/rean16/*domain.nc'))
 ls1=sorted(glob.glob('/work/opa/da01720/Tools/hov/rean16_2020/*domain.nc'))
@@ -11,6 +12,15 @@ dfm=df.resample(time="1MS").mean(dim="time")
 dfm70=dfm.votemper[:,12]                                                                                                         
 dfm70y=dfm70.groupby('time.year').mean('time')    
 
+# total volume
+base='/work/opa/sc33616/nemo/tools/OC/daily_rean16_vol/'
+years=np.arange(1993,2021,1)
+
+buffer=[]
+for y in years:
+    buffer.append(np.nanmean(np.load(os.path.join(base,f"vol_{y}.npy"))))
+
+buffer=np.array(buffer) 
 
 # plotyy
 # df2=xr.open_dataset('maxmocy.nc') 
@@ -45,8 +55,10 @@ ax3.spines["right"].set_position(("axes", 1.2))
 
 color = cycle[0]
 # color = 'tab:blue'
-ax2.set_ylabel(r'Temperature [$^\circ$C] at 70m', color=color, fontsize=14) 
-ax2.plot(np.int16(df2.year), dfm70y,'-*' , color=color)
+# ax2.set_ylabel(r'Temperature [$^\circ$C] at 70m', color=color, fontsize=14) 
+ax2.set_ylabel(r'Volume of Temperature [$<8.35^\circ$C] [1000xkm^3]', color=color, fontsize=14) 
+# ax2.plot(np.int16(df2.year), dfm70y,'-*' , color=color)
+ax2.plot(np.int16(df2.year), buffer*1e-12,'-*' , color=color)
 ax2.tick_params(axis='y', labelcolor=color)
 ax2.set_yticklabels(ax2.get_yticks(), rotation=0, fontsize=14);
 
@@ -57,4 +69,8 @@ ax3.plot(df2.year[:-1], np.copy(df3.C_ShipCast), '-', color=color)
 ax3.tick_params(axis='y', labelcolor=color)
 ax3.set_yticklabels(ax3.get_yticks(), rotation=0, fontsize=14);
 
-plt.savefig('paperfigs/MOC_sigma2_vs_CIL_vs_70mtemp.png', bbox_inches='tight',format='png',dpi=300)
+
+# plt.savefig('paperfigs/MOC_sigma2_vs_CIL_vs_70mtemp.png', bbox_inches='tight',format='png',dpi=300)
+plt.savefig('paperfigs/MOC_sigma2_vs_CIL_vs_voltemp.jpeg',
+            bbox_inches='tight',format='jpeg',dpi=300)
+# plt.savefig('paperfigs/MOC_sigma2_vs_CIL_vs_voltemp.png', bbox_inches='tight',format='png',dpi=300)
