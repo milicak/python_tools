@@ -5,6 +5,8 @@ import os
 import numpy as np
 import xarray as xr
 import scipy.io
+from scipy.io import savemat
+from scipy.io import loadmat
 from mpl_toolkits.basemap import Basemap, shiftgrid
 import matplotlib.colors as colors
 from scipy.signal import medfilt2d
@@ -24,8 +26,8 @@ nj,ni = df.lon_rho.shape
 
 # Read and interpolate TOPO file into the grid
 gr = xr.open_dataset('/okyanus/users/milicak/dataset/world_bathy/GEBCO_2014_1D.nc')
-lon_gebco = np.linspace(gr.x_range[0],gr.x_range[1],gr.dimension[0],endpoint=True);
-lat_gebco = np.linspace(gr.y_range[0],gr.y_range[1],gr.dimension[1],endpoint=True);
+lon_gebco = np.linspace(np.copy(gr.x_range[0]),np.copy(gr.x_range[1]),np.copy(gr.dimension[0]),endpoint=True);
+lat_gebco = np.linspace(np.copy(gr.y_range[0]),np.copy(gr.y_range[1]),np.copy(gr.dimension[1]),endpoint=True);
 depth_gebco = np.reshape(np.copy(gr.z), (np.copy(gr.dimension[1]), np.copy(gr.dimension[0])))
 lat_gebco = lat_gebco[15000:]
 depth_gebco = np.flipud(depth_gebco)
@@ -41,9 +43,15 @@ dd = foo.interp(lat=df.lat_rho,lon=df.lon_rho,method='linear')
 aa = np.copy(dd.depth_g.where(dd.depth_g<0,0))
 aa[(aa>-5) & (aa<0)]=-5
 aa[aa<-6000]=-6000
-hraw = -aa
+
+mdic = {"hraw": aa}
+savemat("Arctic_bathy_raw.mat", mdic)
 
 # for Arctic setup
+print('Now you have to run matlab and ')
+print('load the new matfile')
+tmp = loadmat('Arctic_bathy_raw_smooth.mat')
+hraw = -tmp['bath4']
 
 # Create a topography file
 rg = scipy.io.netcdf_file('ocean_topog.nc','w')

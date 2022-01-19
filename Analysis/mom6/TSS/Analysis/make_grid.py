@@ -61,109 +61,35 @@ def spherical_quad(lat,lon):
     a3 = spherical_angle( c0, c3, c1)
     return a0+a1+a2+a3-2.*np.pi
 
-# Grid dimension
-# x-direction
-Lp = 1680
-# y-direction
-# Mp = 1536
-Mp = 1680
 
-# Lp = 80
-# Mp = 60
-
-# define the 4 corners of the grid
-# top left corner
-lon0=-129.97 ; lat0=39.28
-# bottom left corner
-lon1=-48.84 ; lat1=38.71
-# bottom right corner
-# lon2=31.96 ; lat2=48.85
-lon2=33.6 ; lat2=48.85
-# top right corner
-lon3=145.5 ; lat3=50.11
-# lon3=146.95 ; lat3=50.11
-
-# bottom left corner
-lon0=-48.84 ; lat0=38.71
-# bottom right corner
-lon1=31.96 ; lat1=48.85
-# lon1=33.6 ; lat1=48.85
-# top right corner
-lon2=146.95 ; lat2=50.11
-# lon2=145.5 ; lat2=50.11
-# top left corner
-lon3=-129.97 ; lat3=39.28
-
-#Arctic_Copernicus
-# bottom left corner
-lon0=-48.84 ; lat0=38.71
-# bottom right corner
-lon1=31.96 ; lat1=48.85
-# top right corner
-lon2=146.95+10 ; lat2=50.11-15
-# top left corner
-lon3=-129.97-25 ; lat3=39.28-5
-
-# lon0=98. ; lat0=25.
-# lon1=98. ; lat1=-10.
-# lon2=125. ; lat2=-10.
-# lon3=125. ; lat3=25.
-#define map projection (here mercator)
-# lon_min = min(lon0,lon1,lon2,lon3)
-# lon_max = max(lon0,lon1,lon2,lon3)
-# lon_0 = (lon_min + lon_max) / 2.
-# lat_min = min(lat0,lat1,lat2,lat3)
-# lat_max = max(lat0,lat1,lat2,lat3)
-# lat_0 = (lat_min + lat_max) / 2.
-
-# map = Basemap(projection='merc', llcrnrlon=lon_min, llcrnrlat=lat_min,
-#          urcrnrlon=lon_max, urcrnrlat=lat_max, lat_0=lat_0, lon_0=lon_0,
-#          resolution='c')
-
-print('generating the projection')
-
-map = Basemap(projection='npstere',boundinglat=35,lon_0=0,resolution='f')
-
-#generate the new grid
-lonp = np.array([lon0, lon1, lon2, lon3])
-latp = np.array([lat0, lat1, lat2, lat3])
-
-beta = np.array([1, 1, 1, 1])
-
-print('generating the grid')
-hgrd = pyroms.grid.Gridgen(lonp, latp, beta, (Mp+3,Lp+3), proj=map)
-lonv, latv = list(map(hgrd.x_vert, hgrd.y_vert, inverse=True))
-hgrd = pyroms.grid.CGrid_geo(lonv, latv, map)
-
-# if you want to us ethe graphical interface
-#map.drawcoastlines()
-#xp, yp = map(lonp, latp)
-#bry = pyroms.hgrid.BoundaryInteractor(xp, yp, beta, shp=(Mp+3,Lp+3), proj=map)
-#hgrd = bry.grd
-
-print('writing the grid')
-hgrd.to_netcdf('roms_grid_Arctic_Copernicus.nc')
-
-# lon_rho = hgrd.lon_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
-# lat_rho = hgrd.lat_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
-# foo = xr.Dataset({'lon_rho':(['nj', 'ni'], lon_rho),'lat_rho':(['nj', 'ni'], lat_rho)})
-# foo.to_netcdf('roms_grid_orig.nc')
 
 # generate the mask
 #for verts in map.coastsegs:
 #    hgrd.mask_polygon(verts)
 # alternate version from johan.navarro.padron
 
-# plt.figure()
-# lon, lat = map(hgrd.lon_rho,hgrd.lat_rho)
-# map.fillcontinents(color='grey');
-# map.plot(lon,lat,'k');
-# map.plot(np.transpose(lon),np.transpose(lat),'k');
-#
+hgrd = scipy.io.loadmat('MITgcm_TSS_grid.mat')
+lon_rho = np.transpose(hgrd['lon_rho']) #[1:-1,1:-1])
+lon_psi = np.transpose(hgrd['lon_psi']) #[1:-2,1:-2])
+lat_rho = np.transpose(hgrd['lat_rho']) #[1:-1,1:-1])
+lat_psi = np.transpose(hgrd['lat_psi']) #[1:-2,1:-2])
 
-nj,ni = hgrd.lon_rho.shape
+lon_u = np.transpose(hgrd['lon_u'])
+lon_v = np.transpose(hgrd['lon_v'])
+lat_u = np.transpose(hgrd['lat_u'])
+lat_v = np.transpose(hgrd['lat_v'])
+
+nj,ni = lon_rho.shape
 nj -=2; ni -=2
 print('nj=%i, nj=%i'%(nj,ni))
+
+# sni - Number of columns in x-direction
+# snj - Number of rows in y-direction
+# x[snj+1,sni+1] - x-coordinate of the grid vertices
+# y[snj+1,sni+1] - y-coordinate of the grid vertices
+# area[snj,sni] - area of each cell
+# dx[snj+1,sni] - length of theedges of constant j-index
+# dy[snj,sni+1] - length of the edges of constant -index
 
 # Supergrid shape
 snj,sni = 2*np.array([nj,ni]) # Smallest useful super-grid has a multiplier of 2
@@ -177,16 +103,16 @@ dy = np.zeros((snj,sni+1))
 angle = np.zeros((snj+1,sni+1))
 
 # Copy in data from ROMS file
-lon[::2,::2] = hgrd.lon_psi[:,:] # Cell corners
-lon[1::2,1::2] = hgrd.lon_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
-lon[1::2,::2] = hgrd.lon_u[1:-1,:] # U-points (drop outside row)
-lon[::2,1::2] = hgrd.lon_v[:,1:-1] # V-points (drop outside column)
-lat[::2,::2] = hgrd.lat_psi[:,:] # Cell corners
-lat[1::2,1::2] = hgrd.lat_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
-lat[1::2,::2] = hgrd.lat_u[1:-1,:] # U-points (drop outside row)
-lat[::2,1::2] = hgrd.lat_v[:,1:-1] # V-points (drop outside column)
+lon[::2,::2] = lon_psi[:,:] # Cell corners
+lon[1::2,1::2] = lon_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
+lon[1::2,::2] = lon_u[1:-1,:] # U-points (drop outside row)
+lon[::2,1::2] = lon_v[:,1:-1] # V-points (drop outside column)
+lat[::2,::2] = lat_psi[:,:] # Cell corners
+lat[1::2,1::2] =lat_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
+lat[1::2,::2] = lat_u[1:-1,:] # U-points (drop outside row)
+lat[::2,1::2] = lat_v[:,1:-1] # V-points (drop outside column)
 
-# Approximate edge lengths as great arcs
+# tApproximate edge lengths as great arcs
 R = 6370.e3 # Radius of sphere
 dx[:,:] = R*angle_p1p2( (lat[:,1:],lon[:,1:]), (lat[:,:-1],lon[:,:-1]) )
 dy[:,:] = R*angle_p1p2( (lat[1:,:],lon[1:,:]), (lat[:-1,:],lon[:-1,:]) )
@@ -203,7 +129,7 @@ area = dx[:-1,:]*dy[:,:-1]
 # area = area[:-1,:-1]
 
 # Create a mosaic file
-rg = scipy.io.netcdf_file('ocean_hgrid.nc','w')
+rg = scipy.io.netcdf_file('/okyanus/users/milicak/dataset/MOM6/TSS/ocean_hgrid.nc','w')
 # Dimensions
 rg.createDimension('nx',sni)
 rg.createDimension('nxp1',sni+1)

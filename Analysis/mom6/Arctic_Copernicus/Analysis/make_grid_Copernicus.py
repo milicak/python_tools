@@ -63,66 +63,28 @@ def spherical_quad(lat,lon):
 
 # Grid dimension
 # x-direction
-Lp = 1680
+Lp = 500*4
 # y-direction
 # Mp = 1536
-Mp = 1680
+Mp = 325*4
 
-# Lp = 80
-# Mp = 60
-
-# define the 4 corners of the grid
-# top left corner
-lon0=-129.97 ; lat0=39.28
-# bottom left corner
-lon1=-48.84 ; lat1=38.71
-# bottom right corner
-# lon2=31.96 ; lat2=48.85
-lon2=33.6 ; lat2=48.85
-# top right corner
-lon3=145.5 ; lat3=50.11
-# lon3=146.95 ; lat3=50.11
-
-# bottom left corner
-lon0=-48.84 ; lat0=38.71
-# bottom right corner
-lon1=31.96 ; lat1=48.85
-# lon1=33.6 ; lat1=48.85
-# top right corner
-lon2=146.95 ; lat2=50.11
-# lon2=145.5 ; lat2=50.11
-# top left corner
-lon3=-129.97 ; lat3=39.28
-
-#Arctic_Copernicus
-# bottom left corner
-lon0=-48.84 ; lat0=38.71
-# bottom right corner
-lon1=31.96 ; lat1=48.85
-# top right corner
-lon2=146.95+10 ; lat2=50.11-15
-# top left corner
-lon3=-129.97-25 ; lat3=39.28-5
-
-# lon0=98. ; lat0=25.
-# lon1=98. ; lat1=-10.
-# lon2=125. ; lat2=-10.
-# lon3=125. ; lat3=25.
-#define map projection (here mercator)
-# lon_min = min(lon0,lon1,lon2,lon3)
-# lon_max = max(lon0,lon1,lon2,lon3)
-# lon_0 = (lon_min + lon_max) / 2.
-# lat_min = min(lat0,lat1,lat2,lat3)
-# lat_max = max(lat0,lat1,lat2,lat3)
-# lat_0 = (lat_min + lat_max) / 2.
-
-# map = Basemap(projection='merc', llcrnrlon=lon_min, llcrnrlat=lat_min,
-#          urcrnrlon=lon_max, urcrnrlat=lat_max, lat_0=lat_0, lon_0=lon_0,
-#          resolution='c')
 
 print('generating the projection')
 
-map = Basemap(projection='npstere',boundinglat=35,lon_0=0,resolution='f')
+map = Basemap(projection='npstere',boundinglat=29,lon_0=0,resolution='h')
+# map = Basemap(projection='npstere',boundinglat=35,lon_0=0,resolution='f')
+
+#Arctic_Copernicus
+# top right corner
+lon0=157 ; lat0=35.0
+# top left corner
+lon1=-146 ; lat1=29.5
+# lon1=-147.55 ; lat1=27.6
+# lon1=-144 ; lat1=32.0
+# bottom left corner
+lon2=-45.4 ; lat2=41.7
+# bottom right corner
+lon3=32 ; lat3=48.85
 
 #generate the new grid
 lonp = np.array([lon0, lon1, lon2, lon3])
@@ -141,8 +103,66 @@ hgrd = pyroms.grid.CGrid_geo(lonv, latv, map)
 #bry = pyroms.hgrid.BoundaryInteractor(xp, yp, beta, shp=(Mp+3,Lp+3), proj=map)
 #hgrd = bry.grd
 
+
+# we do not need this part untill topo
+for xx,yy in map.coastpolygons:
+    xa = np.array(xx, np.float32)
+    ya = np.array(yy,np.float32)
+    vv = np.zeros((xa.shape[0],2))
+    vv[:, 0] = xa
+    vv[:, 1] = ya
+    hgrd.mask_polygon(vv,mask_value=0)
+
+
+# Edit the land mask interactively.
+#pyroms.grid.edit_mask_mesh(hgrd, proj=map)
+#edit_mask_mesh_ij is a faster version using imshow... but no map projection.
+coast = pyroms.utility.get_coast_from_map(map)
+pyroms.grid.edit_mask_mesh_ij(hgrd, coast=coast)
+
+datadir = '/okyanus/users/milicak/dataset/MOM6/Arctic_Copernicus_oldlonlat//'
+topo = np.loadtxt(os.path.join(datadir, 'etopo20data.gz'))
+lons = np.loadtxt(os.path.join(datadir, 'etopo20lons.gz'))
+lats = np.loadtxt(os.path.join(datadir, 'etopo20lats.gz'))
+
+# depth positive
+topo = -topo
+
+# fix minimum depth
+hmin = 5
+topo = np.where(topo < hmin, hmin, topo)
+
+# interpolate new bathymetry
+lon, lat = np.meshgrid(lons, lats)
+h = griddata((lon.flat,lat.flat),topo.flat,(hgrd.lon_rho,hgrd.lat_rho), method='linear')
+
+# insure that depth is always deeper than hmin
+h = np.where(h < hmin, hmin, h)
+
+# set depth to hmin where masked
+idx = np.where(hgrd.mask_rho == 0)
+h[idx] = hmin
+
+# save raw bathymetry
+hraw = h.copy()
+
+# vertical coordinate
+theta_b = 2
+theta_s = 7.0
+Tcline = 50
+N = 30
+vgrd = pyroms.vgrid.s_coordinate_4(h, theta_b, theta_s, Tcline, N, hraw=hraw)
+
+# ROMS grid
+grd_name = 'ARCTIC_COPERNICUS'
+grd = pyroms.grid.ROMS_Grid(grd_name, hgrd, vgrd)
+
+# write grid to netcdf file
 print('writing the grid')
-hgrd.to_netcdf('roms_grid_Arctic_Copernicus.nc')
+pyroms.grid.write_ROMS_grid(grd, filename='roms_grid_Arctic_Copernicus.nc')
+
+# to load the grid file back
+# grd=pyroms.grid.get_ROMS_grid(grd_name,hist_file='roms_grid_Arctic_Copernicus.nc',grid_file='roms_grid_Arctic_Copernicus.nc')
 
 # lon_rho = hgrd.lon_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
 # lat_rho = hgrd.lat_rho[1:-1,1:-1] # Cell centers (drop outside row and column)
@@ -163,7 +183,7 @@ hgrd.to_netcdf('roms_grid_Arctic_Copernicus.nc')
 
 nj,ni = hgrd.lon_rho.shape
 nj -=2; ni -=2
-print('nj=%i, nj=%i'%(nj,ni))
+print('nj=%i, ni=%i'%(nj,ni))
 
 # Supergrid shape
 snj,sni = 2*np.array([nj,ni]) # Smallest useful super-grid has a multiplier of 2
@@ -192,12 +212,20 @@ dx[:,:] = R*angle_p1p2( (lat[:,1:],lon[:,1:]), (lat[:,:-1],lon[:,:-1]) )
 dy[:,:] = R*angle_p1p2( (lat[1:,:],lon[1:,:]), (lat[:-1,:],lon[:-1,:]) )
 
 # Approximate angles using centered differences in interior
-angle[:,1:-1] = np.arctan( (lat[:,2:]-lat[:,:-2]) /
-                          ((lon[:,2:]-lon[:,:-2])*np.cos(np.deg2rad(lat[:,1:-1]))) )
-# Approximate angles using side differences on left/right edges
-angle[:,0] = np.arctan( (lat[:,1]-lat[:,0]) / ((lon[:,1]-lon[:,0])*np.cos(np.deg2rad(lat[:,0]))) )
-angle[:,-1] = np.arctan( (lat[:,-1]-lat[:,-2]) /
-                        ((lon[:,-1]-lon[:,-2])*np.cos(np.deg2rad(lat[:,-1]))) )
+lon1 = lon
+cos_lat = np.cos(np.radians(lat))
+angle1 = np.zeros(lat.shape)
+angle2 = np.zeros(lat.shape)
+# Compute it twice to recover from dateline problems, if any
+angle1[:,1:-1] = np.arctan2( (lat[:,2:] - lat[:,:-2]) , ((lon[:,2:] - lon[:,:-2]) * cos_lat[:,1:-1]) )
+angle1[:, 0  ] = np.arctan2( (lat[:, 1] - lat[:, 0 ]) , ((lon[:, 1] - lon[:, 0 ]) * cos_lat[:, 0  ]) )
+angle1[:,-1  ] = np.arctan2( (lat[:,-1] - lat[:,-2 ]) , ((lon[:,-1] - lon[:,-2 ]) * cos_lat[:,-1  ]) )
+lon = np.where(lon < 0., lon+360, lon)
+angle2[:,1:-1] = np.arctan2( (lat[:,2:] - lat[:,:-2]) , ((lon[:,2:] - lon[:,:-2]) * cos_lat[:,1:-1]) )
+angle2[:, 0  ] = np.arctan2( (lat[:, 1] - lat[:, 0 ]) , ((lon[:, 1] - lon[:, 0 ]) * cos_lat[:, 0  ]) )
+angle2[:,-1  ] = np.arctan2( (lat[:,-1] - lat[:,-2 ]) , ((lon[:,-1] - lon[:,-2 ]) * cos_lat[:,-1  ]) )
+angle = np.maximum(angle1, angle2)
+lon = lon1
 
 area = dx[:-1,:]*dy[:,:-1]
 # area = area[:-1,:-1]
@@ -206,23 +234,23 @@ area = dx[:-1,:]*dy[:,:-1]
 rg = scipy.io.netcdf_file('ocean_hgrid.nc','w')
 # Dimensions
 rg.createDimension('nx',sni)
-rg.createDimension('nxp1',sni+1)
+rg.createDimension('nxp',sni+1)
 rg.createDimension('ny',snj)
-rg.createDimension('nyp1',snj+1)
+rg.createDimension('nyp',snj+1)
 # rg.createDimension('string',255)
 rg.createDimension('string',5)
 # Variables
-hx = rg.createVariable('x','float32',('nyp1','nxp1',))
+hx = rg.createVariable('x','float32',('nyp','nxp',))
 hx.units = 'degrees'
-hy = rg.createVariable('y','float32',('nyp1','nxp1',))
+hy = rg.createVariable('y','float32',('nyp','nxp',))
 hy.units = 'degrees'
-hdx = rg.createVariable('dx','float32',('nyp1','nx',))
+hdx = rg.createVariable('dx','float32',('nyp','nx',))
 hdx.units = 'meters'
-hdy = rg.createVariable('dy','float32',('ny','nxp1',))
+hdy = rg.createVariable('dy','float32',('ny','nxp',))
 hdy.units = 'meters'
 harea = rg.createVariable('area','float32',('ny','nx',))
 harea.units = 'meters^2'
-hangle = rg.createVariable('angle_dx','float32',('nyp1','nxp1',))
+hangle = rg.createVariable('angle_dx','float32',('nyp','nxp',))
 hangle.units = 'degrees'
 htile = rg.createVariable('tile','c',('string',))
 # Values
@@ -234,3 +262,4 @@ harea[:] = area
 hangle[:] = angle
 htile[:5] = 'tile1'
 rg.close()
+
