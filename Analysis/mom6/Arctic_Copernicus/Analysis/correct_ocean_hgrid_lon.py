@@ -46,11 +46,17 @@ def quad_area(lat, lon):
     return a0 + a1 + a2 + a3 - 2. * np.pi
 
 
-df = xr.open_dataset('ocean_hgrid_old.nc')
+df = xr.open_dataset('~/dataset/MOM6/Arctic_Copernicus/ocean_hgrid.nc')
 
-lon = np.flipud(np.transpose(np.copy(df.x)))
-lon1 = np.flipud(np.transpose(np.copy(df.x)))
-lat = np.flipud(np.transpose(np.copy(df.y)))
+lon = np.copy(df.x)
+lon1 = lon
+lon[lon<0]=lon[lon<0]+360
+lat = np.copy(df.y)
+
+lon = np.transpose(lon)
+lon1 = np.transpose(lon1)
+lat = np.transpose(lat)
+
 snj, sni = lon.shape
 
 snj -= 1
@@ -74,10 +80,10 @@ angle2 = np.zeros(lat.shape)
 angle1[:,1:-1] = np.arctan2( (lat[:,2:] - lat[:,:-2]) , ((lon[:,2:] - lon[:,:-2]) * cos_lat[:,1:-1]) )
 angle1[:, 0  ] = np.arctan2( (lat[:, 1] - lat[:, 0 ]) , ((lon[:, 1] - lon[:, 0 ]) * cos_lat[:, 0  ]) )
 angle1[:,-1  ] = np.arctan2( (lat[:,-1] - lat[:,-2 ]) , ((lon[:,-1] - lon[:,-2 ]) * cos_lat[:,-1  ]) )
-lon = np.where(lon < 0., lon+360, lon)
-angle2[:,1:-1] = np.arctan2( (lat[:,2:] - lat[:,:-2]) , ((lon[:,2:] - lon[:,:-2]) * cos_lat[:,1:-1]) )
-angle2[:, 0  ] = np.arctan2( (lat[:, 1] - lat[:, 0 ]) , ((lon[:, 1] - lon[:, 0 ]) * cos_lat[:, 0  ]) )
-angle2[:,-1  ] = np.arctan2( (lat[:,-1] - lat[:,-2 ]) , ((lon[:,-1] - lon[:,-2 ]) * cos_lat[:,-1  ]) )
+lon1 = np.where(lon1 < 0., lon1+360, lon1)
+angle2[:,1:-1] = np.arctan2( (lat[:,2:] - lat[:,:-2]) , ((lon1[:,2:] - lon1[:,:-2]) * cos_lat[:,1:-1]) )
+angle2[:, 0  ] = np.arctan2( (lat[:, 1] - lat[:, 0 ]) , ((lon1[:, 1] - lon1[:, 0 ]) * cos_lat[:, 0  ]) )
+angle2[:,-1  ] = np.arctan2( (lat[:,-1] - lat[:,-2 ]) , ((lon1[:,-1] - lon1[:,-2 ]) * cos_lat[:,-1  ]) )
 angle = np.maximum(angle1, angle2)
 
 area = dx[:-1,:]*dy[:,:-1]
@@ -107,7 +113,7 @@ hangle = rg.createVariable('angle_dx','float32',('nyp','nxp',))
 hangle.units = 'degrees'
 htile = rg.createVariable('tile','c',('string',))
 # Values
-hx[:] = lon1
+hx[:] = lon
 hy[:] = lat
 hdx[:] = dx
 hdy[:] = dy

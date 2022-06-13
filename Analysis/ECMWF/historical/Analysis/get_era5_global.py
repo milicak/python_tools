@@ -2,12 +2,7 @@ import cdsapi
 
 c = cdsapi.Client()
 
-root_folder = '/okyanus/users/milicak/dataset/ERA5/'
-
-variables = ['10m_u_component_of_wind','10m_v_component_of_wind','2m_dewpoint_temperature',
-'2m_temperature','evaporation','mean_sea_level_pressure','surface_latent_heat_flux',
-'surface_net_solar_radiation','surface_net_thermal_radiation','surface_sensible_heat_flux',
-'surface_thermal_radiation_downwards','total_cloud_cover','total_precipitation']
+root_folder = '/okyanus/users/milicak/dataset/ERA5/global/'
 
 variables = ['10m_u_component_of_wind']
 # variables = ['10m_v_component_of_wind']
@@ -24,15 +19,19 @@ variables = ['10m_u_component_of_wind']
 # variables = ['total_precipitation']
 # variables = ['specific humidity']
 
-variables = ['10m_u_component_of_wind','10m_v_component_of_wind','2m_dewpoint_temperature',
-'2m_temperature','evaporation','mean_sea_level_pressure','surface_latent_heat_flux',
-'surface_net_solar_radiation','surface_net_thermal_radiation','surface_sensible_heat_flux',
-'surface_thermal_radiation_downwards','total_cloud_cover','total_precipitation']
+variables = [
+             '10m_u_component_of_wind','10m_v_component_of_wind','2m_dewpoint_temperature',
+             '2m_temperature','mean_sea_level_pressure','snowfall',
+             'surface_pressure','surface_solar_radiation_downwards','surface_thermal_radiation_downwards',
+             'total_cloud_cover','total_precipitation'
+         ]
+
 
 
 # for year in range(2014, 2020):
 # for year in range(2019, 2020):
-for year in range(1993, 2007):
+yearind = 1995
+for year in range(yearind, yearind+1):
     for var in variables:
         filename = root_folder + 'era5_' + var + '_' + str(year) + '.nc'
         c.retrieve(
@@ -43,7 +42,6 @@ for year in range(1993, 2007):
                 'variable':[
                     var
                 ],
-                'area'    : "48.50/25.00/37.00/43.00",
                 'year':[
                     year
                 ],

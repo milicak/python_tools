@@ -95,10 +95,10 @@ def velocity_at_corners(ds_u,ds_v):
     ds_uvq = xr.Dataset({'u':u_q,'v':v_q},coords={'time':ds_u.time,'lon':parent_grid['q'].x,'lat':parent_grid['q'].y,'angle_dx':parent_grid['q'].angle_dx})
     return ds_uvq
 
-root_folder = '/okyanus/users/milicak/dataset/SODA3_12_21/'
+root_folder = '/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/'
 # fname1 = 'soda3.12.2_5dy_ocean_reg_1980_01_03.nc'
 # df = xr.open_dataset(root_folder + fname1)
-mom_dir = '/okyanus/users/milicak/dataset/MOM6/Arctic_Copernicus/'
+mom_dir = '/okyanus/users/milicak/dataset/MOM6/NA12/'
 path_regional_grid = mom_dir + './ocean_hgrid.nc'
 regional_grid=open_grid(path_regional_grid)
 
@@ -113,15 +113,6 @@ north['lat'] = ds_regional['y'].isel(nyp=-1)
 south = xr.Dataset()
 south['lon'] = ds_regional['x'].isel(nyp=0)
 south['lat'] = ds_regional['y'].isel(nyp=0)
-# western boundary
-west = xr.Dataset()
-west['lon'] = ds_regional['x'].isel(nxp=0)
-west['lat'] = ds_regional['y'].isel(nxp=0)
-# eastern boundary
-east = xr.Dataset()
-east['lon'] = ds_regional['x'].isel(nxp=-1)
-east['lat'] = ds_regional['y'].isel(nxp=-1)
-
 
 ls1 = sorted(glob.glob('/okyanus/users/milicak/dataset/SODA3_12_21/sodafiles/soda3.12.2*.nc'))
 dfm = xr.open_dataset(ls1[0])
@@ -139,12 +130,6 @@ regrid_north_uv = xesmf.Regridder(dfuv, north, 'nearest_s2d',
 regrid_south_uv = xesmf.Regridder(dfuv, south, 'nearest_s2d',
                        locstream_out=True, periodic=False, filename='regrid_south_uv.nc',reuse_weights=True)
 
-regrid_east_uv = xesmf.Regridder(dfuv, east, 'nearest_s2d',
-                       locstream_out=True, periodic=False, filename='regrid_east_uv.nc',reuse_weights=True)
-
-regrid_west_uv = xesmf.Regridder(dfuv, west, 'nearest_s2d',
-                       locstream_out=True, periodic=False, filename='regrid_west_uv.nc',reuse_weights=True)
-
 # tracer values
 regrid_north_tr = xesmf.Regridder(dft, north, 'nearest_s2d',
                        locstream_out=True, periodic=False, filename='regrid_north_tr.nc',reuse_weights=True)
@@ -152,13 +137,7 @@ regrid_north_tr = xesmf.Regridder(dft, north, 'nearest_s2d',
 regrid_south_tr = xesmf.Regridder(dft, south, 'nearest_s2d',
                        locstream_out=True, periodic=False, filename='regrid_south_tr.nc',reuse_weights=True)
 
-regrid_east_tr = xesmf.Regridder(dft, east, 'nearest_s2d',
-                       locstream_out=True, periodic=False, filename='regrid_east_tr.nc',reuse_weights=True)
-
-regrid_west_tr = xesmf.Regridder(dft, west, 'nearest_s2d',
-                       locstream_out=True, periodic=False, filename='regrid_west_tr.nc',reuse_weights=True)
-
-
+ls1 = ls1[1168:]
 for idx, fname in enumerate(ls1):
     print(idx,fname)
     dfm = xr.open_dataset(fname)
@@ -183,23 +162,6 @@ for idx, fname in enumerate(ls1):
     fnam=root_folder + 'tracers_south_' + np.str(idx).zfill(4)+ '_obc.nc'
     ds_tr_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
 
-    temp_east = regrid_east_tr(dft['temp'])
-    salt_east = regrid_east_tr(dft['salt'])
-    temp_east = temp_east.ffill(dim='locations').ffill(dim='st_ocean')
-    salt_east = salt_east.ffill(dim='locations').ffill(dim='st_ocean')
-    ds_tr_east = xr.Dataset({'temp':temp_east,'salt':salt_east})
-    ds_tr_east.time.encoding['calendar']='gregorian'
-    fnam=root_folder + 'tracers_east' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_tr_east.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
-
-    temp_west = regrid_west_tr(dft['temp'])
-    salt_west = regrid_west_tr(dft['salt'])
-    temp_west = temp_west.ffill(dim='locations').ffill(dim='st_ocean')
-    salt_west = salt_west.ffill(dim='locations').ffill(dim='st_ocean')
-    ds_tr_west = xr.Dataset({'temp':temp_west,'salt':salt_west})
-    ds_tr_west.time.encoding['calendar']='gregorian'
-    fnam=root_folder + 'tracers_west' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_tr_west.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
     # interpolate ssh
     ssh_north = regrid_north_tr(dft['ssh'])
     ds_ssh_north = xr.Dataset({'ssh':ssh_north})
@@ -211,25 +173,11 @@ for idx, fname in enumerate(ls1):
     ds_ssh_south.time.encoding['calendar'] = "gregorian"
     fnam=root_folder + 'ssh_south' + np.str(idx).zfill(4)+ '_obc.nc'
     ds_ssh_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
-    ssh_east = regrid_east_tr(dft['ssh'])
-    ds_ssh_east = xr.Dataset({'ssh':ssh_east})
-    ds_ssh_east.time.encoding['calendar'] = "gregorian"
-    fnam=root_folder + 'ssh_east' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_ssh_east.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
-    ssh_west = regrid_west_tr(dft['ssh'])
-    ds_ssh_west = xr.Dataset({'ssh':ssh_west})
-    ds_ssh_west.time.encoding['calendar'] = "gregorian"
-    fnam=root_folder + 'ssh_west' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_ssh_west.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
     # interpolate true u and v velocities
     u_north_r = regrid_north_uv(dfuv['u'])
     v_north_r = regrid_north_uv(dfuv['v'])
     u_south_r = regrid_south_uv(dfuv['u'])
     v_south_r = regrid_south_uv(dfuv['v'])
-    u_east_r = regrid_east_uv(dfuv['u'])
-    v_east_r = regrid_east_uv(dfuv['v'])
-    u_west_r = regrid_west_uv(dfuv['u'])
-    v_west_r = regrid_west_uv(dfuv['v'])
     # rotate back to model grid
     u_north,v_north=apply_rotation_transpose(u_north_r,v_north_r,ds_regional.angle_dx.isel(nyp=ds_regional.nyp[-1]),time_slice=None)
     u_north = u_north.fillna(0)
@@ -248,24 +196,6 @@ for idx, fname in enumerate(ls1):
     ds_uv_south.time.encoding['calendar']='gregorian'
     fnam=root_folder + 'uv_south' + np.str(idx).zfill(4)+ '_obc.nc'
     ds_uv_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
-
-    u_east,v_east=apply_rotation_transpose(u_east_r,v_east_r,ds_regional.angle_dx.isel(nxp=ds_regional.nxp[-1]),time_slice=None)
-    u_east = u_east.fillna(0)
-    v_east = v_east.fillna(0)
-    ds_uv_east = xr.Dataset({'u':u_east,'v':v_east},coords={'lon':east.lon,'lat':east.lat,'st_ocean':dfuv.st_ocean})
-    ds_uv_east = ds_uv_east.rename({'i':'locations'})
-    ds_uv_east.time.encoding['calendar']='gregorian'
-    fnam=root_folder + 'uv_east' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_uv_east.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
-
-    u_west,v_west=apply_rotation_transpose(u_west_r,v_west_r,ds_regional.angle_dx.isel(nxp=ds_regional.nxp[0]),time_slice=None)
-    u_west = u_west.fillna(0)
-    v_west = v_west.fillna(0)
-    ds_uv_west = xr.Dataset({'u':u_west,'v':v_west},coords={'lon':west.lon,'lat':west.lat,'st_ocean':dfuv.st_ocean})
-    ds_uv_west = ds_uv_west.rename({'i':'locations'})
-    ds_uv_west.time.encoding['calendar']='gregorian'
-    fnam=root_folder + 'uv_west' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_uv_west.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
 
 
 
