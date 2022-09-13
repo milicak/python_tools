@@ -4,14 +4,14 @@ import glob
 from mpl_toolkits.basemap import Basemap
 import xarray
 
-root_folder = '~/dataset/MOM6/NA12/'
+root_folder = '~/dataset/MOM6/Arctic_Copernicus/'
 year1 = 1996
 fname = '~/dataset/GLOFAS/glofas-era5_' + str(year1) + '.nc'
 df = xr.open_dataset(fname)
-gr = xr.open_dataset('~/dataset/MOM6/NA12/ocean_hgrid.nc')
+gr = xr.open_dataset('~/dataset/MOM6/Arctic_Copernicus/ocean_hgrid.nc')
 
 
-uparea = xarray.open_dataarray('/okyanus/users/milicak/dataset/MOM6/NA12/upArea.nc')
+uparea = xarray.open_dataarray('/okyanus/users/milicak/dataset/MOM6/Arctic_Copernicus/upArea.nc')
 
 # Find river end points by looking for local maxima in upstream area.
 uparea = uparea.fillna(0).values
@@ -27,7 +27,7 @@ for i in range(window, ni-window):
         if point > 1e6 and sub.max() == point:
             points[i, j] = 1
 
-m = Basemap(projection='cea',llcrnrlat=-90,urcrnrlat=90,llcrnrlon=-180,urcrnrlon=180,resolution='c')
+m = Basemap(projection='npstere',boundinglat=10,lon_0=0,resolution='l');
 # m.fillcontinents(color='coral',lake_color='aqua');
 
 lon = np.copy(df.lon)
@@ -46,57 +46,6 @@ nx = lon.shape[1]
 inside = np.reshape(inside,((ny,nx)))
 inside = np.double(inside)
 
-lon_pac = np.array([ 9048029.34206251, 12573138.58634935, 12065283.86471481,
-       11348312.49299545, 11497681.52877031, 11467807.72161534,
-       11228817.26437556, 11019700.61429074, 10750836.34989598,
-       10571593.50696614, 10392350.6640363 ,  9944243.55671171,
-        9675379.29231695,  9077903.14921748,  8390805.5846531 ,
-        8420679.39180807, 9048029.34206251])
-
-lat_pac = np.array([3283837.76860507, 3283837.76860507, 5375004.2694532 ,
-       5882858.99108774, 6540082.74849715, 7167432.69875159,
-       7376549.3488364 , 7316801.73452646, 7346675.54168143,
-       7585665.99892121, 8003899.29909084, 8003899.29909084,
-       8242889.75633062, 8392258.79210549, 6420587.51987726,
-       5584120.91953801, 3283837.76860507])
-
-vertices2 = np.transpose(np.array([lon_pac,lat_pac]))
-path2 = mpPath(vertices2)
-inside2 = path2.contains_points(pnts)
-inside2 = np.reshape(inside2,((ny,nx)))
-inside2 = np.double(inside2)
-inside[inside2==1] = 0
-
-# black sea
-lon_bs = np.array([22967935.510735497, 24767590.5340392,
-                   24755934.737256326,22972597.82944872,
-                  22967935.510735497])
-lat_bs = np.array([10458202.148715083, 10446546.351932026,
-                    11211166.620900515,11157549.955698457,
-                  10458202.148715083])
-
-vertices3 = np.transpose(np.array([lon_bs,lat_bs]))
-path3 = mpPath(vertices3)
-inside3 = path3.contains_points(pnts)
-inside3 = np.reshape(inside3,((ny,nx)))
-inside3 = np.double(inside3)
-inside[inside3==1] = 0
-
-# East africa
-lon_afr = np.array([23302593.001464494,24203086.558646895,
-                    24192263.318776917,23389178.92042434,
-                   23302593.001464494])
-
-lat_afr = np.array([3379250.4559573424, 3372756.512035354,
-                     4552489.657863263, 4580630.081525214,
-                   3379250.4559573424])
-
-vertices4 = np.transpose(np.array([lon_afr,lat_afr]))
-path4 = mpPath(vertices4)
-inside4 = path4.contains_points(pnts)
-inside4 = np.reshape(inside4,((ny,nx)))
-inside4 = np.double(inside4)
-inside[inside4==1] = 0
 
 # Convert m3/s to kg/m2/s
 # Borrowed from https://xgcm.readthedocs.io/en/latest/xgcm-examples/05_autogenerate.html
@@ -122,7 +71,7 @@ for year in range(1996,2018):
     #glofas_kg = glofas_kg.rename({'dis24': 'runoff'})
     #glofas_kg['area'] = glofas_area
     #glofas_kg['runoff'] = glofas_kg['runoff']*inside*points
-    fout = root_folder + 'glofas-era5_NA12_' + str(year) + '.nc'
+    fout = root_folder + 'glofas-era5_Arctic_Copernicus_' + str(year) + '.nc'
     glofas_kg=glofas_kg.to_dataset(name='runoff')
     glofas_kg['lon']=glofas_kg.lon-360
     glofas_kg.to_netcdf(fout)

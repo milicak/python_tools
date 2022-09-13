@@ -9,14 +9,14 @@ import os.path
 from HCtFlood import kara as flood
 
 era5_dict = {
-            # 'ERA5_2m_temperature':'t2m',
-            # 'ERA5_10m_u_component_of_wind':'u10',
-            # 'ERA5_10m_v_component_of_wind':'v10',
-            # 'ERA5_surface_solar_radiation_downwards':'ssrd',
-            # 'ERA5_surface_thermal_radiation_downwards':'strd',
+            'ERA5_2m_temperature':'t2m',
+            'ERA5_10m_u_component_of_wind':'u10',
+            'ERA5_10m_v_component_of_wind':'v10',
+            'ERA5_surface_solar_radiation_downwards':'ssrd',
+            'ERA5_surface_thermal_radiation_downwards':'strd',
             'ERA5_total_rain_rate':'trr',
-            # 'ERA5_mean_sea_level_pressure':'msl',
-            # 'ERA5_2m_specific_humidity':'huss'
+            'ERA5_mean_sea_level_pressure':'msl',
+            'ERA5_2m_specific_humidity':'huss'
             }
 
 def interp_landmask(landmask_file):
@@ -166,8 +166,8 @@ def flood_era5_data(era5_file,era5_var,landmask_file, outfile, reuse_weights=Fal
 
 def main():
     landmask_file = '/okyanus/users/milicak/dataset/MOM6/NA12/land_mask_v2.nc'
-    padded_dir = '/okyanus/users/milicak/dataset/ERA5/NA12/padded/'
-    flood_dir = '/okyanus/users/milicak/dataset/ERA5/NA12/flooded/'
+    padded_dir = '/okyanus/users/milicak/dataset/ERA5/TSS/padded/'
+    flood_dir = '/okyanus/users/milicak/dataset/ERA5/TSS/flooded/'
     keys_list=list(era5_dict)
     # for era5_year in range(1995,1998):
     # for era5_year in range(1998,2002):
@@ -175,7 +175,7 @@ def main():
     # for era5_year in range(2005,2008):
     # for era5_year in range(2008,2011):
     # for era5_year in range(2011,2015):
-    for era5_year in range(2015,2018):
+    for era5_year in range(2018,2020):
         print(era5_year)
         for f in era5_dict.keys():
             reuse_weights=False

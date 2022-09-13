@@ -1,23 +1,23 @@
 import cdsapi
 import sys
 
-year=2020
+year=2021
 cyear=str(year)
 
 varlist=[
          #  '10m_u_component_of_wind',
-         #  '10m_v_component_of_wind',
-         #  '2m_dewpoint_temperature',
-         #   '2m_temperature',
-         #   'mean_sea_level_pressure',
-         #   'snowfall',
-         #   'surface_pressure',
-         #   'surface_solar_radiation_downwards',
-         #   'surface_thermal_radiation_downwards',
-         #   'total_cloud_cover',
-         #   'total_precipitation'
-             'convective_rain_rate',
-             'large_scale_rain_rate',
+           # '10m_v_component_of_wind',
+           # '2m_dewpoint_temperature',
+            # '2m_temperature',
+            # 'mean_sea_level_pressure',
+            # 'snowfall',
+            # 'surface_pressure',
+            # 'surface_solar_radiation_downwards',
+            # 'surface_thermal_radiation_downwards',
+            # 'total_cloud_cover',
+            # 'total_precipitation'
+            'convective_rain_rate',
+            'large_scale_rain_rate',
         ]
 
 c = cdsapi.Client()

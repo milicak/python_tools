@@ -264,8 +264,13 @@ for itr in range(0,len(iind)):
 # a lake in the Canada region is closed
 # also river end in the Siberia
 df = xr.open_dataset('ocean_topog.nc')
+hraw = np.copy(df.depth)
 # great lakes closed
 hraw[0,1300:1380] = 0
+
+# 4 points lake closed
+hraw[161:163,675:677]=-0.0
+nj,ni = hraw.shape
 
 # Create a topography file
 rg = scipy.io.netcdf_file('ocean_topog.nc','w')

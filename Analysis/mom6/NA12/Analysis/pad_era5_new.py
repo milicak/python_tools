@@ -35,6 +35,29 @@ for year in range(1997,1998):
         current.close()
         next_data.close()
         all_vars = list(out.data_vars.keys()) + list(out.coords.keys())
+        if f1=='ssrd' or f1=='strd':
+            # convert radiation from J/m2 to W/m2: https://confluence.ecmwf.int/pages/viewpage.action?pageId=155337784
+            out[f1].values = out[f1].values/3600.0
+            out[f1].attrs['units'] = 'W m-2'
+        if f1=='huss':
+            out[f1].attrs['dtype'] = 'float64'
+            out[f1].attrs['standard_name'] = 'specific_humidity'
+            out[f1].attrs['long_name'] = 'Near-Surface Specific Humidity'
+            out[f1].attrs['coordinates'] = 'height'
+            out[f1].attrs['units'] = '1'
+            out['height'] = 2.0
+            out['height'].attrs['units'] = "m"
+            out['height'].attrs['axis'] = "Z"
+            out['height'].attrs['positive'] = "up"
+            out['height'].attrs['long_name'] = "height"
+            out['height'].attrs['standard_name'] = "height"
+        if f1=='t2m':
+            out['height'] = 2.0
+            out['height'].attrs['units'] = "m"
+            out['height'].attrs['axis'] = "Z"
+            out['height'].attrs['positive'] = "up"
+            out['height'].attrs['long_name'] = "height"
+            out['height'].attrs['standard_name'] = "height"
         encodings = {v: {'_FillValue': 1.0e20} for v in all_vars}
         encodings['time'].update({'dtype':'float64', 'calendar': 'gregorian'})
         out['time'].attrs['long_name'] = 'time'

@@ -1,5 +1,6 @@
 import datetime as dt
 import numpy as np
+import os
 from os import path
 import pandas as pd
 import xarray
@@ -10,7 +11,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def write_tpxo(constituents, tpxo_dir, segments, horizontal_subset):
+def write_tpxo(year,constituents, tpxo_dir, segments, horizontal_subset):
     tpxo_h = (
         xarray.open_dataset(path.join(tpxo_dir, 'h_tpxo9.v5a.nc'))
         .rename({'lon_z': 'lon', 'lat_z': 'lat', 'nc': 'constituent'})
@@ -43,7 +44,7 @@ def write_tpxo(constituents, tpxo_dir, segments, horizontal_subset):
     # or other long-term variations to be added.
     # the date should begin 1 month before first day of simulation
     times = xarray.DataArray(
-        pd.date_range('2009-12-01', periods=1),
+        pd.date_range(str(year)+'-12-01', periods=1),
         dims=['time']
     )
     for seg in segments:
@@ -110,8 +111,17 @@ def main():
         # Segment(3, 'east', hgrid, output_dir=output_dir)
     ]
 
-    write_tpxo(constituents, tpxo_dir, segments, horizontal_subset)
-
+    for year in range(1995,2017):
+        print(year)
+        write_tpxo(year, constituents, tpxo_dir, segments, horizontal_subset)
+        cmnd = 'mv ' + output_dir + '/tz_001.nc ' + output_dir + '/tz_01_' + str(year+1) + '.nc'
+        os.system(cmnd)
+        cmnd = 'mv ' + output_dir + '/tz_002.nc ' + output_dir + '/tz_02_' + str(year+1) + '.nc'
+        os.system(cmnd)
+        cmnd = 'mv ' + output_dir + '/tu_001.nc ' + output_dir + '/tu_01_' + str(year+1) + '.nc'
+        os.system(cmnd)
+        cmnd = 'mv ' + output_dir + '/tu_002.nc ' + output_dir + '/tu_02_' + str(year+1) + '.nc'
+        os.system(cmnd)
 
 
 if __name__ == '__main__':

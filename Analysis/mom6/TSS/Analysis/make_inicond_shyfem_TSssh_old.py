@@ -76,7 +76,7 @@ vartemp[0,-4:,:,:] = vartemp[0,-5,:,:]
 varsalt[0,-4:,:,:] = varsalt[0,-5,:,:]
 nk = vartemp.shape[1]
 varsalt += 0.15
-ssh = np.copy(tmp)
+ssh[0,:,:] = np.copy(tmp)
 
 time = 17.5
 

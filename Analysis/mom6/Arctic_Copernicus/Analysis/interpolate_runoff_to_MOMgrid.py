@@ -9,7 +9,7 @@ import matplotlib as mpl
 import xesmf
 import xarray
 
-root_folder = '~/dataset/MOM6/NA12/'
+root_folder = '~/dataset/MOM6/Arctic_Copernicus/'
 
 def get_coast_mask(mask_file):
     mask = xarray.open_dataset(mask_file)
@@ -32,14 +32,13 @@ def get_coast_mask(mask_file):
     return cst_mask
 
 
-hgrid = xr.open_dataset('~/dataset/MOM6/NA12/ocean_hgrid.nc')
-coast_mask = get_coast_mask('/okyanus/users/milicak/dataset/MOM6/NA12/ocean_mask.nc')
+hgrid = xr.open_dataset('~/dataset/MOM6/Arctic_Copernicus/ocean_hgrid.nc')
+coast_mask = get_coast_mask('/okyanus/users/milicak/dataset/MOM6/Arctic_Copernicus/ocean_mask.nc')
 
-for year in range(2009,2018):
-# for year in range(1997,2018):
+for year in range(1996,2018):
     print(year)
-    fname = '~/dataset/MOM6/NA12/glofas-era5_NA12_' + str(year) + '.nc'
-    out_file = root_folder + 'glofas-era5_NA12_gridded_' + str(year) + '.nc'
+    fname = '~/dataset/MOM6/Arctic_Copernicus/glofas-era5_Arctic_Copernicus_' + str(year) + '.nc'
+    out_file = root_folder + 'glofas-era5_Arctic_Copernicus_' + str(year) + '.nc'
     glofas = xr.open_dataset(fname)
 
     glofas_latb = np.arange(glofas['lat'][0]+.05, glofas['lat'][-1]-.051, -.1)

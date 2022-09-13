@@ -668,11 +668,10 @@ class Segment():
 
         # Convert complex
         cplex = redest + 1j * imdest
-        if self.border in ['south', 'north']:
-            print('ilicak')
-            # cplex=cplex.rename({'nxp': 'locations'})
-        elif self.border in ['west', 'east']:
-            cplex=cplex.rename({'nyp': 'locations'})
+        # if self.border in ['south', 'north']:
+        #     cplex=cplex.rename({'nxp': 'locations'})
+        # elif self.border in ['west', 'east']:
+        #     cplex=cplex.rename({'nyp': 'locations'})
 
         # Convert to real amplitude and phase.
         ds_ap = xarray.Dataset({
@@ -761,26 +760,21 @@ class Segment():
         uimdest = regrid_u(uimsource)['uIm']
         vredest = regrid_v(vresource)['vRe']
         vimdest = regrid_v(vimsource)['vIm']
-        print('mehmet2')
-        print(uredest.dims)
+        print('ilicak')
+        uredest
 
         # Fill missing data.
         # Need to do this first because complex would get converted to real
-        if self.border in ['south', 'north']:
-           # uredest = fill_missing(uredest, xdim='nxp',zdim=None)
-           # uimdest = fill_missing(uimdest, xdim='nxp',zdim=None)
-           # vredest = fill_missing(vredest, xdim='nxp',zdim=None)
-           # vimdest = fill_missing(vimdest, xdim='nxp',zdim=None)
-            uredest = fill_missing(uredest, zdim=None)
-            uimdest = fill_missing(uimdest, zdim=None)
-            vredest = fill_missing(vredest, zdim=None)
-            vimdest = fill_missing(vimdest, zdim=None)
-            print('ilicak2')
-        elif self.border in ['west', 'east']:
-            uredest = fill_missing(uredest, xdim='nyp',zdim=None)
-            uimdest = fill_missing(uimdest, xdim='nyp',zdim=None)
-            vredest = fill_missing(vredest, xdim='nyp',zdim=None)
-            vimdest = fill_missing(vimdest, xdim='nyp',zdim=None)
+        # if self.border in ['south', 'north']:
+        #     uredest = fill_missing(uredest, xdim='nxp',zdim=None)
+        #     uimdest = fill_missing(uimdest, xdim='nxp',zdim=None)
+        #     vredest = fill_missing(vredest, xdim='nxp',zdim=None)
+        #     vimdest = fill_missing(vimdest, xdim='nxp',zdim=None)
+        # elif self.border in ['west', 'east']:
+        #     uredest = fill_missing(uredest, xdim='nyp',zdim=None)
+        #     uimdest = fill_missing(uimdest, xdim='nyp',zdim=None)
+        #     vredest = fill_missing(vredest, xdim='nyp',zdim=None)
+        #     vimdest = fill_missing(vimdest, xdim='nyp',zdim=None)
 
 
         # Convert to complex, remaining separate for u and v.
@@ -801,13 +795,12 @@ class Segment():
         INC -= angle.data[np.newaxis, :]
         ua, va, up, vp = ep2ap(SEMA, ECC, INC, PHA)
         # without this step, problems exist down the line because we have nxp AND locations as dimensions
-        if self.border in ['south', 'north']:
-            # ua=ua.rename({'nxp': 'locations'})
-            # va=va.rename({'nxp': 'locations'})
-            print('ilicak3')
-        elif self.border in ['west', 'east']:
-            ua=ua.rename({'nyp': 'locations'})
-            va=va.rename({'nyp': 'locations'})
+        # if self.border in ['south', 'north']:
+        #     ua=ua.rename({'nxp': 'locations'})
+        #     va=va.rename({'nxp': 'locations'})
+        # elif self.border in ['west', 'east']:
+        #     ua=ua.rename({'nyp': 'locations'})
+        #     va=va.rename({'nyp': 'locations'})
         ds_ap = xarray.Dataset({
             f'uamp_{self.segstr}': ua,
             f'vamp_{self.segstr}': va

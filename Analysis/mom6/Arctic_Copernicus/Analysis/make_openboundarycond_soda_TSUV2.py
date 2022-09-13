@@ -11,15 +11,16 @@ import matplotlib as mpl
 from mpl_toolkits.basemap import Basemap
 from matplotlib.colors import LinearSegmentedColormap
 
-cd ('/okyanus/users/milicak/dataset/SODA3_12_21/OBC/')
+cd ('/okyanus/users/milicak/dataset/SODA3_12_21/Arctic_Copernicus_OBC/')
 
 params=[]
-params.append({'suffix':'_segment_001','dim0':2,'tr_in':'tracers_north_1_365.nc','tr_out':'obc_ts_north_1_365.nc','uv_in':'uv_north_1_365.nc','uv_out':'obc_uv_north_1_365.nc','ssh_in':'ssh_north_1_365.nc','ssh_out':'obc_ssh_north_1_365.nc'})
-params.append({'suffix':'_segment_002','dim0':3,'tr_in':'tracers_west_1_365.nc','tr_out':'obc_ts_west_1_365.nc','uv_in':'uv_west_1_365.nc','uv_out':'obc_uv_west_1_365.nc','ssh_in':'ssh_west_1_365.nc','ssh_out':'obc_ssh_west_1_365.nc'})
-params.append({'suffix':'_segment_003','dim0':2,'tr_in':'tracers_south_1_365.nc','tr_out':'obc_ts_south_1_365.nc','uv_in':'uv_south_1_365.nc','uv_out':'obc_uv_south_1_365.nc','ssh_in':'ssh_south_1_365.nc','ssh_out':'obc_ssh_south_1_365.nc'})
-params.append({'suffix':'_segment_004','dim0':3,'tr_in':'tracers_east_1_365.nc','tr_out':'obc_ts_east_1_365.nc','uv_in':'uv_east_1_365.nc','uv_out':'obc_uv_east_1_365.nc','ssh_in':'ssh_east_1_365.nc','ssh_out':'obc_ssh_east_1_365.nc'})
+params.append({'suffix':'_segment_001','dim0':2,'tr_in':'tracers_north.nc','tr_out':'obc_ts_north.nc','uv_in':'uv_north.nc','uv_out':'obc_uv_north.nc','ssh_in':'ssh_north.nc','ssh_out':'obc_ssh_north.nc'})
+params.append({'suffix':'_segment_002','dim0':3,'tr_in':'tracers_west.nc','tr_out':'obc_ts_west.nc','uv_in':'uv_west.nc','uv_out':'obc_uv_west.nc','ssh_in':'ssh_west.nc','ssh_out':'obc_ssh_west.nc'})
+params.append({'suffix':'_segment_003','dim0':2,'tr_in':'tracers_south.nc','tr_out':'obc_ts_south.nc','uv_in':'uv_south.nc','uv_out':'obc_uv_south.nc','ssh_in':'ssh_south.nc','ssh_out':'obc_ssh_south.nc'})
+params.append({'suffix':'_segment_004','dim0':3,'tr_in':'tracers_east.nc','tr_out':'obc_ts_east.nc','uv_in':'uv_east.nc','uv_out':'obc_uv_east.nc','ssh_in':'ssh_east.nc','ssh_out':'obc_ssh_east.nc'})
 
 for pr in params:
+    print(pr)
     ds=xr.open_dataset(pr['tr_in'],decode_times=False)
     zl=ds.temp.z_l
     zi=0.5*(np.roll(zl,shift=-1)+zl)

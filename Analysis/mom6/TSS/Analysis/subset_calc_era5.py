@@ -45,8 +45,8 @@ lat_max = 39.5
 lon_min = 25.5
 lon_max = 30.5
 
-year = 2018
-years = range(year,2021)
+year = 2021
+years = range(year,2022)
 #subset
 era5dir = "/okyanus/users/milicak/dataset/ERA5/global/"
 subdir = '/okyanus/users/milicak/dataset/ERA5/TSS/subset/'
