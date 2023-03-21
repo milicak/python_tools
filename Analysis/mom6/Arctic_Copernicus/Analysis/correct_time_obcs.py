@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 from PyCNAL_regridding import *
 import glob
+import os
 
 def month_range(start, periods=12):
     rng = pd.date_range(pd.Timestamp(start)-pd.offsets.MonthBegin(),
@@ -25,9 +26,9 @@ time = xr.cftime_range(start="1958-01-01", periods=12*61, freq="1MS", calendar="
 time2 = time.shift(15,'D')
 
 # OMIP2.025d.01_1m_19720101_19721231_grid_T_obc_10.nc
-years=np.arange(1958,1959)
-# years=np.arange(1958,1982)
-# years=np.arange(1982,1982)
+years=np.arange(1958,1967)
+# years=np.arange(1958,2001)
+# years=np.arange(2001,2002)
 mom_dir = '/work/opa/mi19918/Projects/mom6/Arctic_Copernicus/INPUT/'
 vars=('temp_segment_001','salt_segment_001','u_segment_001','v_segment_001',
       'temp_segment_002','salt_segment_002','u_segment_002','v_segment_002',
@@ -52,18 +53,19 @@ for ind, year in enumerate(years):
         elif var[0] == 'u':
             remove_extreme_val1_val2(df,var,1,-1);
             df[var] = df[var].fillna(0)
-            # df[var][:,28::,:,:]=0
         elif var[0] == 'v':
             remove_extreme_val1_val2(df,var,1,-1);
             df[var] = df[var].fillna(0)
-            # df[var][:,28::,:,:]=0
     
     encoding={'time':{'dtype':'float64'}}
     # df.time.attrs['units'] = 'Seconds since 01/01/1958 00:00:00 UTC'
     # df.time.attrs['calendar']='gregorian'
+    print(time[ind*12:(12*(ind+1))])
     df['time'] = time[ind*12:(12*(ind+1))]
     fout = mom_dir + 'MOM6_Arctic_Copernicus_year_' + str(year) + '_obc.nc'
     df.to_netcdf(fout, encoding=encoding, unlimited_dims={'time':True})
+    cmnds = 'ncatted -h -O -a _FillValue,,d,, ' + fout
+    os.system(cmnds)
     # df['time'] = df.time+365*ind
     # df['time'].attrs['calendar']='gregorian'
 

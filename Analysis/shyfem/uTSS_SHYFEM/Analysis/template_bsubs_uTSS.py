@@ -1,7 +1,7 @@
 date=20200101
 days=[0,366]
-# days=[0,1096]
-#days=[366,732]
+days=[0,1096]
+# days=[366,732]
 #days=[0,31]
 dtt=86400
 title='uTSS'
@@ -15,7 +15,7 @@ def setBSUBS(paramfile,day,day0,simul, Nprocs):
     f.write('#!/bin/bash\n\n')
     f.write('#BSUB -x\n')
     f.write('#BSUB -q p_short\n')
-    f.write('#BSUB -P 0285\n')
+    f.write('#BSUB -P 0512\n')
     # f.write('#BSUB -q p_medium\n')
     f.write('#BSUB -J uTSS_SHYFEM%s\n' % day)
     f.write('#BSUB -n %s\n' % Nprocs)

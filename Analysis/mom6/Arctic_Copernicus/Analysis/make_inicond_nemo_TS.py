@@ -19,17 +19,24 @@ from PyCNAL_regridding import *
 
 root_folder = '/data/products/OMIP/OMIP2_ORCA025/'
 fname1 = 'OMIP2.025d.01_1m_19580101_19581231_grid_T.nc'
-ds = xr.open_dataset(root_folder + fname1)
+dds = xr.open_dataset(root_folder + fname1)
 mom_dir = '/work/opa/mi19918/Projects/mom6/Arctic_Copernicus/INPUT/'
 path_regional_grid = mom_dir + './ocean_hgrid.nc'                     
 
 variable = 'thetao'
 
+# here I make a filter so that I only take high latitudes profile which is 
+# good when I ran the flood_kara for the deep ocean
+ds = dds[variable][0,:,700:,:]
+# ds = dds[variable]
+ds = ds.to_dataset(name='thetao')  
 ds[variable] = ds.thetao.where(ds.thetao!=0)
-df = flood_kara(ds[variable][0,:,:,:], xdim='x_grid_T', ydim='y_grid_T', zdim='deptht') 
+# ds[variable] = ds[variable].ffill(dim=ds[variable].dims[1])
+df = flood_kara(ds[variable][:,:,:], xdim='x_grid_T', ydim='y_grid_T', zdim='deptht') 
+# df = flood_kara(ds[variable][0,:,:,:], xdim='x_grid_T', ydim='y_grid_T', zdim='deptht') 
 df = df.to_dataset(name='temp')  
 df['nav_lon_grid_T'] = ds['nav_lon_grid_T']  
-df['nav_lat_grid_T'] = ds['nav_lat_grid_T']  
+# df['nav_lat_grid_T'] = ds['nav_lat_grid_T']  
 df = df.rename({'nav_lon_grid_T': 'lon', 'nav_lat_grid_T': 'lat', 'y_grid_T':
                 'y', 'x_grid_T': 'x'})            
                                                                                 
@@ -58,16 +65,21 @@ dr_out = regridder(df['temp'])
 # create 3d ssh variable                   
 # not sure if i need to multiply with mask 
 var = np.copy(dr_out)                      
+var = np.where(var>-1.8,var,-1.8)
 nk = var.shape[1]                          
 
 
 # salinity                                                              
 variable = 'so'                                                    
+ds = dds[variable][0,:,700:,:]
+ds = ds.to_dataset(name='so')  
 ds[variable] = ds.so.where(ds.so!=0)
-df = flood_kara(ds[variable][0,:,:,:], xdim='x_grid_T', ydim='y_grid_T', zdim='deptht') 
+# ds[variable] = ds[variable].ffill(dim=ds[variable].dims[1])
+# df = flood_kara(ds[variable][0,:,:,:], xdim='x_grid_T', ydim='y_grid_T', zdim='deptht') 
+df = flood_kara(ds[variable][:,:,:], xdim='x_grid_T', ydim='y_grid_T', zdim='deptht') 
 df = df.to_dataset(name='salt')                                         
 df['nav_lon_grid_T'] = ds['nav_lon_grid_T']  
-df['nav_lat_grid_T'] = ds['nav_lat_grid_T']  
+# df['nav_lat_grid_T'] = ds['nav_lat_grid_T']  
 df = df.rename({'nav_lon_grid_T': 'lon', 'nav_lat_grid_T': 'lat', 'y_grid_T':
                 'y', 'x_grid_T': 'x'})            
 df = df.rename({'deptht':'depth'})

@@ -41,7 +41,7 @@ ds2 = ds2.rename_dims({'nxp': 'x','nyp': 'y'})
                                                                                 
 # build regridder                                                               
 regridder = xe.Regridder(df, ds2, 'nearest_s2d')                                
-regridder = xe.Regridder(df, ds2, 'nearest_s2d', reuse_weights=True)            
+# regridder = xe.Regridder(df, ds2, 'nearest_s2d', reuse_weights=True)            
                                                                                 
 #apply regridder                          
 dr_out = regridder(df[variable])          

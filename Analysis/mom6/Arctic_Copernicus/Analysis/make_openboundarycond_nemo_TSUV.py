@@ -25,8 +25,10 @@ fname1 = 'OMIP2.025d.01_1m_19580101_19581231_grid_T.nc'
 df = xr.open_dataset(root_folder + fname1)
 mom_dir = '/work/opa/mi19918/Projects/mom6/Arctic_Copernicus/INPUT/'
 path_regional_grid = mom_dir + './ocean_hgrid.nc'                     
+ds = xr.open_dataset(path_regional_grid)
 ls1 = sorted(glob.glob(root_folder+'*grid_T*'))
 xstr = 305
+# xend = 314
 xend = 366
 
 # ds = xr.open_dataset(mom_dir+fname1)
@@ -63,7 +65,7 @@ xend = 366
 # ---------- define a domain target on MOM grid ---------------------
 # Nx and Ny should be the hgrid sizes so double the model grid
 Nx=4000
-Ny=3500
+Ny=2600
 # domain = obc_segment('domain',path_regional_grid,istart=0,iend=Nx,jstart=0,  jend=Ny)
 
 # ---------- define variables on each segment ------------------
@@ -100,19 +102,6 @@ vel_east   = obc_vectvariable(east ,'u','v',geometry='surface',obctype='radiatio
 maskfile = mom_dir + 'nemo0_25degree_mask.nc' 
 # maskfile = mom_dir + 'nemo0_25degree_mask_trim.nc' 
 
-# compute angle 
-# Approximate angles using centered differences in interior                     
-# lon = np.copy(df.nav_lon_grid_T)
-# lat = np.copy(df.nav_lat_grid_T)
-# angle = np.zeros((df.nav_lon_grid_T.shape[0],df.nav_lon_grid_T.shape[1]))
-# angle[:,1:-1] = np.arctan( (lat[:,2:]-lat[:,:-2]) /                             
-#                           ((lon[:,2:]-lon[:,:-2])*np.cos(np.deg2rad(lat[:,1:-1]))) )
-# # Approximate angles using side differences on left/right edges                 
-# angle[:,0] = np.arctan( (lat[:,1]-lat[:,0]) / ((lon[:,1]-lon[:,0])*np.cos(np.deg2rad(lat[:,0]))) )
-# angle[:,-1] = np.arctan( (lat[:,-1]-lat[:,-2]) /                                
-#                         ((lon[:,-1]-lon[:,-2])*np.cos(np.deg2rad(lat[:,-1]))) ) 
-#
-
 # output grid info                                                              
 # df2 = xr.open_dataset(path_regional_grid)
 # lon_rho = np.copy(df2['x'][1::2,1::2])                                          
@@ -138,6 +127,7 @@ for ind in range(1,12):
 
 for ind0 in range(xstr,xend):
     fname1 = ls1[ind0][-44:]
+    fname2 = fname1[:-3]+'_rotated.nc'
     for ind in range(0,12):
         df = xr.open_dataset(root_folder + fname1)
         tail = '_obc_' + str(ind).zfill(2) + '.nc'
@@ -214,47 +204,50 @@ for ind0 in range(xstr,xend):
     
             if first_call:
                 interp_u2s_south, interp_v2s_south = vel_south.interpolate_from(mom_dir +
-                                                fname1,'uo','vo',frame=ind,depthname='deptht',
+                                                fname2,'ue','vn',frame=ind,depthname='deptht',
                                                 coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False)  
                 interp_u2s_west, interp_v2s_west   = vel_west.interpolate_from(mom_dir +
-                                                fname1,'uo','vo',frame=ind,depthname='deptht',
+                                                fname2,'ue','vn',frame=ind,depthname='deptht',
                                                 coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False)  
                 interp_u2s_east, interp_v2s_east   = vel_east.interpolate_from(mom_dir +
-                                                fname1,'uo','vo',frame=ind,depthname='deptht',
+                                                fname2,'ue','vn',frame=ind,depthname='deptht',
                                                 coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False)  
                 interp_u2s_north, interp_v2s_north = vel_north.interpolate_from(mom_dir +
-                                                fname1,'uo','vo',frame=ind,depthname='deptht',
+                                                fname2,'ue','vn',frame=ind,depthname='deptht',
                                                 coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                                 missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False)  
             else:
-                vel_north.interpolate_from(mom_dir + fname1,'uo','vo',frame=ind,depthname='deptht',
+                vel_north.interpolate_from(mom_dir + fname2,'ue','vn',frame=ind,depthname='deptht',
                                     coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                     coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                     missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False,
                                     interpolator_u=interp_u2s_north,interpolator_v=interp_v2s_north)
-                vel_south.interpolate_from(mom_dir + fname1,'uo','vo',frame=ind,depthname='deptht',
+                vel_south.interpolate_from(mom_dir + fname2,'ue','vn',frame=ind,depthname='deptht',
                                     coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                     coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                     missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False,
                                     interpolator_u=interp_u2s_south,interpolator_v=interp_v2s_south)
-                vel_east.interpolate_from(mom_dir + fname1,'uo','vo',frame=ind,depthname='deptht',
+                vel_east.interpolate_from(mom_dir + fname2,'ue','vn',frame=ind,depthname='deptht',
                                     coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                     coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                     missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False,
                                     interpolator_u=interp_u2s_east,interpolator_v=interp_v2s_east)
-                vel_west.interpolate_from(mom_dir + fname1,'uo','vo',frame=ind,depthname='deptht',
+                vel_west.interpolate_from(mom_dir + fname2,'ue','vn',frame=ind,depthname='deptht',
                                     coord_names_u=['nav_lon_grid_T','nav_lat_grid_T'],
                                     coord_names_v=['nav_lon_grid_T','nav_lat_grid_T'],
                                     missing_value=0,maskfile=maskfile,maskvar='mask',autocrop=False,
                                     interpolator_u=interp_u2s_west,interpolator_v=interp_v2s_west)
-    
+
+
+            # DONT FORGET PYCNAL regridding already performed apply rotation transpose
+
     # ---------- list segments and variables to be written -------
             list_segments = [south,north,east,west]
     

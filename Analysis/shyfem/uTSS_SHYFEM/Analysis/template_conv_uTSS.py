@@ -3,6 +3,8 @@ simul='uTSS_lobc_chunk_'
 param='param_lobc_chunk_'
 
 days=[0,366]
+days=[366,732]
+days=[0,1096]
 # days=[366,732]
 # days=[0,732]
 # days=[0,1096]
@@ -207,5 +209,5 @@ def setCONV_WND(bas,day,simul):
 
 for day in range(days[0],days[1]):
 	# setCONV_WND(bas,day,simul)	
-	setCONV_NOS(bas,day,simul)	
-	# setCONV_OUS(bas,day,simul)	
+	# setCONV_NOS(bas,day,simul)	
+	setCONV_OUS(bas,day,simul)	
