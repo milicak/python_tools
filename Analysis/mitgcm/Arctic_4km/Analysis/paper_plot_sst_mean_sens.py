@@ -5,6 +5,9 @@ import mpl_util
 from cpttoseg import cpt2seg
 import matplotlib as mpllib
 
+#Exp2.3 is only temperature change
+#Exp2.1 is both temp and salt change
+
 # AtlorPac = 'Atl'
 AtlorPac = 'Atlv2'
 # AtlorPac = 'Pac'
