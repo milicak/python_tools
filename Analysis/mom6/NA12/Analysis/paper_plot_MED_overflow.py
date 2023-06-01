@@ -34,7 +34,7 @@ cbar = fig.colorbar(im1, cax=cbar_ax)
 ax1.set_xlim(-25,-7.5)
 ax1.set_ylim(-6000,0)
 ax1.set_ylabel(r'Depth [m]',fontsize = 12.0)
-ax1.set_xlabel(r'Lat',fontsize = 12.0)
+ax1.set_xlabel(r'Lon',fontsize = 12.0)
 
 plt.savefig('paperfigs/MED_overflow_section_MOM6_obs.png', bbox_inches='tight',format='png',dpi=300)
 

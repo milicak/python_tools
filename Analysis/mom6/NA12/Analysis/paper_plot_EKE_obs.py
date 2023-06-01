@@ -24,7 +24,7 @@ axpos = ax1.get_position()
 cbar_ax = fig.add_axes([axpos.x1+0.01,axpos.y0+0.035,0.03,axpos.height*0.91]);
 cbar = fig.colorbar(im1, cax=cbar_ax)                             
 cbar.ax.tick_params(labelsize=16)                                          
-cbar.set_label('m/s', fontsize=16)                      
+cbar.set_label(r'm$^2$/s$^2$', fontsize=16)
 lon = np.arange(-100,50,20)
 lat = np.array([-20,0,20,40,60,70])
 ax.set_xticks(lon, crs=ccrs.PlateCarree())

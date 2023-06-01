@@ -5,6 +5,9 @@ import cartopy
 import cartopy.crs as ccrs
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 
+ds = xr.open_dataset('moc_transports.nc')
+ds2 = ds.resample(time='M').mean('time')
+
 df = xr.open_dataset('AMOC_MOM6.nc')
 amocmean = df.AMOC.mean('time')
 # 26.5N is df.lat[708]
@@ -28,7 +31,9 @@ ax0.text(25,-6900,'Lat',fontsize=12)
 
 ax1.plot(df.time,amoc26N,'k',label='monthly')
 ax1.plot(df.time[5::12],df_annual,'r',label='annual')
-ax1.set_ylim(10,35)
+ax1.plot(ds2.time[:-36],ds2.moc_mar_hc10[:-36],'b',label='RAPID')
+ax1.legend(loc='lower left')  
+ax1.set_ylim(5,35)
 ax1.grid()
 ax1.set_ylabel(r'Maximum AMOC at 26.5N [Sv]',fontsize = 12.0)
 ax1.set_xlabel(r'Year',fontsize = 12.0)
