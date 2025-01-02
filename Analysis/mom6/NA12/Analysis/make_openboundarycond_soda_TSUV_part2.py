@@ -4,7 +4,7 @@ import datetime
 
 # ls1=sorted(glob.glob('/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/*1605*'))
 
-root_folder = '/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/'
+root_folder = '/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/tmp/'
 
 variables = ['ssh_north1605_obc','ssh_south1605_obc',
              'tracers_north_1605_obc','tracers_south_1605_obc',
@@ -27,7 +27,7 @@ for var in variables:
     print(outname)
     # out3.time.encoding['calendar']='gregorian'
     # out3.time.encoding['units'] = 'days since 1980-01-01'
-    out3.to_netcdf(outname,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    out3.to_netcdf(outname,unlimited_dims='time',format='NETCDF4')
     # newtime = xr.Dataset({'time': datetime.datetime(2017, 12, 29)})
     ds = xr.Dataset({'time': ('time', [13877], attrs)})
     newtime=xr.decode_cf(ds)
@@ -36,7 +36,7 @@ for var in variables:
     # out3.time.encoding['units'] = 'days since 1980-01-01'
     outname = root_folder + var[:-5]+'7_obc.nc'
     print(outname)
-    out3.to_netcdf(outname,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    out3.to_netcdf(outname,unlimited_dims='time',format='NETCDF4')
     # newtime = xr.Dataset({'time': datetime.datetime(2018, 1, 3)})
     # ds = xr.Dataset({'time': ('time', [13872, 13877, 13882], attrs)})
     ds = xr.Dataset({'time': ('time', [13882], attrs)})
@@ -46,4 +46,4 @@ for var in variables:
     # out3.time.encoding['units'] = 'days since 1980-01-01'
     outname = root_folder + var[:-5]+'8_obc.nc'
     print(outname)
-    out3.to_netcdf(outname,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    out3.to_netcdf(outname,unlimited_dims='time',format='NETCDF4')

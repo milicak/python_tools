@@ -35,7 +35,7 @@ def get_coast_mask(mask_file):
 hgrid = xr.open_dataset('~/dataset/MOM6/NA12/ocean_hgrid.nc')
 coast_mask = get_coast_mask('/okyanus/users/milicak/dataset/MOM6/NA12/ocean_mask.nc')
 
-for year in range(2009,2018):
+for year in range(2020,2021):
 # for year in range(1997,2018):
     print(year)
     fname = '~/dataset/MOM6/NA12/glofas-era5_NA12_' + str(year) + '.nc'

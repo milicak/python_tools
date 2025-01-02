@@ -3,9 +3,18 @@ from matplotlib.path import Path as mpPath
 import glob
 from mpl_toolkits.basemap import Basemap
 import xarray
+import xarray as xr
+import numpy as np
+import numpy.ma as ma
+import glob
+import xarray as xr
+import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 root_folder = '~/dataset/MOM6/NA12/'
-year1 = 1996
+year1 = 2020
 fname = '~/dataset/GLOFAS/glofas-era5_' + str(year1) + '.nc'
 df = xr.open_dataset(fname)
 gr = xr.open_dataset('~/dataset/MOM6/NA12/ocean_hgrid.nc')
@@ -107,16 +116,28 @@ dy = ((df.lon * 0) + 1) * dlat * distance_1deg_equator
 glofas_area = dx * dy
 
 
-for year in range(1996,2018):
+for year in range(2023,2024):
     print(year)
-    files = [f'/okyanus/users/milicak/dataset/GLOFAS/glofas-era5_{year}.nc' for year
+    if year < 2023:
+        files = [f'/okyanus/users/milicak/dataset/GLOFAS/glofas-era5_{year}.nc' for year
              in [year-1, year, year+1]]
+    else:
+        files = [f'/okyanus/users/milicak/dataset/GLOFAS/glofas-era5_{year}.nc' for year
+             in [year-1, year]]
 
-    glofas = (
+    if year < 2023:
+        glofas = (
         xarray.open_mfdataset(files, combine='by_coords')
         .sel(time=slice(f'{year-1}-12-31 00:00:00', f'{year+1}-01-01 12:00:00'))
         .dis24.chunk({'time': -1})
-    )
+        )
+    else:
+        glofas = (
+        xarray.open_mfdataset(files, combine='by_coords')
+        .sel(time=slice(f'{year-1}-12-31 00:00:00', f'{year}-12-31 23:00:00'))
+        .dis24.chunk({'time': -1})
+        )
+
     glofas_kg = glofas * 1000.0 / glofas_area
     glofas_kg = glofas_kg*inside*points
     #glofas_kg = glofas_kg.rename({'dis24': 'runoff'})

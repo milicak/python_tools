@@ -27,10 +27,11 @@ variables = [
          ]
 
 
+variables = ['total_precipitation']
 
 # for year in range(2014, 2020):
 # for year in range(2019, 2020):
-yearind = 1995
+yearind = 2021
 for year in range(yearind, yearind+1):
     for var in variables:
         filename = root_folder + 'era5_' + var + '_' + str(year) + '.nc'

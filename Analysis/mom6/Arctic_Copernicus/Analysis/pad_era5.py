@@ -7,18 +7,18 @@ datadir = '/okyanus/users/milicak/dataset/ERA5/Arctic_Copernicus/subset/'
 outdir = '/okyanus/users/milicak/dataset/ERA5/Arctic_Copernicus/padded/'
 
 era5_dict = {
-            # 'ERA5_10m_u_component_of_wind':'u10',
-            # 'ERA5_10m_v_component_of_wind':'v10',
-            # 'ERA5_2m_temperature':'t2m',
-            # 'ERA5_surface_solar_radiation_downwards':'ssrd',
-            # 'ERA5_surface_thermal_radiation_downwards':'strd',
-            # 'ERA5_total_rain_rate':'trr',
+            'ERA5_10m_u_component_of_wind':'u10',
+            'ERA5_10m_v_component_of_wind':'v10',
+            'ERA5_2m_temperature':'t2m',
+            'ERA5_surface_solar_radiation_downwards':'ssrd',
+            'ERA5_surface_thermal_radiation_downwards':'strd',
+            'ERA5_total_rain_rate':'trr',
             'ERA5_mean_sea_level_pressure':'msl',
-            # 'ERA5_2m_specific_humidity':'huss'
+            'ERA5_2m_specific_humidity':'huss'
             }
 
 # for year in range(1996,2018):
-for year in range(2008,2009):
+for year in range(1996,1997):
     print(year)
     for f, f1 in era5_dict.items():
         print(f)

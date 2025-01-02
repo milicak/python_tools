@@ -39,14 +39,15 @@ era5_dict = {
             'ERA5_2m_specific_humidity':'huss'
             }
 
-df = xr.open_dataset('/okyanus/users/milicak/dataset/ERA5/global/ERA5_2m_temperature_2018.nc')
-lat_min = 42.0
-lat_max = 39.5
-lon_min = 25.5
+# df = xr.open_dataset('/okyanus/users/milicak/dataset/ERA5/global/ERA5_2m_temperature_2018.nc')
+lat_min = 42.5
+lat_max = 38.5
+lon_min = 24.5
 lon_max = 30.5
 
-year = 2021
+year = 2015
 years = range(year,2022)
+years = range(2015,2016)
 #subset
 era5dir = "/okyanus/users/milicak/dataset/ERA5/global/"
 subdir = '/okyanus/users/milicak/dataset/ERA5/TSS/subset/'

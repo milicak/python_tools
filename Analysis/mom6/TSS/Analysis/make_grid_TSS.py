@@ -63,9 +63,11 @@ def spherical_quad(lat,lon):
 
 # Grid dimension
 # x-direction
-Lp = 11000
+# Lp = 11000
+Lp = 2750
 # y-direction
-Mp = 6060
+# Mp = 6060
+Mp = 1515
 
 
 print('generating the projection')

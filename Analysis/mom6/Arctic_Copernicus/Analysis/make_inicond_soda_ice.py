@@ -57,7 +57,7 @@ hice = np.copy(dr_out2)
 time = 17.5
 
 # Create a mosaic file
-fout = mom_dir + 'SODA_seaice_IC.nc'
+fout = mom_dir + 'Glorys_seaice_IC.nc'
 rg = scipy.io.netcdf_file(fout,'w')
 # Dimensions
 rg.createDimension('time', None)

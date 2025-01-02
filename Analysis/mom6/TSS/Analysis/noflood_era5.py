@@ -145,12 +145,14 @@ def main():
     padded_dir = '/okyanus/users/milicak/dataset/ERA5/TSS/padded/'
     flood_dir = '/okyanus/users/milicak/dataset/ERA5/TSS/flooded/'
     keys_list=list(era5_dict)
-    for era5_year in range(2020,2021):
+    for era5_year in range(2015,2021):
         print(era5_year)
         for f in era5_dict.keys():
+            print(f)
             reuse_weights=False
             era5_file = f"{padded_dir}/{f}_{era5_year}.nc"
             outfile = f"{flood_dir}/{f}_{era5_year}.nc"
+            print(outfile)
             reuse_weights=True
             if f != keys_list[0]:
                 reuse_weights=True

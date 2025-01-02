@@ -17,7 +17,7 @@ era5_dict = {
             'ERA5_2m_specific_humidity':'huss'
             }
 
-for year in range(1997,1998):
+for year in range(2021,2022):
     print(year)
     for f, f1 in era5_dict.items():
         print(f)

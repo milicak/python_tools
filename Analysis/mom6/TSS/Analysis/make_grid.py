@@ -129,7 +129,7 @@ area = dx[:-1,:]*dy[:,:-1]
 # area = area[:-1,:-1]
 
 # Create a mosaic file
-rg = scipy.io.netcdf_file('/okyanus/users/milicak/dataset/MOM6/TSS/ocean_hgrid.nc','w')
+rg = scipy.io.netcdf_file('ocean_hgrid_coarse.nc','w')
 # Dimensions
 rg.createDimension('nx',sni)
 rg.createDimension('nxp1',sni+1)

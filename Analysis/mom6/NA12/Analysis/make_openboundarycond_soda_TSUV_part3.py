@@ -11,7 +11,7 @@ import matplotlib as mpl
 from mpl_toolkits.basemap import Basemap
 from matplotlib.colors import LinearSegmentedColormap
 
-cd ('/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/')
+cd ('/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/tmp/')
 
 params=[]
 params.append({'suffix':'_segment_002','dim0':2,'tr_in':'tracers_north.nc','tr_out':'obc_ts_north.nc','uv_in':'uv_north.nc','uv_out':'obc_uv_north.nc','ssh_in':'ssh_north.nc','ssh_out':'obc_ssh_north.nc'})

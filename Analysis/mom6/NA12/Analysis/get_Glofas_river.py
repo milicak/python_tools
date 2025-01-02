@@ -8,7 +8,7 @@ c.retrieve(
         'variable': 'river_discharge_in_the_last_24_hours',
         'format': 'grib',
         'system_version': 'version_3_1',
-        'hyear': '2015',
+        'hyear': '2023',
         'hmonth': [
             'april', 'august', 'december',
             'february', 'january', 'july',
@@ -35,6 +35,6 @@ c.retrieve(
         # ],
         'product_type': 'consolidated',
     },
-    'glofas-era5_2015.grib')
+    'glofas-era5_2023.grib')
 
 # cdo -f nc copy glofas-era5_1995.grib glofas-era5_1995.nc

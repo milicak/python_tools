@@ -9,18 +9,22 @@ variables = [
          ]
 
 variables = [
-             'snowfall'
+             'snowfall',
              'surface_pressure',
              'surface_solar_radiation_downwards',
              'surface_thermal_radiation_downwards',
              'convective_rain_rate','large_scale_rain_rate',
              'total_cloud_cover','total_precipitation'
          ]
-         #
+variables = [
+             'snowfall',
+             'surface_pressure',
+         ]
+
 root_folder  = '/okyanus/users/milicak/dataset/ERA5/global/'
 
 # for year in range(1997,2003):
-years = 2018
+years = 1992
 for year in range(years,years+1):
     for var in variables:
         print(var)

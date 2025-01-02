@@ -6,20 +6,7 @@ import xesmf as xe
 import xesmf
 import glob
 import xarray as xr
-import scipy.io
-from scipy.io import savemat
-from scipy.io import loadmat
-# from mpl_toolkits.basemap import Basemap, shiftgrid
-import matplotlib.colors as colors
-from scipy.signal import medfilt2d
-import netCDF4
 import matplotlib.pyplot as plt
-from scipy.interpolate import griddata
-from matplotlib.path import Path
-#for interpolation
-from scipy.spatial import cKDTree
-from HCtFlood.kara import flood_kara
-# from PyCNAL_regridding import *
 
 
 def open_grid(path,decode_times=False):
@@ -40,8 +27,8 @@ def open_grid(path,decode_times=False):
 
 def apply_rotation(u,v,angle_dx,time_slice=slice(0)):
     """Rotate from model space to easterly coordinates"""
-    # deg_rad=np.pi/180.
-    deg_rad=1.0
+    deg_rad=np.pi/180.
+    # deg_rad=1.0
 
     if time_slice is not None:
         t=u.time.isel(time=time_slice)
@@ -65,8 +52,8 @@ def apply_rotation(u,v,angle_dx,time_slice=slice(0)):
 
 def apply_rotation_transpose(ue,vn,angle_dx,time_slice=slice(0)):
     """Rotate from easterly coordinates to model space"""
-    # deg_rad=np.pi/180.
-    deg_rad=1.0
+    deg_rad=np.pi/180.
+    # deg_rad=1.0
 
     if time_slice is not None:
         t=ue.time.isel(time=time_slice)
@@ -95,7 +82,7 @@ def velocity_at_corners(ds_u,ds_v):
     ds_uvq = xr.Dataset({'u':u_q,'v':v_q},coords={'time':ds_u.time,'lon':parent_grid['q'].x,'lat':parent_grid['q'].y,'angle_dx':parent_grid['q'].angle_dx})
     return ds_uvq
 
-root_folder = '/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/'
+root_folder = '/okyanus/users/milicak/dataset/SODA3_12_21/NA12_OBC/tmp/'
 # fname1 = 'soda3.12.2_5dy_ocean_reg_1980_01_03.nc'
 # df = xr.open_dataset(root_folder + fname1)
 mom_dir = '/okyanus/users/milicak/dataset/MOM6/NA12/'
@@ -151,7 +138,7 @@ for idx, fname in enumerate(ls1):
     ds_tr_north = xr.Dataset({'temp':temp_north,'salt':salt_north})
     ds_tr_north.time.encoding['calendar']='gregorian'
     fnam=root_folder + 'tracers_north_' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_tr_north.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    ds_tr_north.to_netcdf(fnam,unlimited_dims='time',format='NETCDF4')
 
     temp_south = regrid_south_tr(dft['temp'])
     salt_south = regrid_south_tr(dft['salt'])
@@ -160,19 +147,19 @@ for idx, fname in enumerate(ls1):
     ds_tr_south = xr.Dataset({'temp':temp_south,'salt':salt_south})
     ds_tr_south.time.encoding['calendar']='gregorian'
     fnam=root_folder + 'tracers_south_' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_tr_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    ds_tr_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF4')
 
     # interpolate ssh
     ssh_north = regrid_north_tr(dft['ssh'])
     ds_ssh_north = xr.Dataset({'ssh':ssh_north})
     ds_ssh_north.time.encoding['calendar'] = "gregorian"
     fnam=root_folder + 'ssh_north' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_ssh_north.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    ds_ssh_north.to_netcdf(fnam,unlimited_dims='time',format='NETCDF4')
     ssh_south = regrid_south_tr(dft['ssh'])
     ds_ssh_south = xr.Dataset({'ssh':ssh_south})
     ds_ssh_south.time.encoding['calendar'] = "gregorian"
     fnam=root_folder + 'ssh_south' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_ssh_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    ds_ssh_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF4')
     # interpolate true u and v velocities
     u_north_r = regrid_north_uv(dfuv['u'])
     v_north_r = regrid_north_uv(dfuv['v'])
@@ -186,7 +173,7 @@ for idx, fname in enumerate(ls1):
     ds_uv_north = ds_uv_north.rename({'i':'locations'})
     ds_uv_north.time.encoding['calendar']='gregorian'
     fnam=root_folder + 'uv_north' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_uv_north.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    ds_uv_north.to_netcdf(fnam,unlimited_dims='time',format='NETCDF4')
 
     u_south,v_south=apply_rotation_transpose(u_south_r,v_south_r,ds_regional.angle_dx.isel(nyp=ds_regional.nyp[0]),time_slice=None)
     u_south = u_south.fillna(0)
@@ -195,7 +182,7 @@ for idx, fname in enumerate(ls1):
     ds_uv_south = ds_uv_south.rename({'i':'locations'})
     ds_uv_south.time.encoding['calendar']='gregorian'
     fnam=root_folder + 'uv_south' + np.str(idx).zfill(4)+ '_obc.nc'
-    ds_uv_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF3_CLASSIC')
+    ds_uv_south.to_netcdf(fnam,unlimited_dims='time',format='NETCDF4')
 
 
 
